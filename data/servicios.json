@@ -1,0 +1,337 @@
+{
+  "servicios": {
+    "micropigmentacion_y_microblading": [
+      {
+        "id": "micro_cejas",
+        "name": "Cejas (Pelo a pelo / Sombreadas / Combinada)",
+        "price": 350.0
+      },
+      { "id": "micro_ojos", "name": "Ojos", "price": 350.0 },
+      { "id": "micro_labios", "name": "Labios", "price": 350.0 },
+      { "id": "micro_prueba", "name": "Prueba de sensibilidad", "price": 25.0 }
+    ],
+    "diseno_de_la_mirada": [
+      { "id": "mirada_diseno_cejas", "name": "Diseño de cejas", "price": 25.0 },
+      {
+        "id": "mirada_mantenimiento_3s",
+        "name": "Mantenimiento del diseño (hasta 3 semanas)",
+        "price": 15.0
+      },
+      {
+        "id": "mirada_cejas_color",
+        "name": "Diseño de cejas con color",
+        "price": 32.0
+      },
+      {
+        "id": "mirada_cejas_henna",
+        "name": "Diseño de cejas + henna",
+        "price": 39.0
+      },
+      {
+        "id": "mirada_laminado_cejas",
+        "name": "Laminado de cejas",
+        "price": 50.0
+      },
+      {
+        "id": "mirada_lifting_pestañas",
+        "name": "Lifting de pestañas + tinte",
+        "price": 50.0
+      },
+      {
+        "id": "mirada_cejas_masculinas",
+        "name": "Cejas masculinas",
+        "price": 25.0
+      },
+      {
+        "id": "mirada_mant_masculinas",
+        "name": "Mantenimiento cejas masculinas",
+        "price": 15.0
+      },
+      { "id": "mirada_tinte_cejas", "name": "Tinte de cejas", "price": 10.0 }
+    ],
+    "depilaciones": [
+      {
+        "id": "depil_piernas_enteras",
+        "name": "Piernas enteras",
+        "price": 25.0
+      },
+      { "id": "depil_medias_piernas", "name": "Medias piernas", "price": 15.0 },
+      { "id": "depil_brazos", "name": "Brazos", "price": 13.0 },
+      { "id": "depil_espalda", "name": "Espalda", "price": 13.0 },
+      { "id": "depil_axilas", "name": "Axilas", "price": 12.0 },
+      { "id": "depil_ingles", "name": "Ingles", "price": 12.0 },
+      {
+        "id": "depil_ingles_brasilena",
+        "name": "Ingles brasileña",
+        "price": 15.0
+      },
+      {
+        "id": "depil_ingles_integrales",
+        "name": "Ingles integrales",
+        "price": 20.0
+      },
+      { "id": "depil_labio_superior", "name": "Labio superior", "price": 5.0 },
+      { "id": "depil_nariz", "name": "Nariz", "price": 3.0 }
+    ],
+    "maquillaje": [
+      { "id": "maq_invitada", "name": "Maquillaje invitada", "price": 45.0 },
+      { "id": "maq_eventual", "name": "Maquillaje eventual", "price": 40.0 },
+      { "id": "maq_novia", "name": "Maquillaje novia", "price": 80.0 },
+      { "id": "maq_prueba_novia", "name": "Prueba novia", "price": 40.0 }
+    ],
+    "tratamientos_faciales": [
+      {
+        "id": "facial_purification",
+        "name": "Limpieza facial Purification",
+        "price": 60.0,
+        "duration_or_sessions": "1h",
+        "description": "Mediante esta limpieza purificante prepararemos tu piel para recibir tu tratamiento ideal."
+      },
+      {
+        "id": "facial_pele_pole",
+        "name": "Pele Pole",
+        "price": 70.0,
+        "duration_or_sessions": "1h",
+        "description": "Purificante e hidratante. Apto para todo tipo de pieles."
+      },
+      {
+        "id": "facial_calm",
+        "name": "Tratamiento Calm",
+        "price": 70.0,
+        "duration_or_sessions": "1h",
+        "description": "Pieles sensibles. Calmante, hidratante y reparador."
+      },
+      {
+        "id": "facial_balance",
+        "name": "Tratamiento Balance",
+        "price": 70.0,
+        "duration_or_sessions": "1h",
+        "description": "Pieles mixtas y grasas. Reequilibrante."
+      },
+      {
+        "id": "facial_rejuvenate",
+        "name": "Tratamiento Rejuvenate",
+        "price": 80.0,
+        "duration_or_sessions": "1h20'",
+        "description": "Antiedad y regenerador, con maderoterapia facial."
+      },
+      {
+        "id": "facial_radiance_glow",
+        "name": "Tratamiento Radiance Glow",
+        "price": 80.0,
+        "duration_or_sessions": "1h20'",
+        "description": "Luminosidad, unificación del tono y renovación celular."
+      },
+      {
+        "id": "facial_withe_ligth",
+        "name": "Tratamiento Withe Ligth",
+        "price": 80.0,
+        "duration_or_sessions": "1h20'",
+        "description": "Despigmentante e iluminador."
+      }
+    ],
+    "tratamientos_corporales": [
+      {
+        "id": "corp_relajante_1h",
+        "name": "Masaje relajante",
+        "price": 55.0,
+        "duration_or_sessions": "1h"
+      },
+      {
+        "id": "corp_localizado_30m",
+        "name": "Masaje relajante localizado",
+        "price": 40.0,
+        "duration_or_sessions": "30'"
+      },
+      {
+        "id": "corp_peeling_masaje",
+        "name": "Peeling + masaje",
+        "price": 65.0,
+        "duration_or_sessions": "1h",
+        "description": "Exfoliación completa y masaje hidratante."
+      },
+      {
+        "id": "corp_spa",
+        "name": "Tratamiento spa",
+        "price": 90.0,
+        "duration_or_sessions": "1h30'",
+        "description": "Exfoliación, envoltura hidratante y masaje relajante."
+      },
+      {
+        "id": "corp_confort_legs",
+        "name": "Confort Legs",
+        "price": 50.0,
+        "duration_or_sessions": "45'",
+        "description": "Tratamiento indicado para devolver el frescor, bienestar y ligereza a tus piernas. Maderoterapia."
+      }
+    ],
+    "rituales": [
+      {
+        "id": "rit_reina_egipto",
+        "name": "Reina de Egipto",
+        "price": 140.0,
+        "duration_or_sessions": "1h45'",
+        "description": "Rostro y cuerpo. Para sentirte como una reina. Un ritual de belleza inspirado en la reina Cleopatra con fragancias exóticas, para rejuvenecer tu piel devolviendo tu belleza femenina, reforzando tu autoestima y tu fuerza interior."
+      },
+      {
+        "id": "rit_oasis_serenidad",
+        "name": "Oasis de serenidad",
+        "price": 140.0,
+        "duration_or_sessions": "1h45'",
+        "description": "Rostro y cuerpo. Para una relajación profunda y un momento de relax total con nuestra línea anti estrés."
+      },
+      {
+        "id": "rit_holistic_armony",
+        "name": "Holistic Armony",
+        "price": 95.0,
+        "duration_or_sessions": "1h30'",
+        "description": "Rostro y cuerpo. Ritual exclusivo diseñado para restaurar el equilibrio y la armonía entre cuerpo y mente. Proporcionando una profunda sensación de paz y bienestar."
+      },
+      {
+        "id": "rit_cura_alma",
+        "name": "Ritual Cura pa mi alma",
+        "price": 85.0,
+        "duration_or_sessions": "1h20'",
+        "description": "Rostro y cuerpo. Un ritual diseñado para desconectar del exterior, reconectar contigo misma y restaurar tu bienestar."
+      }
+    ],
+    "silueta": [
+      {
+        "id": "silu_body_sculptor",
+        "name": "Body sculptor",
+        "price": 90.0,
+        "duration_or_sessions": "1h30'",
+        "description": "Tratamiento indicado para moldear y reducir la silueta. Exfoliación, envoltura de algas reductoras y anticelulíticas, masaje manual y maderoterapia."
+      },
+      {
+        "id": "silu_maderoterapia",
+        "name": "Maderoterapia",
+        "price": 65.0,
+        "duration_or_sessions": "50'"
+      },
+      {
+        "id": "silu_drenaje_linfatico",
+        "name": "Drenaje linfático",
+        "price": 40.0,
+        "duration_or_sessions": "30'-90'",
+        "description": "Precio base mínimo indicado en la carta."
+      }
+    ],
+    "manicura": [
+      { "id": "mani_clasica", "name": "Manicura clásica", "price": 25.0 },
+      {
+        "id": "mani_semipermanente",
+        "name": "Manicura semipermanente",
+        "price": 30.0
+      },
+      {
+        "id": "mani_spa",
+        "name": "Manicura Spa",
+        "price": 15.0,
+        "description": "Exfoliación, parafina y masaje."
+      },
+      { "id": "mani_masculina", "name": "Manicura masculina", "price": 15.0 }
+    ],
+    "pedicura": [
+      { "id": "pedi_clasica", "name": "Pedicura clásica", "price": 35.0 },
+      {
+        "id": "pedi_semipermanente",
+        "name": "Pedicura semipermanente",
+        "price": 40.0
+      },
+      {
+        "id": "pedi_spa",
+        "name": "Pedicura spa",
+        "price": 45.0,
+        "description": "Exfoliación, tratamiento para las durezas y masaje."
+      },
+      {
+        "id": "pedi_spa_esm_clasico",
+        "name": "Pedicura spa + esmaltado clásico",
+        "price": 45.0
+      },
+      {
+        "id": "pedi_spa_esm_semi",
+        "name": "Pedicura spa + esmaltado semipermanente",
+        "price": 55.0
+      }
+    ],
+    "packs": [
+      {
+        "id": "pack_novias",
+        "name": "Novias",
+        "price": 200.0,
+        "description": "Incluye: tratamiento facial, masaje relajante, diseño de cejas, manicura y pedicura semipermanente."
+      }
+    ],
+    "bonos": [
+      {
+        "id": "bono_body_sculptor_5",
+        "name": "Bono Body Sculptor",
+        "price": 350.0,
+        "duration_or_sessions": "5 sesiones"
+      },
+      {
+        "id": "bono_body_sculptor_10",
+        "name": "Bono Body Sculptor",
+        "price": 650.0,
+        "duration_or_sessions": "10 sesiones"
+      },
+      {
+        "id": "bono_maderoterapia_5",
+        "name": "Bono Maderoterapia",
+        "price": 259.0,
+        "duration_or_sessions": "5 sesiones"
+      },
+      {
+        "id": "bono_maderoterapia_10",
+        "name": "Bono Maderoterapia",
+        "price": 499.0,
+        "duration_or_sessions": "10 sesiones"
+      },
+      {
+        "id": "bono_masaje_relajante_5",
+        "name": "Bono Masaje relajante",
+        "price": 210.0,
+        "duration_or_sessions": "5 sesiones"
+      },
+      {
+        "id": "bono_faciales_5",
+        "name": "Bono Faciales",
+        "price": 350.0,
+        "duration_or_sessions": "5 sesiones"
+      },
+      {
+        "id": "bono_drenaje_5",
+        "name": "Bono Drenaje linfático",
+        "price": 200.0,
+        "duration_or_sessions": "5 sesiones"
+      },
+      {
+        "id": "bono_drenaje_10",
+        "name": "Bono Drenaje linfático",
+        "price": 350.0,
+        "duration_or_sessions": "10 sesiones"
+      }
+    ],
+    "formaciones": [
+      {
+        "id": "form_diseno_cejas",
+        "name": "Formación: Diseño de cejas",
+        "price": 370.0
+      },
+      {
+        "id": "form_auto_maquillaje",
+        "name": "Formación: Auto maquillaje",
+        "price": 90.0,
+        "description": "Día, noche, eventos..."
+      },
+      {
+        "id": "form_auto_maquillaje_grupo",
+        "name": "Formación: Auto maquillaje en grupo",
+        "price": 70.0,
+        "description": "Grupos reducidos. Precio por persona."
+      }
+    ]
+  }
+}

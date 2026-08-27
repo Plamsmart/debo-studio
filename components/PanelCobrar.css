@@ -1,0 +1,130 @@
+.panel-cobrar__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-width: 380px;
+  font-family: 'Georgia', 'Times New Roman', serif;
+}
+
+.panel-cobrar__label {
+  font-size: 0.85rem;
+  color: #8a7a6b;
+  margin-top: 0.8rem;
+}
+
+.panel-cobrar__input {
+  padding: 0.7rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid #f0e8dc;
+  background: #faf6f0;
+  font-family: inherit;
+  font-size: 1rem;
+  color: #3a2e26;
+}
+
+.panel-cobrar__error {
+  color: #b5564a;
+  font-size: 0.85rem;
+  margin-top: 0.6rem;
+}
+
+.panel-cobrar__btn {
+  margin-top: 1.6rem;
+  padding: 0.9rem;
+  border-radius: 8px;
+  border: none;
+  background: #b08d57;
+  color: #fff;
+  font-family: inherit;
+  font-size: 1.05rem;
+  cursor: pointer;
+}
+
+.panel-cobrar__btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Pantalla de QR — pensada para verse grande en una tablet en el mostrador */
+.panel-cobrar__qr {
+  text-align: center;
+  max-width: 420px;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: #3a2e26;
+}
+
+.panel-cobrar__qr h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.panel-cobrar__concepto {
+  color: #8a7a6b;
+  margin-bottom: 1.6rem;
+  font-size: 1.05rem;
+}
+
+.panel-cobrar__qr-img {
+  width: 260px;
+  height: 260px;
+  border-radius: 12px;
+  border: 1px solid #f0e8dc;
+  padding: 1rem;
+  background: #fff;
+}
+
+.panel-cobrar__esperando {
+  margin-top: 1.4rem;
+  color: #b08d57;
+  font-style: italic;
+}
+
+.panel-cobrar__link-alt {
+  display: block;
+  margin-top: 0.8rem;
+  font-size: 0.85rem;
+  color: #8a7a6b;
+}
+
+.panel-cobrar__btn-cancelar {
+  margin-top: 2rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  border: 1px solid #f0e8dc;
+  background: #fff;
+  color: #8a7a6b;
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+/* Pantalla de confirmación de pago */
+.panel-cobrar__pagado {
+  text-align: center;
+  max-width: 420px;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: #3a2e26;
+}
+
+.panel-cobrar__check {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #6b8e5a;
+  color: #fff;
+  font-size: 2.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.4rem;
+}
+
+.panel-cobrar__pagado h2 {
+  font-size: 1.6rem;
+  margin-bottom: 0.4rem;
+}
+
+.panel-cobrar__pagado p {
+  color: #8a7a6b;
+  margin-bottom: 1.8rem;
+}

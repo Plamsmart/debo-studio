@@ -1,0 +1,133 @@
+/* Paleta basada en la identidad real de Estudio Débora Pereira:
+   crema cálido de fondo, dorado como acento, texto marrón cálido oscuro */
+.selector-citas {
+  --dp-crema: #faf6f0;
+  --dp-crema-oscuro: #f0e8dc;
+  --dp-dorado: #b08d57;
+  --dp-dorado-suave: #d9c4a3;
+  --dp-texto: #3a2e26;
+  --dp-texto-suave: #8a7a6b;
+
+  font-family: "Georgia", "Times New Roman", serif;
+  color: var(--dp-texto);
+  max-width: 640px;
+}
+
+.selector-citas__seccion {
+  margin-bottom: 2rem;
+}
+
+.selector-citas__titulo {
+  font-size: 1.05rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.9rem;
+  color: var(--dp-texto);
+}
+
+/* Tira horizontal de días */
+.selector-citas__dias {
+  display: flex;
+  gap: 0.6rem;
+  overflow-x: auto;
+  padding-bottom: 0.4rem;
+  scrollbar-width: thin;
+}
+
+.selector-citas__dia-btn {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 4.2rem;
+  height: 4.8rem;
+  border-radius: 12px;
+  border: 1px solid var(--dp-crema-oscuro);
+  background: var(--dp-crema);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  color: var(--dp-texto);
+}
+
+.selector-citas__dia-btn:hover {
+  border-color: var(--dp-dorado-suave);
+}
+
+.selector-citas__dia-btn:focus-visible {
+  outline: 2px solid var(--dp-dorado);
+  outline-offset: 2px;
+}
+
+.selector-citas__dia-btn--activo {
+  background: var(--dp-dorado);
+  border-color: var(--dp-dorado);
+  color: #fff;
+}
+
+.selector-citas__dia-nombre {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.75;
+}
+
+.selector-citas__dia-numero {
+  font-size: 1.3rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.selector-citas__dia-mes {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+/* Grid de horas */
+.selector-citas__horas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(4.6rem, 1fr));
+  gap: 0.6rem;
+}
+
+.selector-citas__hora-btn {
+  padding: 0.6rem 0.4rem;
+  border-radius: 10px;
+  border: 1px solid var(--dp-crema-oscuro);
+  background: var(--dp-crema);
+  color: var(--dp-texto);
+  font-family: inherit;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.selector-citas__hora-btn:hover {
+  border-color: var(--dp-dorado-suave);
+}
+
+.selector-citas__hora-btn:focus-visible {
+  outline: 2px solid var(--dp-dorado);
+  outline-offset: 2px;
+}
+
+.selector-citas__hora-btn--activo {
+  background: var(--dp-dorado);
+  border-color: var(--dp-dorado);
+  color: #fff;
+}
+
+.selector-citas__estado {
+  color: var(--dp-texto-suave);
+  font-size: 0.92rem;
+  font-style: italic;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .selector-citas__dia-btn,
+  .selector-citas__hora-btn {
+    transition: none;
+  }
+}

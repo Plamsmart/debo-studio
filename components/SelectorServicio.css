@@ -1,0 +1,115 @@
+.selector-servicio {
+  --dp-crema: #faf6f0;
+  --dp-crema-oscuro: #f0e8dc;
+  --dp-dorado: #b08d57;
+  --dp-dorado-suave: #d9c4a3;
+  --dp-texto: #3a2e26;
+  --dp-texto-suave: #8a7a6b;
+
+  font-family: "Georgia", "Times New Roman", serif;
+  color: var(--dp-texto);
+  max-width: 640px;
+}
+
+.selector-servicio__grupo {
+  margin-bottom: 1.6rem;
+}
+
+.selector-servicio__categoria {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--dp-texto-suave);
+  margin-bottom: 0.7rem;
+}
+
+.selector-servicio__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.selector-servicio__tarjeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  text-align: left;
+  padding: 0.9rem 1.1rem;
+  border-radius: 12px;
+  border: 1px solid var(--dp-crema-oscuro);
+  background: var(--dp-crema);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  color: var(--dp-texto);
+}
+
+.selector-servicio__tarjeta:hover {
+  border-color: var(--dp-dorado-suave);
+}
+
+.selector-servicio__tarjeta:focus-visible {
+  outline: 2px solid var(--dp-dorado);
+  outline-offset: 2px;
+}
+
+.selector-servicio__tarjeta--activo {
+  background: var(--dp-dorado);
+  border-color: var(--dp-dorado);
+  color: #fff;
+}
+
+.selector-servicio__tarjeta--activo .selector-servicio__descripcion,
+.selector-servicio__tarjeta--activo .selector-servicio__duracion {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.selector-servicio__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.selector-servicio__nombre {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.selector-servicio__descripcion {
+  font-size: 0.82rem;
+  color: var(--dp-texto-suave);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selector-servicio__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+  flex-shrink: 0;
+}
+
+.selector-servicio__duracion {
+  font-size: 0.78rem;
+  color: var(--dp-texto-suave);
+}
+
+.selector-servicio__precio {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.selector-servicio__estado {
+  color: var(--dp-texto-suave);
+  font-style: italic;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .selector-servicio__tarjeta {
+    transition: none;
+  }
+}

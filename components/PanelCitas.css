@@ -1,0 +1,160 @@
+.panel-citas-wrap {
+  --dp-crema: #faf6f0;
+  --dp-crema-oscuro: #f0e8dc;
+  --dp-dorado: #b08d57;
+  --dp-verde: #6b8e5a;
+  --dp-rojo: #b5564a;
+  --dp-texto: #3a2e26;
+  --dp-texto-suave: #8a7a6b;
+
+  font-family: 'Georgia', 'Times New Roman', serif;
+}
+
+.panel-citas__pestanas {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 1.4rem;
+}
+
+.panel-citas__pestana {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  border: 1px solid var(--dp-crema-oscuro);
+  background: #fff;
+  color: var(--dp-texto-suave);
+  font-family: inherit;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.panel-citas__pestana:hover {
+  border-color: var(--dp-dorado-suave, #d9c4a3);
+}
+
+.panel-citas__pestana--activa {
+  background: var(--dp-dorado);
+  border-color: var(--dp-dorado);
+  color: #fff;
+}
+
+.panel-citas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  max-width: 760px;
+}
+
+.panel-citas__tarjeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 1rem 1.3rem;
+  border-radius: 12px;
+  border: 1px solid var(--dp-crema-oscuro);
+  background: var(--dp-crema);
+  flex-wrap: wrap;
+}
+
+.panel-citas__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  color: var(--dp-texto);
+}
+
+.panel-citas__linea-superior {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.panel-citas__servicio {
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.panel-citas__badge {
+  font-size: 0.72rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #fff;
+}
+
+.panel-citas__badge--pendiente {
+  background: var(--dp-dorado);
+}
+
+.panel-citas__badge--confirmada {
+  background: var(--dp-verde);
+}
+
+.panel-citas__badge--cancelada {
+  background: var(--dp-rojo);
+}
+
+.panel-citas__badge--completada {
+  background: #6b7f8e;
+}
+
+.panel-citas__badge--no_asistio {
+  background: #8a7a6b;
+}
+
+.panel-citas__fecha {
+  font-size: 0.9rem;
+  color: var(--dp-texto-suave);
+}
+
+.panel-citas__cliente {
+  font-size: 0.85rem;
+  color: var(--dp-texto-suave);
+}
+
+.panel-citas__precio {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-top: 0.15rem;
+}
+
+.panel-citas__acciones {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.panel-citas__btn {
+  padding: 0.55rem 1rem;
+  border-radius: 8px;
+  border: none;
+  font-family: inherit;
+  font-size: 0.88rem;
+  cursor: pointer;
+  color: #fff;
+  transition: opacity 0.15s ease;
+}
+
+.panel-citas__btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.panel-citas__btn--confirmar {
+  background: var(--dp-verde);
+}
+
+.panel-citas__btn--cancelar {
+  background: var(--dp-rojo);
+}
+
+.panel-citas__btn:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.panel-citas__vacio {
+  color: var(--dp-texto-suave);
+  font-style: italic;
+}

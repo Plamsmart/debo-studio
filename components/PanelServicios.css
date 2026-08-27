@@ -1,0 +1,172 @@
+.panel-servicios {
+  --dp-crema: #faf6f0;
+  --dp-crema-oscuro: #f0e8dc;
+  --dp-dorado: #b08d57;
+  --dp-verde: #6b8e5a;
+  --dp-texto: #3a2e26;
+  --dp-texto-suave: #8a7a6b;
+
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: var(--dp-texto);
+  max-width: 820px;
+}
+
+.panel-servicios__btn-nuevo {
+  padding: 0.6rem 1.1rem;
+  border-radius: 8px;
+  border: 1px solid var(--dp-dorado);
+  background: #fff;
+  color: var(--dp-dorado);
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-bottom: 1.4rem;
+}
+
+.panel-servicios__btn-nuevo:hover {
+  background: var(--dp-dorado);
+  color: #fff;
+}
+
+.panel-servicios__form-nuevo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background: var(--dp-crema);
+  border: 1px solid var(--dp-crema-oscuro);
+  margin-bottom: 1.6rem;
+  align-items: center;
+}
+
+.panel-servicios__input {
+  padding: 0.5rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid var(--dp-crema-oscuro);
+  background: #fff;
+  font-family: inherit;
+  font-size: 0.88rem;
+  color: var(--dp-texto);
+  flex: 1 1 160px;
+}
+
+.panel-servicios__input--ancho {
+  flex: 1 1 100%;
+}
+
+.panel-servicios__input--corto {
+  flex: 0 1 110px;
+}
+
+.panel-servicios__grupo {
+  margin-bottom: 1.6rem;
+}
+
+.panel-servicios__categoria {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--dp-texto-suave);
+  margin-bottom: 0.6rem;
+}
+
+.panel-servicios__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.panel-servicios__fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: var(--dp-crema);
+  border: 1px solid var(--dp-crema-oscuro);
+  flex-wrap: wrap;
+}
+
+.panel-servicios__fila--inactivo {
+  opacity: 0.55;
+}
+
+.panel-servicios__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.panel-servicios__nombre {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.panel-servicios__meta {
+  font-size: 0.8rem;
+  color: var(--dp-texto-suave);
+}
+
+.panel-servicios__botones {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.panel-servicios__btn-editar,
+.panel-servicios__btn-toggle {
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid var(--dp-crema-oscuro);
+  background: #fff;
+  color: var(--dp-texto);
+  font-family: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.panel-servicios__btn-toggle--activo {
+  border-color: var(--dp-verde);
+  color: var(--dp-verde);
+}
+
+.panel-servicios__form-edicion {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  width: 100%;
+}
+
+.panel-servicios__acciones-edicion {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.panel-servicios__btn-guardar {
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  border: none;
+  background: var(--dp-dorado);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.panel-servicios__btn-guardar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.panel-servicios__btn-cancelar {
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid var(--dp-crema-oscuro);
+  background: #fff;
+  color: var(--dp-texto-suave);
+  font-family: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}

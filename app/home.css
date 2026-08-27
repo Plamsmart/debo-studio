@@ -1,0 +1,649 @@
+.pagina-inicio {
+  --crema: #fbf7f1;
+  --crema-oscuro: #f1e7d8;
+  --dorado-claro: #e8d4b5;
+  --dorado: #b8813e;
+  --dorado-oscuro: #96692f;
+  --texto: #4a3b2e;
+  --texto-suave: #8c7a66;
+  --blanco: #ffffff;
+
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Jost', 'Work Sans', sans-serif;
+
+  background: var(--crema);
+  color: var(--texto);
+  font-family: var(--font-body);
+}
+
+.pagina-inicio a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ===== Utilidades ===== */
+.seccion__eyebrow,
+.hero__eyebrow {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--dorado-oscuro);
+  margin-bottom: 0.8rem;
+}
+
+.seccion__titulo {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  font-weight: 500;
+  margin: 0 0 2.4rem 0;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.85rem 1.8rem;
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn--dorado {
+  background: var(--dorado);
+  color: #fff;
+  border: 1px solid var(--dorado);
+}
+
+.btn--dorado:hover {
+  background: var(--dorado-oscuro);
+  border-color: var(--dorado-oscuro);
+}
+
+.btn--outline {
+  border: 1px solid var(--dorado);
+  color: var(--dorado-oscuro);
+}
+
+.btn--outline:hover {
+  background: var(--dorado-claro);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--dorado-oscuro);
+  outline-offset: 3px;
+}
+
+.hero .btn--outline {
+  border-color: var(--hero-dorado-claro);
+  color: var(--hero-dorado-claro);
+}
+
+.hero .btn--outline:hover {
+  background: var(--hero-dorado-claro);
+  color: var(--hero-fondo);
+}
+
+/* ===== Header =====
+   Dos estados: transparente con texto claro (mientras está sobre la
+   "zona oscura" del hero+filosofía) y sólido con blur (al pasarla). */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.7rem 4vw;
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.header--solido {
+  background: rgba(251, 247, 241, 0.92);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--crema-oscuro);
+}
+
+.header__marca {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-right: auto;
+}
+
+.header__marca img {
+  width: 38px;
+  height: auto;
+}
+
+.header__nombre {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  letter-spacing: 0.02em;
+  color: #f7f0e4;
+  transition: color 0.25s ease;
+}
+
+.header--solido .header__nombre {
+  color: var(--texto);
+}
+
+.header__nav {
+  display: flex;
+  gap: 1.9rem;
+  font-size: 1rem;
+}
+
+.header__nav a {
+  color: #e7dcc9;
+  transition: color 0.15s ease;
+}
+
+.header--solido .header__nav a {
+  color: var(--texto);
+}
+
+.header__nav a:hover {
+  color: var(--dorado-oscuro);
+}
+
+.header__cta {
+  padding: 0.65rem 1.5rem;
+  border-radius: 999px;
+  background: var(--dorado);
+  color: #fff;
+  font-size: 0.92rem;
+  transition: background 0.15s ease;
+}
+
+.header__cta:hover {
+  background: var(--dorado-oscuro);
+}
+
+@media (max-width: 780px) {
+  .header__nav,
+  .header__cta {
+    display: none;
+  }
+}
+
+/* ===== Nav móvil ===== */
+.nav-movil {
+  display: none;
+}
+
+@media (max-width: 780px) {
+  .nav-movil {
+    display: block;
+  }
+}
+
+.nav-movil__toggle {
+  width: 32px;
+  height: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.nav-movil__toggle span {
+  display: block;
+  height: 2px;
+  background: #f7f0e4;
+  border-radius: 2px;
+  transition: background 0.25s ease;
+}
+
+.header--solido .nav-movil__toggle span {
+  background: var(--texto);
+}
+
+.nav-movil__panel {
+  position: absolute;
+  top: 100%;
+  right: 4vw;
+  background: #fff;
+  border: 1px solid var(--crema-oscuro);
+  border-radius: 12px;
+  padding: 1rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  font-size: 0.95rem;
+  box-shadow: 0 8px 24px rgba(74, 59, 46, 0.1);
+}
+
+.nav-movil__cta {
+  color: var(--dorado-oscuro);
+  font-weight: 600;
+}
+
+/* ===== Zona oscura: envuelve hero + filosofía con un solo fondo negro ===== */
+.zona-oscura {
+  --hero-fondo: #14100c;
+  --hero-texto: #f7f0e4;
+  --hero-texto-suave: #cdb99c;
+  --hero-dorado-claro: #e8c68c;
+
+  background: var(--hero-fondo);
+  color: var(--hero-texto);
+}
+
+/* ===== Hero ===== */
+.hero__inner {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  align-items: center;
+  gap: 2rem;
+  padding: clamp(7rem, 12vw, 9rem) 4vw clamp(5rem, 12vw, 9rem);
+  min-height: 78vh;
+  max-width: 1280px;
+  margin: 0 auto;
+  overflow: visible;
+}
+
+.hero__eyebrow {
+  animation: aparecer 0.7s ease both;
+  color: var(--hero-dorado-claro);
+}
+
+.hero__titulo {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 5vw, 3.8rem);
+  font-weight: 500;
+  line-height: 1.12;
+  margin: 0 0 1.2rem 0;
+  color: var(--hero-texto);
+  animation: aparecer 0.7s ease 0.1s both;
+}
+
+.hero__subtitulo {
+  font-size: 1.05rem;
+  color: var(--hero-texto-suave);
+  max-width: 34ch;
+  line-height: 1.6;
+  margin: 0 0 2rem 0;
+  animation: aparecer 0.7s ease 0.2s both;
+}
+
+.hero__acciones {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  animation: aparecer 0.7s ease 0.3s both;
+}
+
+.hero__emblema {
+  display: flex;
+  justify-content: center;
+  overflow: visible;
+  animation: aparecer-girar 1.1s ease 0.15s both;
+}
+
+.hero__emblema img {
+  display: block;
+  width: 100%;
+  max-width: 380px;
+  height: auto;
+  object-fit: contain;
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes aparecer-girar {
+  from {
+    opacity: 0;
+    transform: scale(0.92) rotate(-4deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__eyebrow,
+  .hero__titulo,
+  .hero__subtitulo,
+  .hero__acciones,
+  .hero__emblema {
+    animation: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .hero__inner {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .hero__subtitulo {
+    max-width: none;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .hero__acciones {
+    justify-content: center;
+  }
+  .hero__emblema img {
+    max-width: 260px;
+  }
+}
+
+/* ===== Filosofía (comparte el fondo negro de .zona-oscura, sin costura visible) ===== */
+.filosofia {
+  padding-bottom: clamp(4rem, 8vw, 6rem);
+}
+
+.filosofia__inner {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 4vw;
+  text-align: center;
+}
+
+.filosofia__linea {
+  width: 60px;
+  height: 2px;
+  background: #e8c68c;
+  margin: 0 auto 2rem;
+}
+
+.filosofia__texto {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.15rem, 2.1vw, 1.4rem);
+  line-height: 1.6;
+  color: #f7f0e4;
+  margin: 0 0 1.4rem 0;
+}
+
+.filosofia__texto--secundario {
+  font-size: clamp(1rem, 1.7vw, 1.15rem);
+  color: #cdb99c;
+  margin-bottom: 0;
+}
+
+/* ===== Servicios ===== */
+.servicios {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 3rem 4vw 5rem;
+  text-align: center;
+}
+
+.servicios__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.4rem;
+  text-align: left;
+  margin-bottom: 2.6rem;
+}
+
+.servicio-card {
+  background: #fff;
+  border: 1px solid var(--crema-oscuro);
+  border-radius: 16px;
+  padding: 1.8rem 1.6rem;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.servicio-card:hover {
+  border-color: var(--dorado-claro);
+  transform: translateY(-3px);
+}
+
+.servicio-card__titulo {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 500;
+  margin: 0 0 0.6rem 0;
+}
+
+.servicio-card__descripcion {
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+  line-height: 1.5;
+  margin: 0 0 1.2rem 0;
+}
+
+.servicio-card__precio {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--dorado-oscuro);
+}
+
+/* ===== Diferenciales ===== */
+.diferenciales {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 4vw 5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 2.4rem;
+  text-align: center;
+}
+
+.diferencial__linea {
+  display: block;
+  width: 32px;
+  height: 2px;
+  background: var(--dorado);
+  margin: 0 auto 1.1rem;
+}
+
+.diferencial h3 {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin: 0 0 0.5rem 0;
+}
+
+.diferencial p {
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+  line-height: 1.55;
+}
+
+/* ===== Ubicación ===== */
+.ubicacion {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem 4vw 5rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: start;
+}
+
+.ubicacion__direccion {
+  font-size: 1rem;
+  margin: 0 0 0.6rem 0;
+}
+
+.ubicacion__contacto {
+  font-size: 0.92rem;
+  color: var(--texto-suave);
+  margin: 0 0 0.6rem 0;
+}
+
+.ubicacion__contacto a:hover {
+  color: var(--dorado-oscuro);
+}
+
+.ubicacion__instagram {
+  display: inline-block;
+  font-size: 0.88rem;
+  color: var(--dorado-oscuro);
+  margin-bottom: 1.6rem;
+}
+
+.ubicacion__horario {
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.ubicacion__horario td {
+  padding: 0.4rem 1.2rem 0.4rem 0;
+  border-bottom: 1px solid var(--crema-oscuro);
+}
+
+.ubicacion__mapa {
+  background: var(--crema-oscuro);
+  border-radius: 16px;
+  min-height: 320px;
+  overflow: hidden;
+}
+
+.ubicacion__mapa iframe {
+  display: block;
+  min-height: 320px;
+}
+
+@media (max-width: 780px) {
+  .ubicacion {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== CTA final ===== */
+.cta-final {
+  text-align: center;
+  padding: 4.5rem 4vw;
+  background: var(--dorado-claro);
+}
+
+.cta-final h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3.4vw, 2.6rem);
+  font-weight: 500;
+  margin: 0 0 1.6rem 0;
+}
+
+/* ===== Footer (mismo negro cálido que el hero, como cierre simétrico) ===== */
+.footer {
+  --footer-fondo: #14100c;
+  --footer-texto: #f7f0e4;
+  --footer-texto-suave: #b3a48d;
+  --footer-dorado: #e8c68c;
+
+  background: var(--footer-fondo);
+  color: var(--footer-texto-suave);
+  padding: clamp(3.5rem, 7vw, 5.5rem) 4vw 2rem;
+}
+
+.footer__principal {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 2.5rem;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-bottom: 2.8rem;
+}
+
+.footer__columna {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.footer__columna a {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--footer-texto-suave);
+  font-size: 0.92rem;
+  transition: color 0.15s ease;
+}
+
+.footer__columna a svg {
+  flex-shrink: 0;
+}
+
+.footer__columna a:hover {
+  color: var(--footer-dorado);
+}
+
+.footer__titulo-columna {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--footer-texto);
+  margin: 0 0 0.3rem 0;
+}
+
+.footer__marca {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  color: var(--footer-texto);
+  margin-bottom: 0.6rem;
+}
+
+.footer__marca img {
+  width: 28px;
+  height: auto;
+}
+
+.footer__tagline {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--footer-texto-suave);
+  max-width: 32ch;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.footer__linea {
+  max-width: 1280px;
+  margin: 0 auto;
+  height: 1px;
+  background: rgba(247, 240, 228, 0.12);
+}
+
+.footer__copy {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--footer-texto-suave);
+  padding-top: 1.6rem;
+  margin: 0;
+}
+
+@media (max-width: 780px) {
+  .footer__principal {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    text-align: center;
+  }
+  .footer__marca {
+    justify-content: center;
+  }
+  .footer__columna a {
+    justify-content: center;
+  }
+  .footer__tagline {
+    max-width: none;
+    margin: 0 auto;
+  }
+}

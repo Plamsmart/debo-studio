@@ -1,0 +1,11 @@
+En app/admin/layout.tsx, busca este bloque:
+
+          <Link href="/admin/servicios" className="admin-layout__link">
+            Servicios
+          </Link>
+
+Y agrega justo después:
+
+          <Link href="/admin/cobrar" className="admin-layout__link">
+            Cobrar
+          </Link>

@@ -1,0 +1,43 @@
+.flujo-reserva {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: #3a2e26;
+}
+
+.flujo-reserva__paso {
+  margin-bottom: 2.4rem;
+}
+
+.flujo-reserva__titulo {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #3a2e26;
+}
+
+.flujo-reserva__resumen-linea {
+  font-size: 0.92rem;
+  color: #8a7a6b;
+  margin: 0 0 1rem 0;
+}
+
+.flujo-reserva__error {
+  color: #b5564a;
+  font-size: 0.88rem;
+  margin-top: 0.8rem;
+}
+
+.flujo-reserva__exito {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: #3a2e26;
+  padding: 1.4rem 1.6rem;
+  border-radius: 12px;
+  background: #f0e8dc;
+  border: 1px solid #d9c4a3;
+  max-width: 500px;
+}
+
+.flujo-reserva__exito p {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0;
+}
