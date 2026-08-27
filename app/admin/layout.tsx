@@ -40,6 +40,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <Link href="/admin/servicios" className="admin-layout__link">
             Servicios
           </Link>
+          <Link href="/admin/clientes" className="admin-layout__link">
+            Clientes
+          </Link>
         </div>
         <span className="admin-layout__usuario">{esAdmin.nombre}</span>
       </nav>

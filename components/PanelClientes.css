@@ -1,0 +1,215 @@
+.panel-clientes {
+  --dp-crema: #faf6f0;
+  --dp-crema-oscuro: #f0e8dc;
+  --dp-dorado: #b08d57;
+  --dp-verde: #6b8e5a;
+  --dp-rojo: #b5564a;
+  --dp-texto: #3a2e26;
+  --dp-texto-suave: #8a7a6b;
+
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: var(--dp-texto);
+  max-width: 840px;
+}
+
+.panel-clientes__barra {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 1.4rem;
+  flex-wrap: wrap;
+}
+
+.panel-clientes__buscador {
+  flex: 1 1 260px;
+  padding: 0.6rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid var(--dp-crema-oscuro);
+  background: #fff;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: var(--dp-texto);
+}
+
+.panel-clientes__btn-nuevo {
+  padding: 0.6rem 1.1rem;
+  border-radius: 8px;
+  border: 1px solid var(--dp-dorado);
+  background: #fff;
+  color: var(--dp-dorado);
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.panel-clientes__btn-nuevo:hover {
+  background: var(--dp-dorado);
+  color: #fff;
+}
+
+.panel-clientes__form-nuevo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background: var(--dp-crema);
+  border: 1px solid var(--dp-crema-oscuro);
+  margin-bottom: 1.6rem;
+  align-items: center;
+}
+
+.panel-clientes__input {
+  padding: 0.5rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid var(--dp-crema-oscuro);
+  background: #fff;
+  font-family: inherit;
+  font-size: 0.88rem;
+  color: var(--dp-texto);
+  flex: 1 1 160px;
+}
+
+.panel-clientes__input--ancho {
+  flex: 1 1 100%;
+}
+
+.panel-clientes__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.panel-clientes__tarjeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+  border-radius: 12px;
+  background: var(--dp-crema);
+  border: 1px solid var(--dp-crema-oscuro);
+  flex-wrap: wrap;
+}
+
+.panel-clientes__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1 1 400px;
+}
+
+.panel-clientes__nombre {
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.panel-clientes__contacto {
+  font-size: 0.85rem;
+  color: var(--dp-texto-suave);
+}
+
+.panel-clientes__servicios {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.2rem;
+}
+
+.panel-clientes__badge-servicio {
+  font-size: 0.72rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 20px;
+  background: var(--dp-crema-oscuro);
+  color: var(--dp-texto-suave);
+}
+
+.panel-clientes__notas {
+  text-align: left;
+  background: none;
+  border: none;
+  border-top: 1px dashed var(--dp-crema-oscuro);
+  padding-top: 0.5rem;
+  margin-top: 0.3rem;
+  font-family: inherit;
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--dp-texto-suave);
+  cursor: pointer;
+}
+
+.panel-clientes__notas:hover {
+  color: var(--dp-dorado);
+}
+
+.panel-clientes__notas-edicion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.3rem;
+}
+
+.panel-clientes__textarea {
+  padding: 0.5rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid var(--dp-crema-oscuro);
+  background: #fff;
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: var(--dp-texto);
+  resize: vertical;
+}
+
+.panel-clientes__acciones-notas {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.panel-clientes__btn-guardar {
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  border: none;
+  background: var(--dp-dorado);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.panel-clientes__btn-guardar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.panel-clientes__btn-cancelar {
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid var(--dp-crema-oscuro);
+  background: #fff;
+  color: var(--dp-texto-suave);
+  font-family: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.panel-clientes__btn-eliminar {
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid var(--dp-rojo);
+  background: #fff;
+  color: var(--dp-rojo);
+  font-family: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.panel-clientes__btn-eliminar:hover {
+  background: var(--dp-rojo);
+  color: #fff;
+}
+
+.panel-clientes__vacio {
+  color: var(--dp-texto-suave);
+  font-style: italic;
+}
