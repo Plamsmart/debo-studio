@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import type { TablesUpdate } from '@/lib/supabase/database.types'
 
 async function obtenerRol(supabase: Awaited<ReturnType<typeof createClient>>, userId: string) {
   const { data } = await supabase
@@ -32,7 +33,7 @@ export async function PATCH(
   const body = await request.json()
   const { nombre, email, telefono, notas } = body
 
-  const cambios: Record<string, unknown> = {}
+  const cambios: TablesUpdate<'clientes'> = {}
   if (nombre !== undefined) cambios.nombre = nombre.trim()
   if (email !== undefined) cambios.email = email?.trim() || null
   if (telefono !== undefined) cambios.telefono = telefono?.trim() || null

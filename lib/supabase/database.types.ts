@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.15"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -100,7 +100,8 @@ export type Database = {
       }
       pagos: {
         Row: {
-          cita_id: string
+          cita_id: string | null
+          concepto: string | null
           creado_en: string | null
           estado: Database["public"]["Enums"]["estado_pago"] | null
           id: string
@@ -109,7 +110,8 @@ export type Database = {
           stripe_session_id: string | null
         }
         Insert: {
-          cita_id: string
+          cita_id?: string | null
+          concepto?: string | null
           creado_en?: string | null
           estado?: Database["public"]["Enums"]["estado_pago"] | null
           id?: string
@@ -118,7 +120,8 @@ export type Database = {
           stripe_session_id?: string | null
         }
         Update: {
-          cita_id?: string
+          cita_id?: string | null
+          concepto?: string | null
           creado_en?: string | null
           estado?: Database["public"]["Enums"]["estado_pago"] | null
           id?: string
@@ -147,6 +150,7 @@ export type Database = {
           imagen_url: string | null
           nombre: string
           precio: number
+          reservable: boolean
         }
         Insert: {
           activo?: boolean | null
@@ -158,6 +162,7 @@ export type Database = {
           imagen_url?: string | null
           nombre: string
           precio: number
+          reservable?: boolean
         }
         Update: {
           activo?: boolean | null
@@ -169,6 +174,7 @@ export type Database = {
           imagen_url?: string | null
           nombre?: string
           precio?: number
+          reservable?: boolean
         }
         Relationships: []
       }
