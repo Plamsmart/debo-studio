@@ -8,6 +8,7 @@ export default async function ReservarPage() {
     .from("servicios")
     .select("*")
     .eq("activo", true)
+    .eq("reservable", true)
     .order("categoria", { ascending: true })
     .order("nombre", { ascending: true });
 

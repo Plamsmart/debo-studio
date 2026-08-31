@@ -85,24 +85,30 @@ export default function FlujoReserva({ servicios }: Props) {
 
   return (
     <div className="flujo-reserva">
-      <section className="flujo-reserva__paso">
-        <h3 className="flujo-reserva__titulo">1. Elige un servicio</h3>
-        <SelectorServicio
-          servicios={servicios}
-          servicioSeleccionadoId={servicioElegido?.id ?? null}
-          onSeleccionar={elegirServicio}
-        />
-      </section>
-
-      {servicioElegido && (
-        <section className="flujo-reserva__paso">
-          <h3 className="flujo-reserva__titulo">2. Elige fecha y hora</h3>
-          <SelectorCitas servicioId={servicioElegido.id} onSeleccion={elegirFechaHora} />
+      <div className="flujo-reserva__columnas">
+        <section className="flujo-reserva__paso flujo-reserva__columna-servicios">
+          <h3 className="flujo-reserva__titulo">1. Elige un servicio</h3>
+          <SelectorServicio
+            servicios={servicios}
+            servicioSeleccionadoId={servicioElegido?.id ?? null}
+            onSeleccionar={elegirServicio}
+          />
         </section>
-      )}
+
+        <section className="flujo-reserva__paso flujo-reserva__columna-calendario">
+          <h3 className="flujo-reserva__titulo">2. Elige fecha y hora</h3>
+          {servicioElegido ? (
+            <SelectorCitas servicioId={servicioElegido.id} onSeleccion={elegirFechaHora} />
+          ) : (
+            <p className="flujo-reserva__placeholder">
+              Elige un servicio para ver los horarios disponibles.
+            </p>
+          )}
+        </section>
+      </div>
 
       {servicioElegido && seleccion && (
-        <section className="flujo-reserva__paso">
+        <section className="flujo-reserva__paso flujo-reserva__paso-contacto">
           <h3 className="flujo-reserva__titulo">3. Tus datos de contacto</h3>
           <p className="flujo-reserva__resumen-linea">
             <strong>{servicioElegido.nombre}</strong> — {seleccion.fecha} a las {seleccion.hora}

@@ -250,7 +250,10 @@ export default function PanelServicios({ serviciosIniciales }: Props) {
                     <div className="panel-servicios__info">
                       <span className="panel-servicios__nombre">{servicio.nombre}</span>
                       <span className="panel-servicios__meta">
-                        {servicio.duracion_minutos} min ·{' '}
+                        {servicio.duracion_minutos === 0
+                          ? servicio.descripcion || 'Paquete'
+                          : `${servicio.duracion_minutos} min`}{' '}
+                        ·{' '}
                         {new Intl.NumberFormat('es-ES', {
                           style: 'currency',
                           currency: 'EUR',

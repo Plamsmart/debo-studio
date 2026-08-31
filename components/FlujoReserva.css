@@ -3,6 +3,13 @@
   color: #3a2e26;
 }
 
+/* Móvil por defecto: todo apilado, una sola columna */
+.flujo-reserva__columnas {
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+}
+
 .flujo-reserva__paso {
   margin-bottom: 2.4rem;
 }
@@ -26,6 +33,16 @@
   margin-top: 0.8rem;
 }
 
+.flujo-reserva__placeholder {
+  color: #8a7a6b;
+  font-style: italic;
+  font-size: 0.92rem;
+  padding: 1.4rem;
+  border: 1px dashed #f0e8dc;
+  border-radius: 12px;
+  background: #faf6f0;
+}
+
 .flujo-reserva__exito {
   font-family: 'Georgia', 'Times New Roman', serif;
   color: #3a2e26;
@@ -40,4 +57,32 @@
   font-size: 0.95rem;
   line-height: 1.5;
   margin: 0;
+}
+
+/* Pantallas grandes: 2 columnas lado a lado, calendario siempre visible */
+@media (min-width: 960px) {
+  .flujo-reserva__columnas {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 3rem;
+  }
+
+  .flujo-reserva__columna-servicios {
+    flex: 1 1 0;
+    min-width: 0;
+    margin-bottom: 0;
+  }
+
+  .flujo-reserva__columna-calendario {
+    flex: 1 1 0;
+    min-width: 0;
+    margin-bottom: 0;
+    /* Se mantiene visible y "pegada" al hacer scroll dentro de la columna de servicios */
+    position: sticky;
+    top: 1.5rem;
+  }
+
+  .flujo-reserva__paso-contacto {
+    margin-top: 1rem;
+  }
 }

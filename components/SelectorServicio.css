@@ -6,27 +6,88 @@
   --dp-texto: #3a2e26;
   --dp-texto-suave: #8a7a6b;
 
-  font-family: "Georgia", "Times New Roman", serif;
+  font-family: 'Georgia', 'Times New Roman', serif;
   color: var(--dp-texto);
   max-width: 640px;
 }
 
-.selector-servicio__grupo {
-  margin-bottom: 1.6rem;
+.selector-servicio__buscador {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--dp-crema-oscuro);
+  background: var(--dp-crema);
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--dp-texto);
+  margin-bottom: 1.2rem;
 }
 
-.selector-servicio__categoria {
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+.selector-servicio__buscador:focus-visible {
+  outline: 2px solid var(--dp-dorado);
+  outline-offset: 1px;
+}
+
+.selector-servicio__buscador::placeholder {
   color: var(--dp-texto-suave);
-  margin-bottom: 0.7rem;
+}
+
+.selector-servicio__grupo {
+  border-bottom: 1px solid var(--dp-crema-oscuro);
+}
+
+.selector-servicio__categoria-btn {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.9rem 0.2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+}
+
+.selector-servicio__categoria-nombre {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--dp-texto);
+}
+
+.selector-servicio__categoria-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.selector-servicio__categoria-conteo {
+  font-size: 0.75rem;
+  color: var(--dp-texto-suave);
+  background: var(--dp-crema-oscuro);
+  padding: 0.1rem 0.5rem;
+  border-radius: 20px;
+}
+
+.selector-servicio__chevron {
+  color: var(--dp-dorado);
+  font-size: 1.1rem;
+  line-height: 1;
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+
+.selector-servicio__chevron--abierto {
+  transform: rotate(180deg);
 }
 
 .selector-servicio__lista {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
+  padding-bottom: 1rem;
 }
 
 .selector-servicio__tarjeta {
@@ -109,7 +170,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .selector-servicio__tarjeta {
+  .selector-servicio__tarjeta,
+  .selector-servicio__chevron {
     transition: none;
   }
 }

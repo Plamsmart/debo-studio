@@ -1,0 +1,20 @@
+En app/reservar/page.tsx, busca la consulta a Supabase que trae los servicios:
+
+  const { data: servicios, error } = await supabase
+    .from('servicios')
+    .select('*')
+    .eq('activo', true)
+    .order('categoria', { ascending: true })
+    .order('nombre', { ascending: true })
+
+Y agrégale el filtro de reservable, quedando así:
+
+  const { data: servicios, error } = await supabase
+    .from('servicios')
+    .select('*')
+    .eq('activo', true)
+    .eq('reservable', true)
+    .order('categoria', { ascending: true })
+    .order('nombre', { ascending: true })
+
+(Solo se agrega la línea .eq('reservable', true) — el resto queda igual)
