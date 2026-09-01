@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import UsuarioAdminNav from '@/components/UsuarioAdminNav'
+import '@/components/UsuarioAdminNav.css'
 import './admin.css'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -32,7 +34,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="admin-layout">
       <nav className="admin-layout__nav">
-        <span className="admin-layout__marca">Estudio Débora Pereira</span>
+        <div className="admin-layout__marca">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/emblema.png" alt="Estudio Débora Pereira" />
+          <span className="admin-layout__nombre">Estudio Débora Pereira</span>
+        </div>
         <div className="admin-layout__links">
           <Link href="/admin/citas" className="admin-layout__link">
             Citas
@@ -43,8 +49,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <Link href="/admin/clientes" className="admin-layout__link">
             Clientes
           </Link>
+          <Link href="/admin/cobrar" className="admin-layout__link">
+            Cobrar
+          </Link>
         </div>
-        <span className="admin-layout__usuario">{esAdmin.nombre}</span>
+        <UsuarioAdminNav nombre={esAdmin.nombre ?? 'Usuario'} />
       </nav>
       <div className="admin-layout__contenido">{children}</div>
     </div>

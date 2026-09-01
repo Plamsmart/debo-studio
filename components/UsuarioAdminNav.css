@@ -1,0 +1,35 @@
+.admin-layout__usuario-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  justify-self: end;
+}
+
+.admin-layout__usuario {
+  font-size: 0.85rem;
+  color: #8a7a6b;
+  font-family: 'Georgia', 'Times New Roman', serif;
+}
+
+.admin-layout__cerrar-sesion {
+  padding: 0.4rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid #f0e8dc;
+  background: #fff;
+  color: #b5564a;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.admin-layout__cerrar-sesion:hover:not(:disabled) {
+  background: #b5564a;
+  color: #fff;
+  border-color: #b5564a;
+}
+
+.admin-layout__cerrar-sesion:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
