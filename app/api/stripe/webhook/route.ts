@@ -91,6 +91,42 @@ export async function POST(request: NextRequest) {
         }
       }
     }
+
+    if (!citaId) {
+      // Pago de QR local (sin cita) — buscamos el cliente vinculado directo
+      // en la fila de pagos, si lo hay.
+      const { data: pagoConCliente } = await supabase
+        .from('pagos')
+        .select('concepto, monto, clientes(nombre, email)')
+        .eq('stripe_session_id', session.id)
+        .single()
+
+      if (pagoConCliente?.clientes?.email) {
+        const resend = getResend()
+        if (resend) {
+          try {
+            await resend.emails.send({
+              from: 'Estudio Débora Pereira <onboarding@resend.dev>',
+              to: pagoConCliente.clientes.email,
+              subject: 'Recibo de tu compra ✨',
+              html: `
+                <h2>¡Gracias por tu compra!</h2>
+                <p>Hola ${pagoConCliente.clientes.nombre || ''}, este es tu recibo.</p>
+                <p><strong>Concepto:</strong> ${pagoConCliente.concepto}</p>
+                <p><strong>Monto:</strong> ${new Intl.NumberFormat('es-ES', {
+                  style: 'currency',
+                  currency: 'EUR',
+                }).format(pagoConCliente.monto)}</p>
+                <p><strong>Método de pago:</strong> Tarjeta (en el estudio)</p>
+                <p>Gracias por confiar en Estudio Débora Pereira.</p>
+              `,
+            })
+          } catch (errorEmail) {
+            console.error('Error enviando recibo por email (QR local):', errorEmail)
+          }
+        }
+      }
+    }
   }
 
   if (evento.type === 'checkout.session.expired') {

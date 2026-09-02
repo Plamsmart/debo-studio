@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { getResend } from '@/lib/resend'
 
-// POST /api/cobros/efectivo
-// Body: { concepto, monto, servicio_id?, nombre?, email?, telefono? }
-// Registra un pago en efectivo, marcado como 'pagado' de inmediato (no hay
-// nada que esperar, el dinero ya está en el mostrador). Solo admins.
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
 
@@ -38,11 +35,15 @@ export async function POST(request: NextRequest) {
   let clienteId: string | null = null
   if (nombre?.trim()) {
     if (email?.trim()) {
-      const { data: existente } = await supabaseService
+      const { data: existente, error: errorBusqueda } = await supabaseService
         .from('clientes')
         .select('id')
         .eq('email', email.trim())
         .maybeSingle()
+
+      if (errorBusqueda) {
+        console.error('Error buscando cliente existente:', errorBusqueda)
+      }
       if (existente) clienteId = existente.id
     }
 
@@ -57,7 +58,9 @@ export async function POST(request: NextRequest) {
         .select('id')
         .single()
 
-      if (!errorCliente && nuevoCliente) {
+      if (errorCliente) {
+        console.error('Error creando cliente durante cobro en efectivo:', errorCliente)
+      } else if (nuevoCliente) {
         clienteId = nuevoCliente.id
       }
     }
@@ -79,8 +82,41 @@ export async function POST(request: NextRequest) {
     .single()
 
   if (errorPago || !pago) {
+    console.error('Error registrando pago en efectivo:', errorPago)
     return NextResponse.json({ error: 'No se pudo registrar el cobro' }, { status: 500 })
   }
 
-  return NextResponse.json({ pagoId: pago.id }, { status: 201 })
+  // Recibo por email — solo si el cliente dejó su correo
+  if (email?.trim()) {
+    const resend = getResend()
+    if (resend) {
+      try {
+        await resend.emails.send({
+          from: 'Estudio Débora Pereira <onboarding@resend.dev>',
+          to: email.trim(),
+          subject: 'Recibo de tu compra ✨',
+          html: `
+            <h2>¡Gracias por tu compra!</h2>
+            <p>Hola ${nombre?.trim() || ''}, este es tu recibo.</p>
+            <p><strong>Concepto:</strong> ${concepto.trim()}</p>
+            <p><strong>Monto:</strong> ${new Intl.NumberFormat('es-ES', {
+              style: 'currency',
+              currency: 'EUR',
+            }).format(Number(monto))}</p>
+            <p><strong>Método de pago:</strong> Efectivo (en el estudio)</p>
+            <p>Gracias por confiar en Estudio Débora Pereira.</p>
+          `,
+        })
+      } catch (errorEmail) {
+        console.error('Error enviando recibo por email (efectivo):', errorEmail)
+      }
+    }
+  }
+
+  const avisoCliente =
+    nombre?.trim() && !clienteId
+      ? 'El pago se registró, pero no se pudo vincular al cliente (revisa los logs del servidor).'
+      : null
+
+  return NextResponse.json({ pagoId: pago.id, aviso: avisoCliente }, { status: 201 })
 }

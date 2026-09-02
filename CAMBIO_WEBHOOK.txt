@@ -1,0 +1,61 @@
+En app/api/stripe/webhook/route.ts, dentro del bloque que maneja el evento
+'checkout.session.completed', después de actualizar el pago a 'pagado',
+busca la parte que envía el email de confirmación — actualmente algo así:
+
+  const citaId = session.metadata?.cita_id
+  if (citaId) {
+    // ... busca la cita, cliente, servicio y envía email ...
+  }
+
+Esa lógica solo cubre pagos ONLINE (con cita asociada). Necesitamos agregar
+un caso ADICIONAL (un "else" o bloque separado) para pagos de QR LOCAL, que
+no tienen cita_id sino que el cliente (si existe) está vinculado directo en
+la fila de `pagos` a través de `cliente_id`.
+
+Agrega esta lógica DESPUÉS del bloque `if (citaId) { ... }` ya existente,
+como un caso alternativo:
+
+  if (!citaId) {
+    // Pago de QR local (sin cita) — buscamos el cliente vinculado directo
+    // en la fila de pagos, si lo hay.
+    const { data: pagoConCliente } = await supabase
+      .from('pagos')
+      .select('concepto, monto, clientes(nombre, email)')
+      .eq('stripe_session_id', session.id)
+      .single()
+
+    if (pagoConCliente?.clientes?.email) {
+      const resend = getResend()
+      if (resend) {
+        try {
+          await resend.emails.send({
+            from: 'Estudio Débora Pereira <onboarding@resend.dev>',
+            to: pagoConCliente.clientes.email,
+            subject: 'Recibo de tu compra ✨',
+            html: `
+              <h2>¡Gracias por tu compra!</h2>
+              <p>Hola ${pagoConCliente.clientes.nombre || ''}, este es tu recibo.</p>
+              <p><strong>Concepto:</strong> ${pagoConCliente.concepto}</p>
+              <p><strong>Monto:</strong> ${new Intl.NumberFormat('es-ES', {
+                style: 'currency',
+                currency: 'EUR',
+              }).format(pagoConCliente.monto)}</p>
+              <p><strong>Método de pago:</strong> Tarjeta (en el estudio)</p>
+              <p>Gracias por confiar en Estudio Débora Pereira.</p>
+            `,
+          })
+        } catch (errorEmail) {
+          console.error('Error enviando recibo por email (QR local):', errorEmail)
+        }
+      }
+    }
+  }
+
+IMPORTANTE: verifica que el archivo ya importe `getResend` desde '@/lib/resend'
+al inicio del archivo (probablemente ya lo hace, si no, agrégalo). También
+usa el cliente `supabase` que ya exista en ese archivo (probablemente
+`createServiceClient()`, ya que el webhook corre sin sesión de usuario) —
+no crees un cliente nuevo, reutiliza el que ya está siendo usado para el
+update anterior en esa misma función.
+
+Verifica con npm run dev que compile sin errores.
