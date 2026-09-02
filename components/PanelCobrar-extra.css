@@ -1,0 +1,33 @@
+.panel-cobrar__metodo-toggle {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.4rem;
+}
+
+.panel-cobrar__metodo-btn {
+  flex: 1;
+  padding: 0.6rem;
+  border-radius: 8px;
+  border: 1px solid #f0e8dc;
+  background: #faf6f0;
+  color: #8a7a6b;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.panel-cobrar__metodo-btn--activo {
+  background: #b08d57;
+  border-color: #b08d57;
+  color: #fff;
+}
+
+.panel-cobrar__separador {
+  margin-top: 1.4rem;
+  padding-top: 1rem;
+  border-top: 1px dashed #f0e8dc;
+  font-size: 0.8rem;
+  color: #8a7a6b;
+  font-style: italic;
+}

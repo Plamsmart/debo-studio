@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
-import { stripe, SITE_URL } from '@/lib/stripe'
 
-// POST /api/cobros
+// POST /api/cobros/efectivo
 // Body: { concepto, monto, servicio_id?, nombre?, email?, telefono? }
-// Genera un link de pago de Stripe para cobrar en el local (sin cita asociada).
-// Los datos de cliente son opcionales — si se dan, se registra o encuentra
-// el cliente y se vincula al pago. Solo accesible para admins autenticados.
+// Registra un pago en efectivo, marcado como 'pagado' de inmediato (no hay
+// nada que esperar, el dinero ya está en el mostrador). Solo admins.
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
 
@@ -25,7 +23,7 @@ export async function POST(request: NextRequest) {
     .maybeSingle()
 
   if (!esAdmin) {
-    return NextResponse.json({ error: 'Solo el equipo del estudio puede generar cobros' }, { status: 403 })
+    return NextResponse.json({ error: 'Solo el equipo del estudio puede registrar cobros' }, { status: 403 })
   }
 
   const body = await request.json()
@@ -35,10 +33,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Faltan datos: concepto y monto son requeridos' }, { status: 400 })
   }
 
-  const montoEnCentavos = Math.round(Number(monto) * 100)
   const supabaseService = createServiceClient()
 
-  // Si se dieron datos de cliente, buscamos o creamos su registro
   let clienteId: string | null = null
   if (nombre?.trim()) {
     if (email?.trim()) {
@@ -67,27 +63,6 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const session = await stripe.checkout.sessions.create({
-    mode: 'payment',
-    payment_method_types: ['card'],
-    line_items: [
-      {
-        price_data: {
-          currency: 'eur',
-          product_data: { name: concepto.trim() },
-          unit_amount: montoEnCentavos,
-        },
-        quantity: 1,
-      },
-    ],
-    success_url: `${SITE_URL}/pago-exitoso`,
-    cancel_url: `${SITE_URL}/pago-cancelado`,
-    metadata: {
-      tipo: 'cobro_local',
-      concepto: concepto.trim(),
-    },
-  })
-
   const { data: pago, error: errorPago } = await supabaseService
     .from('pagos')
     .insert({
@@ -95,10 +70,10 @@ export async function POST(request: NextRequest) {
       cliente_id: clienteId,
       servicio_id: servicio_id || null,
       concepto: concepto.trim(),
-      stripe_session_id: session.id,
+      stripe_session_id: null,
       monto: Number(monto),
-      estado: 'pendiente',
-      metodo_pago: 'qr_local',
+      estado: 'pagado',
+      metodo_pago: 'efectivo',
     })
     .select('id')
     .single()
@@ -107,9 +82,5 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'No se pudo registrar el cobro' }, { status: 500 })
   }
 
-  return NextResponse.json({
-    url: session.url,
-    sessionId: session.id,
-    pagoId: pago.id,
-  })
+  return NextResponse.json({ pagoId: pago.id }, { status: 201 })
 }

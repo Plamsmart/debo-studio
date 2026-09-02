@@ -14,12 +14,17 @@ type Props = {
 }
 
 type Modo = 'formulario' | 'cobrando' | 'pagado'
+type MetodoElegido = 'qr' | 'efectivo'
 
 export default function PanelCobrar({ servicios }: Props) {
   const [modo, setModo] = useState<Modo>('formulario')
+  const [metodo, setMetodo] = useState<MetodoElegido>('qr')
   const [servicioId, setServicioId] = useState('')
   const [concepto, setConcepto] = useState('')
   const [monto, setMonto] = useState('')
+  const [nombreCliente, setNombreCliente] = useState('')
+  const [emailCliente, setEmailCliente] = useState('')
+  const [telefonoCliente, setTelefonoCliente] = useState('')
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null)
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [linkPago, setLinkPago] = useState<string | null>(null)
@@ -39,7 +44,16 @@ export default function PanelCobrar({ servicios }: Props) {
     }
   }
 
-  async function generarCobro(e: React.FormEvent) {
+  function datosClienteBody() {
+    return {
+      servicio_id: servicioId || undefined,
+      nombre: nombreCliente || undefined,
+      email: emailCliente || undefined,
+      telefono: telefonoCliente || undefined,
+    }
+  }
+
+  async function generarCobroQR(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
 
@@ -53,7 +67,7 @@ export default function PanelCobrar({ servicios }: Props) {
       const res = await fetch('/api/cobros', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ concepto, monto: Number(monto) }),
+        body: JSON.stringify({ concepto, monto: Number(monto), ...datosClienteBody() }),
       })
 
       const data = await res.json()
@@ -73,9 +87,39 @@ export default function PanelCobrar({ servicios }: Props) {
     }
   }
 
-  // Polling: consulta cada 3s si el pago ya se completó
+  async function registrarEfectivo(e: React.FormEvent) {
+    e.preventDefault()
+    setError(null)
+
+    if (!concepto.trim() || !monto || Number(monto) <= 0) {
+      setError('Completa el concepto y un monto válido')
+      return
+    }
+
+    setCargando(true)
+    try {
+      const res = await fetch('/api/cobros/efectivo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ concepto, monto: Number(monto), ...datosClienteBody() }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || 'No se pudo registrar el cobro')
+        return
+      }
+
+      setModo('pagado')
+    } finally {
+      setCargando(false)
+    }
+  }
+
+  // Polling: solo aplica al modo QR (el efectivo se confirma al instante)
   useEffect(() => {
-    if (modo !== 'cobrando' || !sessionId) return
+    if (modo !== 'cobrando' || !sessionId || metodo !== 'qr') return
 
     intervaloRef.current = setInterval(async () => {
       const res = await fetch(`/api/pagos/estado?session_id=${sessionId}`)
@@ -90,13 +134,16 @@ export default function PanelCobrar({ servicios }: Props) {
     return () => {
       if (intervaloRef.current) clearInterval(intervaloRef.current)
     }
-  }, [modo, sessionId])
+  }, [modo, sessionId, metodo])
 
   function nuevoCobro() {
     setModo('formulario')
     setServicioId('')
     setConcepto('')
     setMonto('')
+    setNombreCliente('')
+    setEmailCliente('')
+    setTelefonoCliente('')
     setQrDataUrl(null)
     setSessionId(null)
     setLinkPago(null)
@@ -108,7 +155,10 @@ export default function PanelCobrar({ servicios }: Props) {
       <div className="panel-cobrar__pagado">
         <div className="panel-cobrar__check">✓</div>
         <h2>¡Pago recibido!</h2>
-        <p>{concepto} — {Number(monto).toFixed(2)} €</p>
+        <p>
+          {concepto} — {Number(monto).toFixed(2)} €
+          {metodo === 'efectivo' ? ' (efectivo)' : ''}
+        </p>
         <button type="button" onClick={nuevoCobro} className="panel-cobrar__btn">
           Nuevo cobro
         </button>
@@ -138,7 +188,27 @@ export default function PanelCobrar({ servicios }: Props) {
   }
 
   return (
-    <form className="panel-cobrar__form" onSubmit={generarCobro}>
+    <form
+      className="panel-cobrar__form"
+      onSubmit={metodo === 'qr' ? generarCobroQR : registrarEfectivo}
+    >
+      <div className="panel-cobrar__metodo-toggle">
+        <button
+          type="button"
+          className={`panel-cobrar__metodo-btn ${metodo === 'qr' ? 'panel-cobrar__metodo-btn--activo' : ''}`}
+          onClick={() => setMetodo('qr')}
+        >
+          Cobrar con QR
+        </button>
+        <button
+          type="button"
+          className={`panel-cobrar__metodo-btn ${metodo === 'efectivo' ? 'panel-cobrar__metodo-btn--activo' : ''}`}
+          onClick={() => setMetodo('efectivo')}
+        >
+          Registrar efectivo
+        </button>
+      </div>
+
       <label className="panel-cobrar__label">Servicio (opcional, autocompleta)</label>
       <select
         value={servicioId}
@@ -172,10 +242,41 @@ export default function PanelCobrar({ servicios }: Props) {
         className="panel-cobrar__input"
       />
 
+      <p className="panel-cobrar__separador">Datos del cliente (opcional)</p>
+
+      <label className="panel-cobrar__label">Nombre</label>
+      <input
+        value={nombreCliente}
+        onChange={(e) => setNombreCliente(e.target.value)}
+        placeholder="Nombre del cliente"
+        className="panel-cobrar__input"
+      />
+
+      <label className="panel-cobrar__label">Email</label>
+      <input
+        type="email"
+        value={emailCliente}
+        onChange={(e) => setEmailCliente(e.target.value)}
+        placeholder="email@ejemplo.com"
+        className="panel-cobrar__input"
+      />
+
+      <label className="panel-cobrar__label">Teléfono</label>
+      <input
+        value={telefonoCliente}
+        onChange={(e) => setTelefonoCliente(e.target.value)}
+        placeholder="Teléfono"
+        className="panel-cobrar__input"
+      />
+
       {error && <p className="panel-cobrar__error">{error}</p>}
 
       <button type="submit" disabled={cargando} className="panel-cobrar__btn">
-        {cargando ? 'Generando…' : 'Generar cobro'}
+        {cargando
+          ? 'Procesando…'
+          : metodo === 'qr'
+            ? 'Generar cobro'
+            : 'Registrar pago en efectivo'}
       </button>
     </form>
   )

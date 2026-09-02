@@ -1,3 +1,5 @@
+@import './PanelCobrar-extra.css';
+
 .panel-cobrar__form {
   display: flex;
   flex-direction: column;
