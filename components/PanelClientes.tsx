@@ -8,14 +8,23 @@ type CitaResumen = {
   servicios: { nombre: string } | null
 }
 
+type PagoResumen = {
+  concepto: string | null
+  monto: number
+  metodo_pago: string | null
+  estado: string | null
+  creado_en: string | null
+}
+
 type Cliente = {
   id: string
   nombre: string
   email: string | null
   telefono: string | null
-  notas?: string | null // solo presente si esAdmin=true (el servidor no la envía si no)
+  notas?: string | null // solo presente si esAdmin=true
   creado_en: string | null
   citas: CitaResumen[] | null
+  pagos?: PagoResumen[] | null // solo presente si esAdmin=true
 }
 
 type Props = {
@@ -32,6 +41,12 @@ type FormCliente = {
 
 const FORM_VACIO: FormCliente = { nombre: '', email: '', telefono: '', notas: '' }
 
+const ETIQUETA_METODO: Record<string, string> = {
+  web: 'Web',
+  qr_local: 'QR en el local',
+  efectivo: 'Efectivo',
+}
+
 function serviciosConsumidos(citas: CitaResumen[] | null): string[] {
   if (!citas) return []
   const nombres = citas
@@ -39,6 +54,16 @@ function serviciosConsumidos(citas: CitaResumen[] | null): string[] {
     .map((c) => c.servicios?.nombre)
     .filter((n): n is string => Boolean(n))
   return Array.from(new Set(nombres))
+}
+
+function formatearPrecio(precio: number): string {
+  return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(precio)
+}
+
+function formatearFecha(fechaISO: string | null): string {
+  if (!fechaISO) return ''
+  const d = new Date(fechaISO)
+  return d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
 export default function PanelClientes({ clientesIniciales, esAdmin }: Props) {
@@ -49,6 +74,7 @@ export default function PanelClientes({ clientesIniciales, esAdmin }: Props) {
   const [mostrandoNuevo, setMostrandoNuevo] = useState(false)
   const [formNuevo, setFormNuevo] = useState<FormCliente>(FORM_VACIO)
   const [guardando, setGuardando] = useState(false)
+  const [historialAbiertoId, setHistorialAbiertoId] = useState<string | null>(null)
 
   const clientesFiltrados = clientes.filter((c) => {
     const q = busqueda.toLowerCase()
@@ -121,7 +147,9 @@ export default function PanelClientes({ clientesIniciales, esAdmin }: Props) {
 
       const { cliente: creado } = await res.json()
       setClientes((prev) =>
-        [...prev, { ...creado, citas: [] }].sort((a, b) => a.nombre.localeCompare(b.nombre))
+        [...prev, { ...creado, citas: [], pagos: [] }].sort((a, b) =>
+          a.nombre.localeCompare(b.nombre)
+        )
       )
       setFormNuevo(FORM_VACIO)
       setMostrandoNuevo(false)
@@ -189,6 +217,12 @@ export default function PanelClientes({ clientesIniciales, esAdmin }: Props) {
         <div className="panel-clientes__lista">
           {clientesFiltrados.map((cliente) => {
             const servicios = serviciosConsumidos(cliente.citas)
+            const pagosCompletados = (cliente.pagos ?? [])
+              .filter((p) => p.estado === 'pagado')
+              .sort((a, b) => (b.creado_en ?? '').localeCompare(a.creado_en ?? ''))
+            const totalGastado = pagosCompletados.reduce((sum, p) => sum + p.monto, 0)
+            const historialAbierto = historialAbiertoId === cliente.id
+
             return (
               <div key={cliente.id} className="panel-clientes__tarjeta">
                 <div className="panel-clientes__info">
@@ -204,6 +238,44 @@ export default function PanelClientes({ clientesIniciales, esAdmin }: Props) {
                           {s}
                         </span>
                       ))}
+                    </div>
+                  )}
+
+                  {esAdmin && pagosCompletados.length > 0 && (
+                    <div className="panel-clientes__historial">
+                      <button
+                        type="button"
+                        className="panel-clientes__historial-toggle"
+                        onClick={() =>
+                          setHistorialAbiertoId(historialAbierto ? null : cliente.id)
+                        }
+                      >
+                        {historialAbierto ? '▾' : '▸'} Historial de pagos ·{' '}
+                        {formatearPrecio(totalGastado)} total ({pagosCompletados.length})
+                      </button>
+
+                      {historialAbierto && (
+                        <div className="panel-clientes__historial-lista">
+                          {pagosCompletados.map((pago, i) => (
+                            <div key={i} className="panel-clientes__historial-item">
+                              <span className="panel-clientes__historial-concepto">
+                                {pago.concepto || 'Sin concepto'}
+                              </span>
+                              <span
+                                className={`panel-clientes__badge-metodo panel-clientes__badge-metodo--${pago.metodo_pago}`}
+                              >
+                                {ETIQUETA_METODO[pago.metodo_pago ?? ''] ?? pago.metodo_pago}
+                              </span>
+                              <span className="panel-clientes__historial-fecha">
+                                {formatearFecha(pago.creado_en)}
+                              </span>
+                              <span className="panel-clientes__historial-monto">
+                                {formatearPrecio(pago.monto)}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
 

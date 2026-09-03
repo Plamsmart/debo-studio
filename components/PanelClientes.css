@@ -1,3 +1,5 @@
+@import './PanelClientes-historial.css';
+
 .panel-clientes {
   --dp-crema: #faf6f0;
   --dp-crema-oscuro: #f0e8dc;
