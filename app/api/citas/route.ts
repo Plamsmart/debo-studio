@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
   const resend = getResend()
   if (resend) {
     try {
-      await resend.emails.send({
+      const { error: errorResend } = await resend.emails.send({
         from: 'Reservas Débora Pereira <onboarding@resend.dev>',
         to: EMAIL_ESTUDIO,
         subject: `Nueva solicitud de cita: ${servicio.nombre}`,
@@ -144,6 +144,9 @@ export async function POST(request: NextRequest) {
           <p>Entra al panel de administración para confirmar o cancelar esta cita.</p>
         `,
       })
+      if (errorResend) {
+        console.error('Error de Resend al enviar email:', errorResend)
+      }
     } catch (errorEmail) {
       console.error('Error enviando email de aviso al estudio:', errorEmail)
     }

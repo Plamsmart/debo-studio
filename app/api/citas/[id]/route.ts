@@ -110,7 +110,7 @@ export async function PATCH(
   const resend = getResend()
   if (resend) {
     try {
-      await resend.emails.send({
+      const { error: errorResend } = await resend.emails.send({
         from: 'Estudio Débora Pereira <onboarding@resend.dev>',
         to: citaActualizada.clientes.email,
         subject: 'Tu cita fue confirmada ✨ — Completa tu pago',
@@ -123,6 +123,9 @@ export async function PATCH(
           <p><a href="${session.url}" style="display:inline-block;padding:12px 20px;background:#b08d57;color:#fff;text-decoration:none;border-radius:8px;">Pagar ahora</a></p>
         `,
       })
+      if (errorResend) {
+        console.error('Error de Resend al enviar email:', errorResend)
+      }
     } catch (errorEmail) {
       console.error('Error enviando email de confirmación al cliente:', errorEmail)
     }

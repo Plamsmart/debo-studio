@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
     const resend = getResend()
     if (resend) {
       try {
-        await resend.emails.send({
+        const { error: errorResend } = await resend.emails.send({
           from: 'Estudio Débora Pereira <onboarding@resend.dev>',
           to: email.trim(),
           subject: 'Recibo de tu compra ✨',
@@ -107,6 +107,9 @@ export async function POST(request: NextRequest) {
             <p>Gracias por confiar en Estudio Débora Pereira.</p>
           `,
         })
+        if (errorResend) {
+          console.error('Error de Resend al enviar email:', errorResend)
+        }
       } catch (errorEmail) {
         console.error('Error enviando recibo por email (efectivo):', errorEmail)
       }

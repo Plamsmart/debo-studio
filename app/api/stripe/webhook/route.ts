@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
         const resend = getResend()
         if (resend) {
           try {
-            await resend.emails.send({
+            const { error: errorResend } = await resend.emails.send({
               from: 'Estudio Débora Pereira <onboarding@resend.dev>',
               to: cita.clientes.email,
               subject: '¡Pago recibido! Tu cita está lista ✨',
@@ -83,6 +83,9 @@ export async function POST(request: NextRequest) {
                 <p>Te esperamos en el estudio. ¡Gracias por tu reserva!</p>
               `,
             })
+            if (errorResend) {
+              console.error('Error de Resend al enviar email:', errorResend)
+            }
           } catch (errorEmail) {
             console.error('Error enviando email de confirmación de pago:', errorEmail)
           }
@@ -105,7 +108,7 @@ export async function POST(request: NextRequest) {
         const resend = getResend()
         if (resend) {
           try {
-            await resend.emails.send({
+            const { error: errorResend } = await resend.emails.send({
               from: 'Estudio Débora Pereira <onboarding@resend.dev>',
               to: pagoConCliente.clientes.email,
               subject: 'Recibo de tu compra ✨',
@@ -121,6 +124,9 @@ export async function POST(request: NextRequest) {
                 <p>Gracias por confiar en Estudio Débora Pereira.</p>
               `,
             })
+            if (errorResend) {
+              console.error('Error de Resend al enviar email:', errorResend)
+            }
           } catch (errorEmail) {
             console.error('Error enviando recibo por email (QR local):', errorEmail)
           }
