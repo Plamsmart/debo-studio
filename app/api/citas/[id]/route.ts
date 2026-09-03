@@ -97,6 +97,7 @@ export async function PATCH(
     stripe_session_id: session.id,
     monto: precio,
     estado: 'pendiente',
+    concepto: citaActualizada.servicios?.nombre || 'Cita',
   })
 
   if (errorPago) {
