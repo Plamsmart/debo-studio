@@ -98,6 +98,8 @@ export async function PATCH(
     monto: precio,
     estado: 'pendiente',
     concepto: citaActualizada.servicios?.nombre || 'Cita',
+    cliente_id: citaActualizada.cliente_id,
+    servicio_id: citaActualizada.servicio_id,
   })
 
   if (errorPago) {
