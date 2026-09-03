@@ -2,9 +2,19 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import type { TablesUpdate } from '@/lib/supabase/database.types'
 
+async function obtenerRol(supabase: Awaited<ReturnType<typeof createClient>>, userId: string) {
+  const { data } = await supabase
+    .from('usuarios_admin')
+    .select('rol')
+    .eq('id', userId)
+    .maybeSingle()
+  return data?.rol ?? null
+}
+
 // PATCH /api/servicios/[id]
 // Actualiza cualquier combinación de campos del servicio. Protegido por la
-// policy RLS `servicios_update_admin`.
+// policy RLS `servicios_update_admin`; verificamos el rol explícitamente antes
+// como defensa en profundidad y para dar un mensaje de error más claro.
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -18,6 +28,14 @@ export async function PATCH(
 
   if (!user) {
     return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+  }
+
+  const rol = await obtenerRol(supabase, user.id)
+  if (rol !== 'admin') {
+    return NextResponse.json(
+      { error: 'Solo la administradora puede modificar el catálogo de servicios' },
+      { status: 403 }
+    )
   }
 
   const body = await request.json()

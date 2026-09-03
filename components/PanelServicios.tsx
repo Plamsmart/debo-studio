@@ -7,6 +7,7 @@ type Servicio = Tables<'servicios'>
 
 type Props = {
   serviciosIniciales: Servicio[]
+  esAdmin: boolean
 }
 
 type FormServicio = {
@@ -25,7 +26,7 @@ const FORM_VACIO: FormServicio = {
   precio: '',
 }
 
-export default function PanelServicios({ serviciosIniciales }: Props) {
+export default function PanelServicios({ serviciosIniciales, esAdmin }: Props) {
   const [servicios, setServicios] = useState(serviciosIniciales)
   const [editandoId, setEditandoId] = useState<string | null>(null)
   const [formEdicion, setFormEdicion] = useState<FormServicio>(FORM_VACIO)
@@ -140,15 +141,17 @@ export default function PanelServicios({ serviciosIniciales }: Props) {
 
   return (
     <div className="panel-servicios">
-      <button
-        type="button"
-        className="panel-servicios__btn-nuevo"
-        onClick={() => setMostrandoNuevo((v) => !v)}
-      >
-        {mostrandoNuevo ? 'Cancelar' : '+ Agregar servicio'}
-      </button>
+      {esAdmin && (
+        <button
+          type="button"
+          className="panel-servicios__btn-nuevo"
+          onClick={() => setMostrandoNuevo((v) => !v)}
+        >
+          {mostrandoNuevo ? 'Cancelar' : '+ Agregar servicio'}
+        </button>
+      )}
 
-      {mostrandoNuevo && (
+      {esAdmin && mostrandoNuevo && (
         <form className="panel-servicios__form-nuevo" onSubmit={crearServicio}>
           <input
             placeholder="Nombre"
@@ -261,22 +264,34 @@ export default function PanelServicios({ serviciosIniciales }: Props) {
                       </span>
                     </div>
                     <div className="panel-servicios__botones">
-                      <button
-                        type="button"
-                        onClick={() => iniciarEdicion(servicio)}
-                        className="panel-servicios__btn-editar"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => alternarActivo(servicio)}
-                        className={`panel-servicios__btn-toggle ${
-                          servicio.activo ? 'panel-servicios__btn-toggle--activo' : ''
-                        }`}
-                      >
-                        {servicio.activo ? 'Activo' : 'Inactivo'}
-                      </button>
+                      {esAdmin && (
+                        <button
+                          type="button"
+                          onClick={() => iniciarEdicion(servicio)}
+                          className="panel-servicios__btn-editar"
+                        >
+                          Editar
+                        </button>
+                      )}
+                      {esAdmin ? (
+                        <button
+                          type="button"
+                          onClick={() => alternarActivo(servicio)}
+                          className={`panel-servicios__btn-toggle ${
+                            servicio.activo ? 'panel-servicios__btn-toggle--activo' : ''
+                          }`}
+                        >
+                          {servicio.activo ? 'Activo' : 'Inactivo'}
+                        </button>
+                      ) : (
+                        <span
+                          className={`panel-servicios__badge-toggle ${
+                            servicio.activo ? 'panel-servicios__badge-toggle--activo' : ''
+                          }`}
+                        >
+                          {servicio.activo ? 'Activo' : 'Inactivo'}
+                        </span>
+                      )}
                     </div>
                   </>
                 )}

@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
+async function obtenerRol(supabase: Awaited<ReturnType<typeof createClient>>, userId: string) {
+  const { data } = await supabase
+    .from('usuarios_admin')
+    .select('rol')
+    .eq('id', userId)
+    .maybeSingle()
+  return data?.rol ?? null
+}
+
 // POST /api/servicios
 // Solo usuarios admin pueden crear servicios (la policy RLS `servicios_insert_admin`
-// ya lo garantiza: si el usuario no es admin, el insert simplemente falla).
+// ya lo garantiza: si el usuario no es admin, el insert simplemente falla). Igual
+// verificamos el rol explícitamente antes, como defensa en profundidad y para dar
+// un mensaje de error más claro que el genérico de la policy.
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
 
@@ -13,6 +24,14 @@ export async function POST(request: NextRequest) {
 
   if (!user) {
     return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+  }
+
+  const rol = await obtenerRol(supabase, user.id)
+  if (rol !== 'admin') {
+    return NextResponse.json(
+      { error: 'Solo la administradora puede modificar el catálogo de servicios' },
+      { status: 403 }
+    )
   }
 
   const body = await request.json()

@@ -131,6 +131,21 @@
   color: var(--dp-verde);
 }
 
+.panel-servicios__badge-toggle {
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid var(--dp-crema-oscuro);
+  background: var(--dp-crema);
+  color: var(--dp-texto-suave);
+  font-family: inherit;
+  font-size: 0.82rem;
+}
+
+.panel-servicios__badge-toggle--activo {
+  border-color: var(--dp-verde);
+  color: var(--dp-verde);
+}
+
 .panel-servicios__form-edicion {
   display: flex;
   flex-wrap: wrap;
