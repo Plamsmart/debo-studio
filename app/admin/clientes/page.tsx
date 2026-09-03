@@ -19,14 +19,17 @@ export default async function AdminClientesPage() {
 
   // Si es staff, ni las notas ni el historial de pagos viajan al navegador —
   // no es solo ocultarlos visualmente, directamente no se piden.
-  const columnas = esAdmin
-    ? 'id, nombre, email, telefono, notas, creado_en, citas(estado, fecha, servicios(nombre)), pagos(concepto, monto, metodo_pago, estado, creado_en)'
-    : 'id, nombre, email, telefono, creado_en, citas(estado, fecha, servicios(nombre))'
-
-  const { data: clientes, error } = await supabase
-    .from('clientes')
-    .select(columnas)
-    .order('nombre', { ascending: true })
+  // (El string de columnas va inline en cada .select(): si se arma antes en
+  // una variable, postgrest-js no logra inferir el tipo del resultado.)
+  const { data: clientes, error } = esAdmin
+    ? await supabase
+        .from('clientes')
+        .select('id, nombre, email, telefono, notas, creado_en, citas(estado, fecha, servicios(nombre)), pagos(concepto, monto, metodo_pago, estado, creado_en)')
+        .order('nombre', { ascending: true })
+    : await supabase
+        .from('clientes')
+        .select('id, nombre, email, telefono, creado_en, citas(estado, fecha, servicios(nombre))')
+        .order('nombre', { ascending: true })
 
   if (error) {
     return (
