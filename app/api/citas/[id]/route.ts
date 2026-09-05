@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { getResend } from '@/lib/resend'
 import { stripe, SITE_URL } from '@/lib/stripe'
+import { crearEventoCita, eliminarEventoCita } from '@/lib/google-calendar'
 
 // PATCH /api/citas/[id]
 // Body: { accion: 'confirmar' | 'cancelar' }
@@ -35,7 +36,7 @@ export async function PATCH(
     .from('citas')
     .update({ estado: nuevoEstado, actualizado_en: new Date().toISOString() })
     .eq('id', id)
-    .select('*, clientes(nombre, email), servicios(nombre, precio)')
+    .select('*, clientes(nombre, email, telefono), servicios(nombre, precio)')
     .single()
 
   if (error || !citaActualizada) {
@@ -46,6 +47,14 @@ export async function PATCH(
   }
 
   if (accion !== 'confirmar') {
+    if (citaActualizada.google_event_id) {
+      try {
+        await eliminarEventoCita(citaActualizada.google_event_id)
+      } catch (errorCalendar) {
+        console.error('Error eliminando evento de Google Calendar:', errorCalendar)
+      }
+    }
+
     return NextResponse.json({ cita: citaActualizada })
   }
 
@@ -134,6 +143,25 @@ export async function PATCH(
     }
   } else {
     console.warn('RESEND_API_KEY no configurada, se omite el envío de email')
+  }
+
+  try {
+    const googleEventId = await crearEventoCita({
+      fecha: citaActualizada.fecha,
+      hora_inicio: citaActualizada.hora_inicio,
+      hora_fin: citaActualizada.hora_fin,
+      nombreServicio: citaActualizada.servicios?.nombre || 'Servicio',
+      nombreCliente: citaActualizada.clientes?.nombre || 'Cliente',
+      emailCliente: citaActualizada.clientes?.email,
+      telefonoCliente: citaActualizada.clientes?.telefono,
+    })
+
+    if (googleEventId) {
+      await supabase.from('citas').update({ google_event_id: googleEventId }).eq('id', citaActualizada.id)
+    }
+  } catch (errorCalendar) {
+    console.error('Error sincronizando con Google Calendar:', errorCalendar)
+    // No bloqueamos la confirmación de la cita si esto falla
   }
 
   return NextResponse.json({ cita: citaActualizada, linkPago: session.url })

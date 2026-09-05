@@ -21,6 +21,7 @@ export type Database = {
           creado_en: string | null
           estado: Database["public"]["Enums"]["estado_cita"] | null
           fecha: string
+          google_event_id: string | null
           hora_fin: string
           hora_inicio: string
           id: string
@@ -33,6 +34,7 @@ export type Database = {
           creado_en?: string | null
           estado?: Database["public"]["Enums"]["estado_cita"] | null
           fecha: string
+          google_event_id?: string | null
           hora_fin: string
           hora_inicio: string
           id?: string
@@ -45,6 +47,7 @@ export type Database = {
           creado_en?: string | null
           estado?: Database["public"]["Enums"]["estado_cita"] | null
           fecha?: string
+          google_event_id?: string | null
           hora_fin?: string
           hora_inicio?: string
           id?: string
@@ -97,6 +100,44 @@ export type Database = {
           telefono?: string | null
         }
         Relationships: []
+      }
+      google_calendar_config: {
+        Row: {
+          access_token: string | null
+          calendar_id: string | null
+          conectado_en: string | null
+          conectado_por: string | null
+          id: string
+          refresh_token: string
+          token_expiry: string | null
+        }
+        Insert: {
+          access_token?: string | null
+          calendar_id?: string | null
+          conectado_en?: string | null
+          conectado_por?: string | null
+          id?: string
+          refresh_token: string
+          token_expiry?: string | null
+        }
+        Update: {
+          access_token?: string | null
+          calendar_id?: string | null
+          conectado_en?: string | null
+          conectado_por?: string | null
+          id?: string
+          refresh_token?: string
+          token_expiry?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "google_calendar_config_conectado_por_fkey"
+            columns: ["conectado_por"]
+            isOneToOne: false
+            referencedRelation: "usuarios_admin"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pagos: {
         Row: {

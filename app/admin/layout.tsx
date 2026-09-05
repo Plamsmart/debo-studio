@@ -18,7 +18,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   const { data: esAdmin } = await supabase
     .from('usuarios_admin')
-    .select('id, nombre')
+    .select('id, nombre, rol')
     .eq('id', user.id)
     .maybeSingle()
 
@@ -30,6 +30,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       </main>
     )
   }
+
+  const esRolAdmin = esAdmin.rol === 'admin'
 
   return (
     <div className="admin-layout">
@@ -52,6 +54,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <Link href="/admin/cobrar" className="admin-layout__link">
             Cobrar
           </Link>
+          {esRolAdmin && (
+            <Link href="/admin/integraciones" className="admin-layout__link">
+              Integraciones
+            </Link>
+          )}
         </div>
         <UsuarioAdminNav nombre={esAdmin.nombre ?? 'Usuario'} />
       </nav>
