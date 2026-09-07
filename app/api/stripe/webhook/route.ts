@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
         if (resend) {
           try {
             const { error: errorResend } = await resend.emails.send({
-              from: 'Estudio Débora Pereira <onboarding@resend.dev>',
+              from: 'Estudio Débora Pereira <reservas@estudiodeborapereira.com>',
               to: cita.clientes.email,
               subject: '¡Pago recibido! Tu cita está lista ✨',
               html: `
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
         if (resend) {
           try {
             const { error: errorResend } = await resend.emails.send({
-              from: 'Estudio Débora Pereira <onboarding@resend.dev>',
+              from: 'Estudio Débora Pereira <reservas@estudiodeborapereira.com>',
               to: pagoConCliente.clientes.email,
               subject: 'Recibo de tu compra ✨',
               html: `

@@ -123,7 +123,7 @@ export async function PATCH(
   if (resend) {
     try {
       const { error: errorResend } = await resend.emails.send({
-        from: 'Estudio Débora Pereira <onboarding@resend.dev>',
+        from: 'Estudio Débora Pereira <reservas@estudiodeborapereira.com>',
         to: citaActualizada.clientes.email,
         subject: 'Tu cita fue confirmada ✨ — Completa tu pago',
         html: `

@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
     if (resend) {
       try {
         const { error: errorResend } = await resend.emails.send({
-          from: 'Estudio Débora Pereira <onboarding@resend.dev>',
+          from: 'Estudio Débora Pereira <reservas@estudiodeborapereira.com>',
           to: email.trim(),
           subject: 'Recibo de tu compra ✨',
           html: `

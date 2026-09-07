@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
   if (resend) {
     try {
       const { error: errorResend } = await resend.emails.send({
-        from: 'Reservas Débora Pereira <onboarding@resend.dev>',
+        from: 'Estudio Débora Pereira <reservas@estudiodeborapereira.com>',
         to: EMAIL_ESTUDIO,
         subject: `Nueva solicitud de cita: ${servicio.nombre}`,
         html: `
