@@ -1,0 +1,174 @@
+.calendario-dia {
+  --dp-crema: #faf6f0;
+  --dp-crema-oscuro: #f0e8dc;
+  --dp-dorado: #b08d57;
+  --dp-verde: #6b8e5a;
+  --dp-texto: #3a2e26;
+  --dp-texto-suave: #8a7a6b;
+
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: var(--dp-texto);
+  max-width: 780px;
+}
+
+.calendario-dia__header {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  margin-bottom: 1.4rem;
+}
+
+.calendario-dia__nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.calendario-dia__flecha {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--dp-crema-oscuro);
+  background: #fff;
+  color: var(--dp-dorado);
+  font-size: 1.3rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.calendario-dia__flecha:hover {
+  background: var(--dp-dorado);
+  color: #fff;
+}
+
+.calendario-dia__btn-hoy {
+  padding: 0.4rem 0.9rem;
+  border-radius: 20px;
+  border: 1px solid var(--dp-crema-oscuro);
+  background: #fff;
+  color: var(--dp-texto);
+  font-family: inherit;
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+.calendario-dia__btn-hoy:hover {
+  border-color: var(--dp-dorado);
+}
+
+.calendario-dia__fecha {
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.calendario-dia__cerrado {
+  color: var(--dp-texto-suave);
+  font-style: italic;
+  padding: 2rem;
+  text-align: center;
+  background: var(--dp-crema);
+  border-radius: 12px;
+}
+
+.calendario-dia__grid-wrap {
+  border: 1px solid var(--dp-crema-oscuro);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.calendario-dia__grid {
+  position: relative;
+  margin-left: 56px;
+  border-left: 1px solid var(--dp-crema-oscuro);
+}
+
+.calendario-dia__linea-hora {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px solid var(--dp-crema-oscuro);
+}
+
+.calendario-dia__etiqueta-hora {
+  position: absolute;
+  left: -56px;
+  top: -0.6rem;
+  width: 48px;
+  text-align: right;
+  font-size: 0.72rem;
+  color: var(--dp-texto-suave);
+  background: #fff;
+  padding-right: 0.4rem;
+}
+
+.calendario-dia__linea-ahora {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #b5564a;
+  z-index: 3;
+}
+
+.calendario-dia__linea-ahora::before {
+  content: '';
+  position: absolute;
+  left: -5px;
+  top: -4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #b5564a;
+}
+
+.calendario-dia__evento {
+  position: absolute;
+  left: 0.5rem;
+  right: 0.5rem;
+  background: var(--dp-dorado);
+  color: #fff;
+  border-radius: 6px;
+  padding: 0.25rem 0.6rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  z-index: 2;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.calendario-dia__evento--pendiente {
+  background: var(--dp-crema);
+  border: 1.5px dashed var(--dp-dorado);
+  color: var(--dp-texto);
+}
+
+.calendario-dia__evento-hora {
+  font-size: 0.68rem;
+  opacity: 0.85;
+  font-weight: 600;
+}
+
+.calendario-dia__evento-titulo {
+  font-size: 0.78rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .calendario-dia__grid {
+    margin-left: 44px;
+  }
+  .calendario-dia__etiqueta-hora {
+    left: -44px;
+    width: 38px;
+    font-size: 0.65rem;
+  }
+}
