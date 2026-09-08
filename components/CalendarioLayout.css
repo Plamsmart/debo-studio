@@ -5,10 +5,10 @@
 }
 
 .calendario-layout__titulo-lista {
-  font-family: 'Georgia', 'Times New Roman', serif;
+  font-family: var(--font-body);
   font-size: 1rem;
   font-weight: 600;
-  color: #3a2e26;
+  color: var(--marca-gris);
   margin-bottom: 0.9rem;
 }
 

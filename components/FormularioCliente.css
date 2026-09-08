@@ -1,42 +1,35 @@
 .formulario-cliente {
-  --dp-crema: #faf6f0;
-  --dp-crema-oscuro: #f0e8dc;
-  --dp-dorado: #b08d57;
-  --dp-texto: #3a2e26;
-  --dp-texto-suave: #8a7a6b;
-  --dp-rojo: #b5564a;
-
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
   max-width: 400px;
-  font-family: 'Georgia', 'Times New Roman', serif;
-  color: var(--dp-texto);
+  font-family: var(--font-body);
+  color: var(--marca-gris);
 }
 
 .formulario-cliente__label {
   font-size: 0.82rem;
-  color: var(--dp-texto-suave);
+  color: var(--marca-gris-suave);
   margin-top: 0.7rem;
 }
 
 .formulario-cliente__input {
   padding: 0.65rem 0.8rem;
   border-radius: 8px;
-  border: 1px solid var(--dp-crema-oscuro);
-  background: var(--dp-crema);
+  border: 1px solid var(--marca-crema-oscuro);
+  background: var(--marca-crema);
   font-family: inherit;
   font-size: 0.95rem;
-  color: var(--dp-texto);
+  color: var(--marca-gris);
 }
 
 .formulario-cliente__input:focus-visible {
-  outline: 2px solid var(--dp-dorado);
+  outline: 2px solid var(--marca-bronce);
   outline-offset: 1px;
 }
 
 .formulario-cliente__error {
-  color: var(--dp-rojo);
+  color: var(--marca-rojo);
   font-size: 0.85rem;
   margin: 0.5rem 0 0 0;
 }
@@ -46,7 +39,7 @@
   padding: 0.75rem;
   border-radius: 8px;
   border: none;
-  background: var(--dp-dorado);
+  background: var(--marca-bronce);
   color: #fff;
   font-family: inherit;
   font-size: 0.95rem;

@@ -1,22 +1,15 @@
 .panel-servicios {
-  --dp-crema: #faf6f0;
-  --dp-crema-oscuro: #f0e8dc;
-  --dp-dorado: #b08d57;
-  --dp-verde: #6b8e5a;
-  --dp-texto: #3a2e26;
-  --dp-texto-suave: #8a7a6b;
-
-  font-family: 'Georgia', 'Times New Roman', serif;
-  color: var(--dp-texto);
+  font-family: var(--font-body);
+  color: var(--marca-gris);
   max-width: 820px;
 }
 
 .panel-servicios__btn-nuevo {
   padding: 0.6rem 1.1rem;
   border-radius: 8px;
-  border: 1px solid var(--dp-dorado);
+  border: 1px solid var(--marca-bronce);
   background: #fff;
-  color: var(--dp-dorado);
+  color: var(--marca-bronce);
   font-family: inherit;
   font-size: 0.9rem;
   cursor: pointer;
@@ -24,7 +17,7 @@
 }
 
 .panel-servicios__btn-nuevo:hover {
-  background: var(--dp-dorado);
+  background: var(--marca-bronce);
   color: #fff;
 }
 
@@ -34,8 +27,8 @@
   gap: 0.6rem;
   padding: 1rem;
   border-radius: 12px;
-  background: var(--dp-crema);
-  border: 1px solid var(--dp-crema-oscuro);
+  background: var(--marca-crema);
+  border: 1px solid var(--marca-crema-oscuro);
   margin-bottom: 1.6rem;
   align-items: center;
 }
@@ -43,11 +36,11 @@
 .panel-servicios__input {
   padding: 0.5rem 0.7rem;
   border-radius: 8px;
-  border: 1px solid var(--dp-crema-oscuro);
+  border: 1px solid var(--marca-crema-oscuro);
   background: #fff;
   font-family: inherit;
   font-size: 0.88rem;
-  color: var(--dp-texto);
+  color: var(--marca-gris);
   flex: 1 1 160px;
 }
 
@@ -67,7 +60,7 @@
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--dp-texto-suave);
+  color: var(--marca-gris-suave);
   margin-bottom: 0.6rem;
 }
 
@@ -84,8 +77,8 @@
   gap: 1rem;
   padding: 0.75rem 1rem;
   border-radius: 10px;
-  background: var(--dp-crema);
-  border: 1px solid var(--dp-crema-oscuro);
+  background: var(--marca-crema);
+  border: 1px solid var(--marca-crema-oscuro);
   flex-wrap: wrap;
 }
 
@@ -106,7 +99,7 @@
 
 .panel-servicios__meta {
   font-size: 0.8rem;
-  color: var(--dp-texto-suave);
+  color: var(--marca-gris-suave);
 }
 
 .panel-servicios__botones {
@@ -118,32 +111,32 @@
 .panel-servicios__btn-toggle {
   padding: 0.4rem 0.8rem;
   border-radius: 8px;
-  border: 1px solid var(--dp-crema-oscuro);
+  border: 1px solid var(--marca-crema-oscuro);
   background: #fff;
-  color: var(--dp-texto);
+  color: var(--marca-gris);
   font-family: inherit;
   font-size: 0.82rem;
   cursor: pointer;
 }
 
 .panel-servicios__btn-toggle--activo {
-  border-color: var(--dp-verde);
-  color: var(--dp-verde);
+  border-color: var(--marca-verde);
+  color: var(--marca-verde);
 }
 
 .panel-servicios__badge-toggle {
   padding: 0.4rem 0.8rem;
   border-radius: 8px;
-  border: 1px solid var(--dp-crema-oscuro);
-  background: var(--dp-crema);
-  color: var(--dp-texto-suave);
+  border: 1px solid var(--marca-crema-oscuro);
+  background: var(--marca-crema);
+  color: var(--marca-gris-suave);
   font-family: inherit;
   font-size: 0.82rem;
 }
 
 .panel-servicios__badge-toggle--activo {
-  border-color: var(--dp-verde);
-  color: var(--dp-verde);
+  border-color: var(--marca-verde);
+  color: var(--marca-verde);
 }
 
 .panel-servicios__form-edicion {
@@ -163,7 +156,7 @@
   padding: 0.5rem 0.9rem;
   border-radius: 8px;
   border: none;
-  background: var(--dp-dorado);
+  background: var(--marca-bronce);
   color: #fff;
   font-family: inherit;
   font-size: 0.85rem;
@@ -178,9 +171,9 @@
 .panel-servicios__btn-cancelar {
   padding: 0.5rem 0.9rem;
   border-radius: 8px;
-  border: 1px solid var(--dp-crema-oscuro);
+  border: 1px solid var(--marca-crema-oscuro);
   background: #fff;
-  color: var(--dp-texto-suave);
+  color: var(--marca-gris-suave);
   font-family: inherit;
   font-size: 0.85rem;
   cursor: pointer;

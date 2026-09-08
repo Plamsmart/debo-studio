@@ -1,13 +1,6 @@
 .selector-citas {
-  --dp-crema: #faf6f0;
-  --dp-crema-oscuro: #f0e8dc;
-  --dp-dorado: #b08d57;
-  --dp-dorado-suave: #d9c4a3;
-  --dp-texto: #3a2e26;
-  --dp-texto-suave: #8a7a6b;
-
-  font-family: 'Georgia', 'Times New Roman', serif;
-  color: var(--dp-texto);
+  font-family: var(--font-body);
+  color: var(--marca-gris);
   max-width: 380px;
 }
 
@@ -20,15 +13,15 @@
   font-weight: 500;
   letter-spacing: 0.02em;
   margin-bottom: 0.9rem;
-  color: var(--dp-texto);
+  color: var(--marca-gris);
 }
 
 /* Calendario de mes */
 .selector-citas__calendario {
-  border: 1px solid var(--dp-crema-oscuro);
+  border: 1px solid var(--marca-crema-oscuro);
   border-radius: 14px;
   padding: 1rem;
-  background: var(--dp-crema);
+  background: var(--marca-crema);
 }
 
 .selector-citas__calendario-header {
@@ -48,9 +41,9 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  border: 1px solid var(--dp-crema-oscuro);
+  border: 1px solid var(--marca-crema-oscuro);
   background: #fff;
-  color: var(--dp-dorado);
+  color: var(--marca-bronce);
   font-size: 1.2rem;
   line-height: 1;
   cursor: pointer;
@@ -61,7 +54,7 @@
 }
 
 .selector-citas__flecha:hover:not(:disabled) {
-  background: var(--dp-dorado);
+  background: var(--marca-bronce);
   color: #fff;
 }
 
@@ -79,7 +72,7 @@
 .selector-citas__dia-semana {
   text-align: center;
   font-size: 0.72rem;
-  color: var(--dp-texto-suave);
+  color: var(--marca-gris-suave);
   text-transform: uppercase;
   padding-bottom: 0.4rem;
 }
@@ -99,7 +92,7 @@
   border: none;
   border-radius: 8px;
   background: #fff;
-  color: var(--dp-texto);
+  color: var(--marca-gris);
   font-family: inherit;
   font-size: 0.88rem;
   cursor: pointer;
@@ -110,27 +103,27 @@
 }
 
 .selector-citas__celda:hover:not(:disabled) {
-  background: var(--dp-dorado-suave);
+  background: var(--marca-cobre-claro);
 }
 
 .selector-citas__celda:focus-visible {
-  outline: 2px solid var(--dp-dorado);
+  outline: 2px solid var(--marca-bronce);
   outline-offset: 1px;
 }
 
 .selector-citas__celda--hoy {
-  box-shadow: inset 0 0 0 1.5px var(--dp-dorado);
+  box-shadow: inset 0 0 0 1.5px var(--marca-bronce);
   font-weight: 600;
 }
 
 .selector-citas__celda--activo {
-  background: var(--dp-dorado);
+  background: var(--marca-bronce);
   color: #fff;
   font-weight: 600;
 }
 
 .selector-citas__celda--deshabilitado {
-  color: var(--dp-texto-suave);
+  color: var(--marca-gris-suave);
   opacity: 0.35;
   cursor: not-allowed;
   background: transparent;
@@ -146,9 +139,9 @@
 .selector-citas__hora-btn {
   padding: 0.6rem 0.4rem;
   border-radius: 10px;
-  border: 1px solid var(--dp-crema-oscuro);
-  background: var(--dp-crema);
-  color: var(--dp-texto);
+  border: 1px solid var(--marca-crema-oscuro);
+  background: var(--marca-crema);
+  color: var(--marca-gris);
   font-family: inherit;
   font-size: 0.92rem;
   cursor: pointer;
@@ -156,22 +149,22 @@
 }
 
 .selector-citas__hora-btn:hover {
-  border-color: var(--dp-dorado-suave);
+  border-color: var(--marca-cobre-claro);
 }
 
 .selector-citas__hora-btn:focus-visible {
-  outline: 2px solid var(--dp-dorado);
+  outline: 2px solid var(--marca-bronce);
   outline-offset: 2px;
 }
 
 .selector-citas__hora-btn--activo {
-  background: var(--dp-dorado);
-  border-color: var(--dp-dorado);
+  background: var(--marca-bronce);
+  border-color: var(--marca-bronce);
   color: #fff;
 }
 
 .selector-citas__estado {
-  color: var(--dp-texto-suave);
+  color: var(--marca-gris-suave);
   font-size: 0.92rem;
   font-style: italic;
 }

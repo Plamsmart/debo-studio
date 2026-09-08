@@ -1,18 +1,6 @@
 .pagina-inicio {
-  --crema: #fbf7f1;
-  --crema-oscuro: #f1e7d8;
-  --dorado-claro: #e8d4b5;
-  --dorado: #b8813e;
-  --dorado-oscuro: #96692f;
-  --texto: #4a3b2e;
-  --texto-suave: #8c7a66;
-  --blanco: #ffffff;
-
-  --font-display: 'Cormorant Garamond', Georgia, serif;
-  --font-body: 'Jost', 'Work Sans', sans-serif;
-
-  background: var(--crema);
-  color: var(--texto);
+  background: var(--marca-crema);
+  color: var(--marca-gris);
   font-family: var(--font-body);
 }
 
@@ -29,7 +17,7 @@
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.18em;
-  color: var(--dorado-oscuro);
+  color: var(--marca-bronce-oscuro);
   margin-bottom: 0.8rem;
 }
 
@@ -51,28 +39,28 @@
   transition: all 0.2s ease;
 }
 
-.btn--dorado {
-  background: var(--dorado);
+.btn.btn--dorado {
+  background: var(--marca-bronce);
   color: #fff;
-  border: 1px solid var(--dorado);
+  border: 1px solid var(--marca-bronce);
 }
 
-.btn--dorado:hover {
-  background: var(--dorado-oscuro);
-  border-color: var(--dorado-oscuro);
+.btn.btn--dorado:hover {
+  background: var(--marca-bronce-oscuro);
+  border-color: var(--marca-bronce-oscuro);
 }
 
 .btn--outline {
-  border: 1px solid var(--dorado);
-  color: var(--dorado-oscuro);
+  border: 1px solid var(--marca-bronce);
+  color: var(--marca-bronce-oscuro);
 }
 
 .btn--outline:hover {
-  background: var(--dorado-claro);
+  background: var(--marca-cobre-claro);
 }
 
 .btn:focus-visible {
-  outline: 2px solid var(--dorado-oscuro);
+  outline: 2px solid var(--marca-bronce-oscuro);
   outline-offset: 3px;
 }
 
@@ -107,7 +95,7 @@
 .header--solido {
   background: rgba(251, 247, 241, 0.92);
   backdrop-filter: blur(6px);
-  border-bottom: 1px solid var(--crema-oscuro);
+  border-bottom: 1px solid var(--marca-crema-oscuro);
 }
 
 .header__marca {
@@ -131,7 +119,7 @@
 }
 
 .header--solido .header__nombre {
-  color: var(--texto);
+  color: var(--marca-gris);
 }
 
 .header__nav {
@@ -146,24 +134,24 @@
 }
 
 .header--solido .header__nav a {
-  color: var(--texto);
+  color: var(--marca-gris);
 }
 
 .header__nav a:hover {
-  color: var(--dorado-oscuro);
+  color: var(--marca-bronce-oscuro);
 }
 
-.header__cta {
+.header .header__cta {
   padding: 0.65rem 1.5rem;
   border-radius: 999px;
-  background: var(--dorado);
+  background: var(--marca-bronce);
   color: #fff;
   font-size: 0.92rem;
   transition: background 0.15s ease;
 }
 
-.header__cta:hover {
-  background: var(--dorado-oscuro);
+.header .header__cta:hover {
+  background: var(--marca-bronce-oscuro);
 }
 
 @media (max-width: 780px) {
@@ -205,7 +193,7 @@
 }
 
 .header--solido .nav-movil__toggle span {
-  background: var(--texto);
+  background: var(--marca-gris);
 }
 
 .nav-movil__panel {
@@ -213,7 +201,7 @@
   top: 100%;
   right: 4vw;
   background: #fff;
-  border: 1px solid var(--crema-oscuro);
+  border: 1px solid var(--marca-crema-oscuro);
   border-radius: 12px;
   padding: 1rem 1.4rem;
   display: flex;
@@ -224,7 +212,7 @@
 }
 
 .nav-movil__cta {
-  color: var(--dorado-oscuro);
+  color: var(--marca-bronce-oscuro);
   font-weight: 600;
 }
 
@@ -400,14 +388,14 @@
 
 .servicio-card {
   background: #fff;
-  border: 1px solid var(--crema-oscuro);
+  border: 1px solid var(--marca-crema-oscuro);
   border-radius: 16px;
   padding: 1.8rem 1.6rem;
   transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
 .servicio-card:hover {
-  border-color: var(--dorado-claro);
+  border-color: var(--marca-cobre-claro);
   transform: translateY(-3px);
 }
 
@@ -420,7 +408,7 @@
 
 .servicio-card__descripcion {
   font-size: 0.9rem;
-  color: var(--texto-suave);
+  color: var(--marca-gris-suave);
   line-height: 1.5;
   margin: 0 0 1.2rem 0;
 }
@@ -428,7 +416,7 @@
 .servicio-card__precio {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--dorado-oscuro);
+  color: var(--marca-bronce-oscuro);
 }
 
 /* ===== Diferenciales ===== */
@@ -446,7 +434,7 @@
   display: block;
   width: 32px;
   height: 2px;
-  background: var(--dorado);
+  background: var(--marca-bronce);
   margin: 0 auto 1.1rem;
 }
 
@@ -459,7 +447,7 @@
 
 .diferencial p {
   font-size: 0.9rem;
-  color: var(--texto-suave);
+  color: var(--marca-gris-suave);
   line-height: 1.55;
 }
 
@@ -481,18 +469,18 @@
 
 .ubicacion__contacto {
   font-size: 0.92rem;
-  color: var(--texto-suave);
+  color: var(--marca-gris-suave);
   margin: 0 0 0.6rem 0;
 }
 
 .ubicacion__contacto a:hover {
-  color: var(--dorado-oscuro);
+  color: var(--marca-bronce-oscuro);
 }
 
 .ubicacion__instagram {
   display: inline-block;
   font-size: 0.88rem;
-  color: var(--dorado-oscuro);
+  color: var(--marca-bronce-oscuro);
   margin-bottom: 1.6rem;
 }
 
@@ -503,11 +491,11 @@
 
 .ubicacion__horario td {
   padding: 0.4rem 1.2rem 0.4rem 0;
-  border-bottom: 1px solid var(--crema-oscuro);
+  border-bottom: 1px solid var(--marca-crema-oscuro);
 }
 
 .ubicacion__mapa {
-  background: var(--crema-oscuro);
+  background: var(--marca-crema-oscuro);
   border-radius: 16px;
   min-height: 320px;
   overflow: hidden;
@@ -528,7 +516,7 @@
 .cta-final {
   text-align: center;
   padding: 4.5rem 4vw;
-  background: var(--dorado-claro);
+  background: var(--marca-cobre-claro);
 }
 
 .cta-final h2 {

@@ -1,6 +1,6 @@
 .flujo-reserva {
-  font-family: 'Georgia', 'Times New Roman', serif;
-  color: #3a2e26;
+  font-family: var(--font-body);
+  color: var(--marca-gris);
 }
 
 /* Móvil por defecto: todo apilado, una sola columna */
@@ -18,38 +18,38 @@
   font-size: 1.1rem;
   font-weight: 600;
   margin-bottom: 1rem;
-  color: #3a2e26;
+  color: var(--marca-gris);
 }
 
 .flujo-reserva__resumen-linea {
   font-size: 0.92rem;
-  color: #8a7a6b;
+  color: var(--marca-gris-suave);
   margin: 0 0 1rem 0;
 }
 
 .flujo-reserva__error {
-  color: #b5564a;
+  color: var(--marca-rojo);
   font-size: 0.88rem;
   margin-top: 0.8rem;
 }
 
 .flujo-reserva__placeholder {
-  color: #8a7a6b;
+  color: var(--marca-gris-suave);
   font-style: italic;
   font-size: 0.92rem;
   padding: 1.4rem;
-  border: 1px dashed #f0e8dc;
+  border: 1px dashed var(--marca-crema-oscuro);
   border-radius: 12px;
-  background: #faf6f0;
+  background: var(--marca-crema);
 }
 
 .flujo-reserva__exito {
-  font-family: 'Georgia', 'Times New Roman', serif;
-  color: #3a2e26;
+  font-family: var(--font-body);
+  color: var(--marca-gris);
   padding: 1.4rem 1.6rem;
   border-radius: 12px;
-  background: #f0e8dc;
-  border: 1px solid #d9c4a3;
+  background: var(--marca-crema-oscuro);
+  border: 1px solid var(--marca-cobre-claro);
   max-width: 500px;
 }
 

@@ -8,7 +8,7 @@
   padding: 0;
   font-family: inherit;
   font-size: 0.82rem;
-  color: var(--dp-dorado);
+  color: var(--marca-bronce);
   cursor: pointer;
   text-align: left;
 }
@@ -25,7 +25,7 @@
   padding: 0.6rem 0.8rem;
   border-radius: 8px;
   background: #fff;
-  border: 1px solid var(--dp-crema-oscuro);
+  border: 1px solid var(--marca-crema-oscuro);
 }
 
 .panel-clientes__historial-item {
@@ -35,7 +35,7 @@
   align-items: center;
   font-size: 0.78rem;
   padding: 0.25rem 0;
-  border-bottom: 1px dashed var(--dp-crema-oscuro);
+  border-bottom: 1px dashed var(--marca-crema-oscuro);
 }
 
 .panel-clientes__historial-item:last-child {
@@ -43,20 +43,20 @@
 }
 
 .panel-clientes__historial-concepto {
-  color: var(--dp-texto);
+  color: var(--marca-gris);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .panel-clientes__historial-fecha {
-  color: var(--dp-texto-suave);
+  color: var(--marca-gris-suave);
   white-space: nowrap;
 }
 
 .panel-clientes__historial-monto {
   font-weight: 600;
-  color: var(--dp-texto);
+  color: var(--marca-gris);
   white-space: nowrap;
 }
 
@@ -69,13 +69,13 @@
 }
 
 .panel-clientes__badge-metodo--web {
-  background: #6b8e5a;
+  background: var(--marca-verde);
 }
 
 .panel-clientes__badge-metodo--qr_local {
-  background: var(--dp-dorado);
+  background: var(--marca-bronce);
 }
 
 .panel-clientes__badge-metodo--efectivo {
-  background: #8a7a6b;
+  background: var(--marca-gris-suave);
 }

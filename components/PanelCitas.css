@@ -1,13 +1,5 @@
 .panel-citas-wrap {
-  --dp-crema: #faf6f0;
-  --dp-crema-oscuro: #f0e8dc;
-  --dp-dorado: #b08d57;
-  --dp-verde: #6b8e5a;
-  --dp-rojo: #b5564a;
-  --dp-texto: #3a2e26;
-  --dp-texto-suave: #8a7a6b;
-
-  font-family: 'Georgia', 'Times New Roman', serif;
+  font-family: var(--font-body);
 }
 
 .panel-citas__pestanas {
@@ -19,9 +11,9 @@
 .panel-citas__pestana {
   padding: 0.5rem 1rem;
   border-radius: 20px;
-  border: 1px solid var(--dp-crema-oscuro);
+  border: 1px solid var(--marca-crema-oscuro);
   background: #fff;
-  color: var(--dp-texto-suave);
+  color: var(--marca-gris-suave);
   font-family: inherit;
   font-size: 0.88rem;
   cursor: pointer;
@@ -29,12 +21,12 @@
 }
 
 .panel-citas__pestana:hover {
-  border-color: var(--dp-dorado-suave, #d9c4a3);
+  border-color: var(--marca-cobre-claro);
 }
 
 .panel-citas__pestana--activa {
-  background: var(--dp-dorado);
-  border-color: var(--dp-dorado);
+  background: var(--marca-bronce);
+  border-color: var(--marca-bronce);
   color: #fff;
 }
 
@@ -52,8 +44,8 @@
   gap: 1.2rem;
   padding: 1rem 1.3rem;
   border-radius: 12px;
-  border: 1px solid var(--dp-crema-oscuro);
-  background: var(--dp-crema);
+  border: 1px solid var(--marca-crema-oscuro);
+  background: var(--marca-crema);
   flex-wrap: wrap;
 }
 
@@ -61,7 +53,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  color: var(--dp-texto);
+  color: var(--marca-gris);
 }
 
 .panel-citas__linea-superior {
@@ -85,15 +77,15 @@
 }
 
 .panel-citas__badge--pendiente {
-  background: var(--dp-dorado);
+  background: var(--marca-bronce);
 }
 
 .panel-citas__badge--confirmada {
-  background: var(--dp-verde);
+  background: var(--marca-verde);
 }
 
 .panel-citas__badge--cancelada {
-  background: var(--dp-rojo);
+  background: var(--marca-rojo);
 }
 
 .panel-citas__badge--completada {
@@ -101,17 +93,17 @@
 }
 
 .panel-citas__badge--no_asistio {
-  background: #8a7a6b;
+  background: var(--marca-gris-suave);
 }
 
 .panel-citas__fecha {
   font-size: 0.9rem;
-  color: var(--dp-texto-suave);
+  color: var(--marca-gris-suave);
 }
 
 .panel-citas__cliente {
   font-size: 0.85rem;
-  color: var(--dp-texto-suave);
+  color: var(--marca-gris-suave);
 }
 
 .panel-citas__precio {
@@ -143,11 +135,11 @@
 }
 
 .panel-citas__btn--confirmar {
-  background: var(--dp-verde);
+  background: var(--marca-verde);
 }
 
 .panel-citas__btn--cancelar {
-  background: var(--dp-rojo);
+  background: var(--marca-rojo);
 }
 
 .panel-citas__btn:hover:not(:disabled) {
@@ -155,6 +147,6 @@
 }
 
 .panel-citas__vacio {
-  color: var(--dp-texto-suave);
+  color: var(--marca-gris-suave);
   font-style: italic;
 }

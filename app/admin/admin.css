@@ -1,8 +1,8 @@
 .admin-layout {
   min-height: 100vh;
-  background: #faf6f0;
-  font-family: 'Georgia', 'Times New Roman', serif;
-  color: #3a2e26;
+  background: var(--marca-crema);
+  font-family: var(--font-body);
+  color: var(--marca-gris);
 }
 
 .admin-layout__nav {
@@ -12,7 +12,7 @@
   gap: 1.6rem;
   padding: 1rem 2rem;
   background: #fff;
-  border-bottom: 1px solid #f0e8dc;
+  border-bottom: 1px solid var(--marca-crema-oscuro);
   position: sticky;
   top: 0;
   z-index: 50;
@@ -42,7 +42,7 @@
 }
 
 .admin-layout__link {
-  color: #8a7a6b;
+  color: var(--marca-gris-suave);
   text-decoration: none;
   font-size: 1rem;
   padding: 0.3rem 0;
@@ -51,8 +51,8 @@
 }
 
 .admin-layout__link:hover {
-  color: #b08d57;
-  border-color: #d9c4a3;
+  color: var(--marca-bronce);
+  border-color: var(--marca-cobre-claro);
 }
 
 .admin-layout__contenido {

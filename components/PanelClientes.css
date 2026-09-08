@@ -1,16 +1,8 @@
 @import './PanelClientes-historial.css';
 
 .panel-clientes {
-  --dp-crema: #faf6f0;
-  --dp-crema-oscuro: #f0e8dc;
-  --dp-dorado: #b08d57;
-  --dp-verde: #6b8e5a;
-  --dp-rojo: #b5564a;
-  --dp-texto: #3a2e26;
-  --dp-texto-suave: #8a7a6b;
-
-  font-family: 'Georgia', 'Times New Roman', serif;
-  color: var(--dp-texto);
+  font-family: var(--font-body);
+  color: var(--marca-gris);
   max-width: 840px;
 }
 
@@ -25,19 +17,19 @@
   flex: 1 1 260px;
   padding: 0.6rem 0.9rem;
   border-radius: 8px;
-  border: 1px solid var(--dp-crema-oscuro);
+  border: 1px solid var(--marca-crema-oscuro);
   background: #fff;
   font-family: inherit;
   font-size: 0.9rem;
-  color: var(--dp-texto);
+  color: var(--marca-gris);
 }
 
 .panel-clientes__btn-nuevo {
   padding: 0.6rem 1.1rem;
   border-radius: 8px;
-  border: 1px solid var(--dp-dorado);
+  border: 1px solid var(--marca-bronce);
   background: #fff;
-  color: var(--dp-dorado);
+  color: var(--marca-bronce);
   font-family: inherit;
   font-size: 0.9rem;
   cursor: pointer;
@@ -45,7 +37,7 @@
 }
 
 .panel-clientes__btn-nuevo:hover {
-  background: var(--dp-dorado);
+  background: var(--marca-bronce);
   color: #fff;
 }
 
@@ -55,8 +47,8 @@
   gap: 0.6rem;
   padding: 1rem;
   border-radius: 12px;
-  background: var(--dp-crema);
-  border: 1px solid var(--dp-crema-oscuro);
+  background: var(--marca-crema);
+  border: 1px solid var(--marca-crema-oscuro);
   margin-bottom: 1.6rem;
   align-items: center;
 }
@@ -64,11 +56,11 @@
 .panel-clientes__input {
   padding: 0.5rem 0.7rem;
   border-radius: 8px;
-  border: 1px solid var(--dp-crema-oscuro);
+  border: 1px solid var(--marca-crema-oscuro);
   background: #fff;
   font-family: inherit;
   font-size: 0.88rem;
-  color: var(--dp-texto);
+  color: var(--marca-gris);
   flex: 1 1 160px;
 }
 
@@ -89,8 +81,8 @@
   gap: 1rem;
   padding: 1rem 1.2rem;
   border-radius: 12px;
-  background: var(--dp-crema);
-  border: 1px solid var(--dp-crema-oscuro);
+  background: var(--marca-crema);
+  border: 1px solid var(--marca-crema-oscuro);
   flex-wrap: wrap;
 }
 
@@ -108,7 +100,7 @@
 
 .panel-clientes__contacto {
   font-size: 0.85rem;
-  color: var(--dp-texto-suave);
+  color: var(--marca-gris-suave);
 }
 
 .panel-clientes__servicios {
@@ -122,26 +114,26 @@
   font-size: 0.72rem;
   padding: 0.15rem 0.6rem;
   border-radius: 20px;
-  background: var(--dp-crema-oscuro);
-  color: var(--dp-texto-suave);
+  background: var(--marca-crema-oscuro);
+  color: var(--marca-gris-suave);
 }
 
 .panel-clientes__notas {
   text-align: left;
   background: none;
   border: none;
-  border-top: 1px dashed var(--dp-crema-oscuro);
+  border-top: 1px dashed var(--marca-crema-oscuro);
   padding-top: 0.5rem;
   margin-top: 0.3rem;
   font-family: inherit;
   font-style: italic;
   font-size: 0.85rem;
-  color: var(--dp-texto-suave);
+  color: var(--marca-gris-suave);
   cursor: pointer;
 }
 
 .panel-clientes__notas:hover {
-  color: var(--dp-dorado);
+  color: var(--marca-bronce);
 }
 
 .panel-clientes__notas-edicion {
@@ -154,11 +146,11 @@
 .panel-clientes__textarea {
   padding: 0.5rem 0.7rem;
   border-radius: 8px;
-  border: 1px solid var(--dp-crema-oscuro);
+  border: 1px solid var(--marca-crema-oscuro);
   background: #fff;
   font-family: inherit;
   font-size: 0.85rem;
-  color: var(--dp-texto);
+  color: var(--marca-gris);
   resize: vertical;
 }
 
@@ -171,7 +163,7 @@
   padding: 0.45rem 0.9rem;
   border-radius: 8px;
   border: none;
-  background: var(--dp-dorado);
+  background: var(--marca-bronce);
   color: #fff;
   font-family: inherit;
   font-size: 0.82rem;
@@ -186,9 +178,9 @@
 .panel-clientes__btn-cancelar {
   padding: 0.45rem 0.9rem;
   border-radius: 8px;
-  border: 1px solid var(--dp-crema-oscuro);
+  border: 1px solid var(--marca-crema-oscuro);
   background: #fff;
-  color: var(--dp-texto-suave);
+  color: var(--marca-gris-suave);
   font-family: inherit;
   font-size: 0.82rem;
   cursor: pointer;
@@ -197,9 +189,9 @@
 .panel-clientes__btn-eliminar {
   padding: 0.4rem 0.8rem;
   border-radius: 8px;
-  border: 1px solid var(--dp-rojo);
+  border: 1px solid var(--marca-rojo);
   background: #fff;
-  color: var(--dp-rojo);
+  color: var(--marca-rojo);
   font-family: inherit;
   font-size: 0.8rem;
   cursor: pointer;
@@ -207,11 +199,11 @@
 }
 
 .panel-clientes__btn-eliminar:hover {
-  background: var(--dp-rojo);
+  background: var(--marca-rojo);
   color: #fff;
 }
 
 .panel-clientes__vacio {
-  color: var(--dp-texto-suave);
+  color: var(--marca-gris-suave);
   font-style: italic;
 }

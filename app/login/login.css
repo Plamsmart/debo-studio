@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #faf6f0;
+  background: var(--marca-crema);
   padding: 1.5rem;
 }
 
@@ -16,9 +16,9 @@
   background: #fff;
   padding: 2.2rem 2rem;
   border-radius: 16px;
-  border: 1px solid #f0e8dc;
-  font-family: 'Georgia', 'Times New Roman', serif;
-  color: #3a2e26;
+  border: 1px solid var(--marca-crema-oscuro);
+  font-family: var(--font-body);
+  color: var(--marca-gris);
 }
 
 .login-page__titulo {
@@ -29,35 +29,35 @@
 
 .login-page__subtitulo {
   font-size: 0.85rem;
-  color: #8a7a6b;
+  color: var(--marca-gris-suave);
   text-align: center;
   margin: 0 0 1.4rem 0;
 }
 
 .login-page__label {
   font-size: 0.82rem;
-  color: #8a7a6b;
+  color: var(--marca-gris-suave);
   margin-top: 0.6rem;
 }
 
 .login-page__input {
   padding: 0.65rem 0.8rem;
   border-radius: 8px;
-  border: 1px solid #f0e8dc;
-  background: #faf6f0;
+  border: 1px solid var(--marca-crema-oscuro);
+  background: var(--marca-crema);
   font-family: inherit;
   font-size: 0.95rem;
-  color: #3a2e26;
+  color: var(--marca-gris);
   margin-top: 0.3rem;
 }
 
 .login-page__input:focus-visible {
-  outline: 2px solid #b08d57;
+  outline: 2px solid var(--marca-bronce);
   outline-offset: 1px;
 }
 
 .login-page__error {
-  color: #b5564a;
+  color: var(--marca-rojo);
   font-size: 0.85rem;
   margin: 0.6rem 0 0 0;
 }
@@ -67,7 +67,7 @@
   padding: 0.7rem;
   border-radius: 8px;
   border: none;
-  background: #b08d57;
+  background: var(--marca-bronce);
   color: #fff;
   font-family: inherit;
   font-size: 0.95rem;

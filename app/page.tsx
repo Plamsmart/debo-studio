@@ -1,4 +1,3 @@
-import { Cormorant_Garamond, Jost } from 'next/font/google'
 import { createClient } from '@/lib/supabase/server'
 import Header from '@/components/Header'
 import Hero from '@/components/Hero'
@@ -9,19 +8,6 @@ import Ubicacion from '@/components/Ubicacion'
 import CtaFinal from '@/components/CtaFinal'
 import Footer from '@/components/Footer'
 import './home.css'
-
-const cormorant = Cormorant_Garamond({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600'],
-  style: ['normal', 'italic'],
-  variable: '--font-display',
-})
-
-const jost = Jost({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600'],
-  variable: '--font-body',
-})
 
 // Descripciones curadas para las categorías destacadas en la portada.
 // (El catálogo completo vive en /reservar)
@@ -56,7 +42,7 @@ export default async function InicioPage() {
   )
 
   return (
-    <div className={`${cormorant.variable} ${jost.variable} pagina-inicio`}>
+    <div className="pagina-inicio">
       {/* ===== HEADER ===== */}
       <Header />
 

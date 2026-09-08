@@ -7,26 +7,26 @@
 
 .admin-layout__usuario {
   font-size: 0.85rem;
-  color: #8a7a6b;
-  font-family: 'Georgia', 'Times New Roman', serif;
+  color: var(--marca-gris-suave);
+  font-family: var(--font-body);
 }
 
 .admin-layout__cerrar-sesion {
   padding: 0.4rem 0.9rem;
   border-radius: 8px;
-  border: 1px solid #f0e8dc;
+  border: 1px solid var(--marca-crema-oscuro);
   background: #fff;
-  color: #b5564a;
-  font-family: 'Georgia', 'Times New Roman', serif;
+  color: var(--marca-rojo);
+  font-family: var(--font-body);
   font-size: 0.82rem;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .admin-layout__cerrar-sesion:hover:not(:disabled) {
-  background: #b5564a;
+  background: var(--marca-rojo);
   color: #fff;
-  border-color: #b5564a;
+  border-color: var(--marca-rojo);
 }
 
 .admin-layout__cerrar-sesion:disabled {

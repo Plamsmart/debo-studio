@@ -31,7 +31,7 @@ export default async function IntegracionesPage({
   const config = await obtenerConfigCalendario()
 
   return (
-    <div style={{ fontFamily: 'Georgia, serif' }}>
+    <div style={{ fontFamily: 'Montserrat, sans-serif' }}>
       <h1>Integraciones</h1>
 
       {exito && (
@@ -55,7 +55,7 @@ export default async function IntegracionesPage({
           background: '#faf6f0',
         }}
       >
-        <h3 style={{ marginTop: 0, color: '#3a2e26' }}>Google Calendar</h3>
+        <h3 style={{ marginTop: 0, color: '#53565a' }}>Google Calendar</h3>
 
         {config ? (
           <>
@@ -63,14 +63,14 @@ export default async function IntegracionesPage({
               ✓ Conectado el{' '}
               {new Date(config.conectado_en ?? '').toLocaleDateString('es-ES')}
             </p>
-            <p style={{ fontSize: '0.85rem', color: '#8a7a6b' }}>
+            <p style={{ fontSize: '0.85rem', color: '#8a8d90' }}>
               Cada cita confirmada se agrega automáticamente a tu Google Calendar. Si se
               cancela, el evento también se elimina de ahí.
             </p>
           </>
         ) : (
           <>
-            <p style={{ color: '#8a7a6b', fontSize: '0.9rem' }}>
+            <p style={{ color: '#8a8d90', fontSize: '0.9rem' }}>
               Conecta tu Google Calendar para que las citas confirmadas aparezcan
               automáticamente ahí.
             </p>
@@ -81,10 +81,10 @@ export default async function IntegracionesPage({
                 marginTop: '0.8rem',
                 padding: '0.7rem 1.3rem',
                 borderRadius: 8,
-                background: '#b08d57',
+                background: '#8f654d',
                 color: '#fff',
                 textDecoration: 'none',
-                fontFamily: 'Georgia, serif',
+                fontFamily: 'Montserrat, sans-serif',
               }}
             >
               Conectar Google Calendar

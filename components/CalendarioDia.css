@@ -1,13 +1,6 @@
 .calendario-dia {
-  --dp-crema: #faf6f0;
-  --dp-crema-oscuro: #f0e8dc;
-  --dp-dorado: #b08d57;
-  --dp-verde: #6b8e5a;
-  --dp-texto: #3a2e26;
-  --dp-texto-suave: #8a7a6b;
-
-  font-family: 'Georgia', 'Times New Roman', serif;
-  color: var(--dp-texto);
+  font-family: var(--font-body);
+  color: var(--marca-gris);
   max-width: 780px;
 }
 
@@ -28,9 +21,9 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  border: 1px solid var(--dp-crema-oscuro);
+  border: 1px solid var(--marca-crema-oscuro);
   background: #fff;
-  color: var(--dp-dorado);
+  color: var(--marca-bronce);
   font-size: 1.3rem;
   line-height: 1;
   display: flex;
@@ -41,23 +34,23 @@
 }
 
 .calendario-dia__flecha:hover {
-  background: var(--dp-dorado);
+  background: var(--marca-bronce);
   color: #fff;
 }
 
 .calendario-dia__btn-hoy {
   padding: 0.4rem 0.9rem;
   border-radius: 20px;
-  border: 1px solid var(--dp-crema-oscuro);
+  border: 1px solid var(--marca-crema-oscuro);
   background: #fff;
-  color: var(--dp-texto);
+  color: var(--marca-gris);
   font-family: inherit;
   font-size: 0.85rem;
   text-decoration: none;
 }
 
 .calendario-dia__btn-hoy:hover {
-  border-color: var(--dp-dorado);
+  border-color: var(--marca-bronce);
 }
 
 .calendario-dia__fecha {
@@ -67,16 +60,16 @@
 }
 
 .calendario-dia__cerrado {
-  color: var(--dp-texto-suave);
+  color: var(--marca-gris-suave);
   font-style: italic;
   padding: 2rem;
   text-align: center;
-  background: var(--dp-crema);
+  background: var(--marca-crema);
   border-radius: 12px;
 }
 
 .calendario-dia__grid-wrap {
-  border: 1px solid var(--dp-crema-oscuro);
+  border: 1px solid var(--marca-crema-oscuro);
   border-radius: 12px;
   overflow: hidden;
   background: #fff;
@@ -85,14 +78,14 @@
 .calendario-dia__grid {
   position: relative;
   margin-left: 56px;
-  border-left: 1px solid var(--dp-crema-oscuro);
+  border-left: 1px solid var(--marca-crema-oscuro);
 }
 
 .calendario-dia__linea-hora {
   position: absolute;
   left: 0;
   right: 0;
-  border-top: 1px solid var(--dp-crema-oscuro);
+  border-top: 1px solid var(--marca-crema-oscuro);
 }
 
 .calendario-dia__etiqueta-hora {
@@ -102,7 +95,7 @@
   width: 48px;
   text-align: right;
   font-size: 0.72rem;
-  color: var(--dp-texto-suave);
+  color: var(--marca-gris-suave);
   background: #fff;
   padding-right: 0.4rem;
 }
@@ -112,7 +105,7 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: #b5564a;
+  background: var(--marca-rojo);
   z-index: 3;
 }
 
@@ -124,14 +117,14 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #b5564a;
+  background: var(--marca-rojo);
 }
 
 .calendario-dia__evento {
   position: absolute;
   left: 0.5rem;
   right: 0.5rem;
-  background: var(--dp-dorado);
+  background: var(--marca-bronce);
   color: #fff;
   border-radius: 6px;
   padding: 0.25rem 0.6rem;
@@ -144,9 +137,9 @@
 }
 
 .calendario-dia__evento--pendiente {
-  background: var(--dp-crema);
-  border: 1.5px dashed var(--dp-dorado);
-  color: var(--dp-texto);
+  background: var(--marca-crema);
+  border: 1.5px dashed var(--marca-bronce);
+  color: var(--marca-gris);
 }
 
 .calendario-dia__evento-hora {

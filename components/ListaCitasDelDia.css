@@ -1,13 +1,5 @@
 .lista-citas-dia {
-  --dp-crema: #faf6f0;
-  --dp-crema-oscuro: #f0e8dc;
-  --dp-dorado: #b08d57;
-  --dp-verde: #6b8e5a;
-  --dp-rojo: #b5564a;
-  --dp-texto: #3a2e26;
-  --dp-texto-suave: #8a7a6b;
-
-  font-family: 'Georgia', 'Times New Roman', serif;
+  font-family: var(--font-body);
   display: flex;
   flex-direction: column;
   gap: 0.7rem;
@@ -20,8 +12,8 @@
   gap: 0.8rem;
   padding: 0.85rem 1rem;
   border-radius: 10px;
-  background: var(--dp-crema);
-  border: 1px solid var(--dp-crema-oscuro);
+  background: var(--marca-crema);
+  border: 1px solid var(--marca-crema-oscuro);
   flex-wrap: wrap;
 }
 
@@ -29,7 +21,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  color: var(--dp-texto);
+  color: var(--marca-gris);
   min-width: 0;
 }
 
@@ -54,11 +46,11 @@
 }
 
 .lista-citas-dia__badge--pendiente {
-  background: var(--dp-dorado);
+  background: var(--marca-bronce);
 }
 
 .lista-citas-dia__badge--confirmada {
-  background: var(--dp-verde);
+  background: var(--marca-verde);
 }
 
 .lista-citas-dia__badge--completada {
@@ -66,7 +58,7 @@
 }
 
 .lista-citas-dia__badge--no_asistio {
-  background: var(--dp-texto-suave);
+  background: var(--marca-gris-suave);
 }
 
 .lista-citas-dia__servicio {
@@ -76,7 +68,7 @@
 
 .lista-citas-dia__cliente {
   font-size: 0.8rem;
-  color: var(--dp-texto-suave);
+  color: var(--marca-gris-suave);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -104,15 +96,15 @@
 }
 
 .lista-citas-dia__btn--confirmar {
-  background: var(--dp-verde);
+  background: var(--marca-verde);
 }
 
 .lista-citas-dia__btn--cancelar {
-  background: var(--dp-rojo);
+  background: var(--marca-rojo);
 }
 
 .lista-citas-dia__vacio {
-  color: var(--dp-texto-suave);
+  color: var(--marca-gris-suave);
   font-style: italic;
-  font-family: 'Georgia', 'Times New Roman', serif;
+  font-family: var(--font-body);
 }

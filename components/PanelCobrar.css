@@ -5,27 +5,27 @@
   flex-direction: column;
   gap: 0.4rem;
   max-width: 380px;
-  font-family: 'Georgia', 'Times New Roman', serif;
+  font-family: var(--font-body);
 }
 
 .panel-cobrar__label {
   font-size: 0.85rem;
-  color: #8a7a6b;
+  color: var(--marca-gris-suave);
   margin-top: 0.8rem;
 }
 
 .panel-cobrar__input {
   padding: 0.7rem 0.9rem;
   border-radius: 8px;
-  border: 1px solid #f0e8dc;
-  background: #faf6f0;
+  border: 1px solid var(--marca-crema-oscuro);
+  background: var(--marca-crema);
   font-family: inherit;
   font-size: 1rem;
-  color: #3a2e26;
+  color: var(--marca-gris);
 }
 
 .panel-cobrar__error {
-  color: #b5564a;
+  color: var(--marca-rojo);
   font-size: 0.85rem;
   margin-top: 0.6rem;
 }
@@ -35,7 +35,7 @@
   padding: 0.9rem;
   border-radius: 8px;
   border: none;
-  background: #b08d57;
+  background: var(--marca-bronce);
   color: #fff;
   font-family: inherit;
   font-size: 1.05rem;
@@ -51,8 +51,8 @@
 .panel-cobrar__qr {
   text-align: center;
   max-width: 420px;
-  font-family: 'Georgia', 'Times New Roman', serif;
-  color: #3a2e26;
+  font-family: var(--font-body);
+  color: var(--marca-gris);
 }
 
 .panel-cobrar__qr h2 {
@@ -61,7 +61,7 @@
 }
 
 .panel-cobrar__concepto {
-  color: #8a7a6b;
+  color: var(--marca-gris-suave);
   margin-bottom: 1.6rem;
   font-size: 1.05rem;
 }
@@ -70,14 +70,14 @@
   width: 260px;
   height: 260px;
   border-radius: 12px;
-  border: 1px solid #f0e8dc;
+  border: 1px solid var(--marca-crema-oscuro);
   padding: 1rem;
   background: #fff;
 }
 
 .panel-cobrar__esperando {
   margin-top: 1.4rem;
-  color: #b08d57;
+  color: var(--marca-bronce);
   font-style: italic;
 }
 
@@ -85,16 +85,16 @@
   display: block;
   margin-top: 0.8rem;
   font-size: 0.85rem;
-  color: #8a7a6b;
+  color: var(--marca-gris-suave);
 }
 
 .panel-cobrar__btn-cancelar {
   margin-top: 2rem;
   padding: 0.6rem 1.2rem;
   border-radius: 8px;
-  border: 1px solid #f0e8dc;
+  border: 1px solid var(--marca-crema-oscuro);
   background: #fff;
-  color: #8a7a6b;
+  color: var(--marca-gris-suave);
   font-family: inherit;
   font-size: 0.9rem;
   cursor: pointer;
@@ -104,15 +104,15 @@
 .panel-cobrar__pagado {
   text-align: center;
   max-width: 420px;
-  font-family: 'Georgia', 'Times New Roman', serif;
-  color: #3a2e26;
+  font-family: var(--font-body);
+  color: var(--marca-gris);
 }
 
 .panel-cobrar__check {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: #6b8e5a;
+  background: var(--marca-verde);
   color: #fff;
   font-size: 2.2rem;
   display: flex;
@@ -127,6 +127,6 @@
 }
 
 .panel-cobrar__pagado p {
-  color: #8a7a6b;
+  color: var(--marca-gris-suave);
   margin-bottom: 1.8rem;
 }
