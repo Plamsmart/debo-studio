@@ -76,6 +76,7 @@ export type Database = {
           auth_user_id: string | null
           creado_en: string | null
           email: string | null
+          foto_url: string | null
           id: string
           nombre: string
           notas: string | null
@@ -85,6 +86,7 @@ export type Database = {
           auth_user_id?: string | null
           creado_en?: string | null
           email?: string | null
+          foto_url?: string | null
           id?: string
           nombre: string
           notas?: string | null
@@ -94,6 +96,7 @@ export type Database = {
           auth_user_id?: string | null
           creado_en?: string | null
           email?: string | null
+          foto_url?: string | null
           id?: string
           nombre?: string
           notas?: string | null

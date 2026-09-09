@@ -22,6 +22,8 @@ type Cliente = {
   email: string | null
   telefono: string | null
   notas?: string | null // solo presente si esAdmin=true
+  foto_url: string | null
+  foto_signed_url?: string | null
   creado_en: string | null
   citas: CitaResumen[] | null
   pagos?: PagoResumen[] | null // solo presente si esAdmin=true
@@ -40,6 +42,9 @@ type FormCliente = {
 }
 
 const FORM_VACIO: FormCliente = { nombre: '', email: '', telefono: '', notas: '' }
+
+const TIPOS_FOTO_PERMITIDOS = ['image/jpeg', 'image/png', 'image/webp']
+const TAMANO_MAXIMO_FOTO_BYTES = 5 * 1024 * 1024
 
 const ETIQUETA_METODO: Record<string, string> = {
   web: 'Web',
@@ -66,6 +71,12 @@ function formatearFecha(fechaISO: string | null): string {
   return d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
+function iniciales(nombre: string): string {
+  const partes = nombre.trim().split(/\s+/).filter(Boolean)
+  const letras = partes.slice(0, 2).map((p) => p[0]?.toUpperCase() ?? '')
+  return letras.join('') || '?'
+}
+
 export default function PanelClientes({ clientesIniciales, esAdmin }: Props) {
   const [clientes, setClientes] = useState(clientesIniciales)
   const [busqueda, setBusqueda] = useState('')
@@ -75,6 +86,7 @@ export default function PanelClientes({ clientesIniciales, esAdmin }: Props) {
   const [formNuevo, setFormNuevo] = useState<FormCliente>(FORM_VACIO)
   const [guardando, setGuardando] = useState(false)
   const [historialAbiertoId, setHistorialAbiertoId] = useState<string | null>(null)
+  const [subiendoFotoId, setSubiendoFotoId] = useState<string | null>(null)
 
   const clientesFiltrados = clientes.filter((c) => {
     const q = busqueda.toLowerCase()
@@ -122,6 +134,44 @@ export default function PanelClientes({ clientesIniciales, esAdmin }: Props) {
     }
 
     setClientes((prev) => prev.filter((c) => c.id !== cliente.id))
+  }
+
+  async function subirFoto(clienteId: string, e: React.ChangeEvent<HTMLInputElement>) {
+    const archivo = e.target.files?.[0]
+    e.target.value = ''
+    if (!archivo) return
+
+    if (!TIPOS_FOTO_PERMITIDOS.includes(archivo.type)) {
+      alert('La foto debe ser JPG, PNG o WEBP')
+      return
+    }
+    if (archivo.size > TAMANO_MAXIMO_FOTO_BYTES) {
+      alert('La foto no puede superar 5MB')
+      return
+    }
+
+    setSubiendoFotoId(clienteId)
+    try {
+      const formData = new FormData()
+      formData.append('foto', archivo)
+      const res = await fetch(`/api/clientes/${clienteId}/foto`, {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!res.ok) {
+        const data = await res.json()
+        alert(data.error || 'No se pudo subir la foto')
+        return
+      }
+
+      const { foto_url, foto_signed_url } = await res.json()
+      setClientes((prev) =>
+        prev.map((c) => (c.id === clienteId ? { ...c, foto_url, foto_signed_url } : c))
+      )
+    } finally {
+      setSubiendoFotoId(null)
+    }
   }
 
   async function crearCliente(e: React.FormEvent) {
@@ -223,8 +273,39 @@ export default function PanelClientes({ clientesIniciales, esAdmin }: Props) {
             const totalGastado = pagosCompletados.reduce((sum, p) => sum + p.monto, 0)
             const historialAbierto = historialAbiertoId === cliente.id
 
+            const subiendoFoto = subiendoFotoId === cliente.id
+
             return (
               <div key={cliente.id} className="panel-clientes__tarjeta">
+                <div className="panel-clientes__avatar-bloque">
+                  <div className="panel-clientes__avatar">
+                    {cliente.foto_signed_url ? (
+                      <img
+                        src={cliente.foto_signed_url}
+                        alt={cliente.nombre}
+                        className="panel-clientes__avatar-img"
+                      />
+                    ) : (
+                      <span className="panel-clientes__avatar-iniciales">
+                        {iniciales(cliente.nombre)}
+                      </span>
+                    )}
+                  </div>
+                  <input
+                    id={`foto-input-${cliente.id}`}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={(e) => subirFoto(cliente.id, e)}
+                    className="panel-clientes__avatar-input"
+                  />
+                  <label
+                    htmlFor={`foto-input-${cliente.id}`}
+                    className="panel-clientes__avatar-btn"
+                  >
+                    {subiendoFoto ? 'Subiendo…' : cliente.foto_url ? 'Cambiar foto' : 'Agregar foto'}
+                  </label>
+                </div>
+
                 <div className="panel-clientes__info">
                   <span className="panel-clientes__nombre">{cliente.nombre}</span>
                   <span className="panel-clientes__contacto">

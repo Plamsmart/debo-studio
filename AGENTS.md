@@ -116,6 +116,28 @@ table X", primero revisar GRANTs, no solo políticas RLS.
    (incluyendo respuestas de servicio) desde el 1 de octubre de 2026 —
    por eso el chatbot arranca solo en el widget web (sin costo de Meta),
    WhatsApp queda como fase futura con su propio costo aparte.
+9. **Falta de GRANT con `service_role`, otra vez** — pasó ahora con la
+   subida de foto de cliente: el `SELECT` sobre `clientes` funcionaba con
+   `service_role`, pero el `UPDATE` fallaba con "permission denied for
+   table clientes" porque nunca se le había otorgado ese permiso
+   específico. Se resolvió con `GRANT UPDATE ON clientes TO
+   service_role;` en el SQL Editor. Ya son 5 casos del mismo patrón
+   (`servicios`, `citas`, `clientes`, `pagos`, y ahora el `UPDATE` de
+   `clientes` en concreto) — **antes de tocar cualquier tabla nueva o
+   nueva operación (INSERT/UPDATE/DELETE) con `service_role`, revisar
+   GRANTs de una vez**, no solo cuando ya falló.
+10. **Los `catch` que devuelven 500 sin loguear el error real cuestan
+    mucho tiempo de diagnóstico** — pasó con el endpoint de fotos:
+    varios bloques `if (error) return NextResponse.json({error: "mensaje
+    genérico"}, {status: 500})` sin `console.error(error)` antes,
+    dejando el error real de Supabase invisible tanto en la terminal
+    como en el Response del navegador. Costó varias rondas de
+    diagnóstico a ciegas (env vars, bucket, nombres) hasta agregar los
+    logs y ver el mensaje real. **Convención a partir de ahora: todo
+    `catch`/bloque de error que vaya a producción debe loguear el error
+    original (`console.error`) antes de devolver un mensaje al
+    cliente**, aunque el mensaje que ve el usuario sea genérico por
+    seguridad.
 
 ## Panel de administración — secciones
 
@@ -127,6 +149,124 @@ table X", primero revisar GRANTs, no solo políticas RLS.
 - `/admin/cobrar` — cobro en el local (QR vía Stripe Checkout, o efectivo
   instantáneo)
 - `/admin/integraciones` — conectar/ver estado de Google Calendar
+
+## TicketBAI (facturación electrónica, en evaluación)
+
+Estudio Débora Pereira está en Irun (Gipuzkoa), así que le aplica la
+normativa foral TicketBAI (obligatoria en Gipuzkoa desde el 1 de junio de
+2023, con matices de calendario según sector). Se investigaron opciones
+para generar el fichero XML firmado y el código QR en cada cobro,
+independientemente del canal (`pagos.metodo_pago`: web/qr_local/efectivo).
+
+**Requisito legal clave:** el software que genera y firma los ficheros
+TBAI (propio o de terceros) debe estar inscrito en el registro de
+software garante de la Hacienda Foral correspondiente. Externalizar la
+tarea a un proveedor no exime al negocio de la obligación — Débora sigue
+siendo responsable de que se cumpla.
+
+**Descartado:** desarrollo propio homologado. Implica registrar el
+software, mantenerlo actualizado con cada cambio normativo, y asumir
+sanciones si falla (hasta 30.000€ al fabricante de software no conforme).
+Desproporcionado para el tamaño del proyecto.
+
+**Hallazgo clave — Débora ya está cumpliendo TicketBAI hoy:** usa un TPV
+llamado **ETPOS** (software de SDI Lab, muy usado en hostelería/comercio
+en España) para los cobros en el local (efectivo y tarjeta), con su
+propio módulo de certificación TicketBAI anual (200€/año — coincide con
+lo que ya paga). Es un sistema cerrado, sin API para inyectar ventas
+externas (confirmado por Pedro, no hay evidencia pública de lo
+contrario). **Esto reduce el alcance real del proyecto:** no hay que
+sustituir nada de lo que ya funciona en el local (~600 cobros/mes); solo
+falta cubrir el canal nuevo que introduce la web (pagos con Stripe, hoy
+inexistente en producción). Es legal y normal tener series de facturación
+separadas por canal bajo el mismo NIF (ej. serie "LOCAL" en ETPOS, serie
+"WEB" en el proveedor elegido).
+
+**Opciones evaluadas:**
+- **Itcons** (conector Stripe–TicketBAI) — empresa de Gipuzkoa,
+  referenciada por Stripe, homologada. Pero solo cubre cobros que pasan
+  por Stripe Invoices; no tiene API genérica conocida. Descartado por no
+  encajar con el flujo de pagos.
+- **B2Brouter** — API REST genérica, homologada en los tres territorios
+  forales, marca blanca. Planes desde Basic/gratuito hasta Enterprise a
+  medida (contactar para precio): https://www.b2brouter.net/es/api-ticketbai/
+- **TicketBAI WS** (Berein Internet S.L., Vitoria-Gasteiz) — **opción
+  elegida para evaluar en profundidad**. API REST/JSON genérica,
+  agnóstica del método de cobro. +10M facturas en producción, ~2.000
+  empresas activas, software garante acreditado en Araba/Bizkaia/Gipuzkoa
+  y colaborador social de la AEAT para Verifactu.
+  - **Precios:** Básico 4,99€/mes anual (5,99€ mensual) — hasta 30
+    facturas/mes, hasta 6.000€ facturación/mes, 1 NIF · Profesional
+    14,99€/mes anual (17,99€ mensual) — sin límite de facturas, hasta
+    30.000€/mes, 1 NIF · Avanzado 29,99€/mes anual (35,99€ mensual) — sin
+    límites, hasta 3 NIFs. https://ticketbaiws.eus/es/tarifas/
+  - **API:** `POST https://{entorno}.ticketbaiws.eus/tbai/` (entornos
+    `api-test` y `api`), headers `Token` + `Nif`. Payload JSON con
+    fecha/hora, `serie`+`numero` (texto libre, permite series separadas
+    tipo "WEB-"), `simplificada: true` para ticket sin NIF/dirección del
+    cliente, `lineas[]` con importe/tipo_iva. Devuelve `huella_tbai`, `qr`
+    (base64) y `url` de validación. Endpoints adicionales: anular
+    (`DEL`), rectificar (`rectificativa` + `rectificadas[]`), forzar
+    reenvío, webhooks (alta/modificación/consulta), listado/descarga
+    (XML, FacturaE, PDF). Documentación completa:
+    https://ticketbaiws.eus/es/documentacion-api/
+  - **No requiere certificado digital propio** — solo registrar su
+    certificado de dispositivo o completar el documento de
+    representación ante la Hacienda Foral correspondiente.
+  - **Sandbox:** existe (`api-test.ticketbaiws.eus`), pero no es
+    autoservicio — hay que escribir a soporte para que den de alta el NIF
+    en el entorno de test antes de contratar.
+  - **Reintentos automáticos** si Hacienda no responde; el ticket ya se
+    imprime con su identificador mientras tanto.
+  - Contacto: soporte@ticketbaiws.eus / +34 945 13 84 93.
+
+**Correo enviado a soporte@ticketbaiws.eus (9 sept 2026), pendiente de
+respuesta.** Preguntas sin resolver por la documentación pública:
+1. Qué pasa exactamente al superar el límite de facturas del plan a
+   mitad de mes (cobro extra / bloqueo / subida de plan).
+2. Importe máximo por operación para factura simplificada (límite legal
+   general, no específico de la API — hay que confirmarlo por si algún
+   tratamiento de micropigmentación lo supera).
+3. Confirmación explícita de que no hay restricción de Hacienda para
+   tener dos software distintos (ETPOS + TicketBAI WS) emitiendo bajo el
+   mismo NIF con series separadas (técnicamente no debería haber problema
+   según la API, pero se pidió confirmación).
+
+**Enfoque de integración recomendado:** llamar a la API de TicketBAI WS
+justo después de insertar el registro en `pagos` cuando `metodo_pago =
+'web'` (no se toca ETPOS ni el resto de canales), con una serie propia
+tipo "WEB-", guardando `huella_tbai` y el QR devueltos (columna nueva en
+`pagos` o `citas`) e incluyéndolos en el email de confirmación que ya se
+envía por Resend.
+
+**Pendiente de resolver antes de implementar:**
+1. Certificado de dispositivo / documento de representación — falta que
+   Débora complete el trámite con la Hacienda Foral de Gipuzkoa una vez
+   se confirme el proveedor.
+2. Respuesta de TicketBAI WS a las 3 preguntas pendientes de arriba.
+
+## Foto de perfil circular en /admin/clientes (implementado)
+
+A pedido de Débora, se agregó una foto de perfil circular por cliente en
+el panel de administración, con subida de archivo (no URL pegada).
+
+- **Supabase:** columna `foto_url text` (nullable) en `clientes`. Bucket
+  de Storage **`clientes-fotos`** — privado, límite 5MB, solo
+  `image/jpeg`, `image/png`, `image/webp`. Sin políticas de
+  `storage.objects` a propósito: por RLS, solo `service_role` puede
+  escribir/leer, nunca expuesto al navegador. Decisión tomada por ser
+  rostros de clientes reales (dato sensible bajo GDPR) — se usan
+  **signed URLs de corta duración (24h)** en vez de bucket público.
+- **Endpoint:** `POST /api/clientes/[id]/foto` — valida sesión + rol
+  (admin o staff, ambos permitidos por ahora, es dato visual no
+  sensible), valida tipo/tamaño, sube con `service_role`, actualiza
+  `foto_url` (se guarda solo la ruta, no la URL firmada), borra la foto
+  anterior si existía, devuelve una signed URL fresca.
+- **UI:** avatar circular en `PanelClientes.tsx` con fallback de
+  iniciales si no hay foto, input estilizado como botón
+  "Agregar/Cambiar foto". Estilos con los tokens de `marca-tokens.css`.
+- **Bug encontrado y resuelto:** falta de GRANT de `UPDATE` sobre
+  `clientes` para `service_role` — ver bug #9 en la lista de arriba.
 
 ## Pendiente / próximos pasos
 
@@ -149,6 +289,21 @@ table X", primero revisar GRANTs, no solo políticas RLS.
    Débora para su aceptación.
 5. **WhatsApp** — pausado indefinidamente, se retomará como fase aparte
    con presupuesto propio si el negocio lo pide más adelante.
+6. **TicketBAI** — en fase de evaluación de proveedor (ver sección
+   dedicada arriba). Correo enviado a TicketBAI WS, pendiente de
+   respuesta (3 preguntas sin resolver). Falta también el trámite de
+   certificado de dispositivo/documento de representación con Débora.
+7. **Carrusel de fotos de trabajos en la web pública** (siguiente sesión)
+   — Débora quiere una sección con fotos de los trabajos realizados
+   (micropigmentación, estética), mostradas en un carrusel en la web
+   pública, con capacidad de subir/quitar fotos desde su propio panel de
+   administración. Pendiente de diseñar: dónde vive en el panel (¿sección
+   nueva, o dentro de `/admin/servicios`?), modelo de datos (tabla nueva
+   tipo `fotos_trabajos` vs. array en Storage con metadata), y si se
+   asocian a un servicio específico o son una galería general. Aplicar
+   la lección de hoy desde el inicio: loguear errores reales en los
+   `catch`, y revisar/otorgar GRANTs de `service_role` para la tabla
+   nueva antes de probar en vez de descubrirlo por error 500.
 
 ## Cuentas y credenciales (dónde viven, no los valores)
 
