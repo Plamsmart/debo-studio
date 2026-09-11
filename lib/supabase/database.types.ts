@@ -104,6 +104,38 @@ export type Database = {
         }
         Relationships: []
       }
+      fotos_trabajos: {
+        Row: {
+          creado_en: string
+          id: string
+          orden: number
+          servicio_id: string | null
+          storage_path: string
+        }
+        Insert: {
+          creado_en?: string
+          id?: string
+          orden?: number
+          servicio_id?: string | null
+          storage_path: string
+        }
+        Update: {
+          creado_en?: string
+          id?: string
+          orden?: number
+          servicio_id?: string | null
+          storage_path?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fotos_trabajos_servicio_id_fkey"
+            columns: ["servicio_id"]
+            isOneToOne: false
+            referencedRelation: "servicios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       google_calendar_config: {
         Row: {
           access_token: string | null

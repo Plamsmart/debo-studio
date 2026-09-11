@@ -121,7 +121,7 @@ table X", primero revisar GRANTs, no solo políticas RLS.
    `service_role`, pero el `UPDATE` fallaba con "permission denied for
    table clientes" porque nunca se le había otorgado ese permiso
    específico. Se resolvió con `GRANT UPDATE ON clientes TO
-   service_role;` en el SQL Editor. Ya son 5 casos del mismo patrón
+service_role;` en el SQL Editor. Ya son 5 casos del mismo patrón
    (`servicios`, `citas`, `clientes`, `pagos`, y ahora el `UPDATE` de
    `clientes` en concreto) — **antes de tocar cualquier tabla nueva o
    nueva operación (INSERT/UPDATE/DELETE) con `service_role`, revisar
@@ -129,7 +129,7 @@ table X", primero revisar GRANTs, no solo políticas RLS.
 10. **Los `catch` que devuelven 500 sin loguear el error real cuestan
     mucho tiempo de diagnóstico** — pasó con el endpoint de fotos:
     varios bloques `if (error) return NextResponse.json({error: "mensaje
-    genérico"}, {status: 500})` sin `console.error(error)` antes,
+genérico"}, {status: 500})` sin `console.error(error)` antes,
     dejando el error real de Supabase invisible tanto en la terminal
     como en el Response del navegador. Costó varias rondas de
     diagnóstico a ciegas (env vars, bucket, nombres) hasta agregar los
@@ -138,6 +138,30 @@ table X", primero revisar GRANTs, no solo políticas RLS.
     original (`console.error`) antes de devolver un mensaje al
     cliente**, aunque el mensaje que ve el usuario sea genérico por
     seguridad.
+11. **El patrón de GRANT faltante también aplica a `anon`/`authenticated`,
+    no solo a `service_role`.** Pasó con `fotos_trabajos`: la policy RLS
+    de lectura pública (`using (true)`) ya estaba bien creada, pero sin
+    `GRANT SELECT ON fotos_trabajos TO anon, authenticated;` PostgREST
+    seguía rechazando con "permission denied" — la policy sin el GRANT no
+    alcanza. **Para cualquier tabla nueva con lectura pública (sin
+    sesión), verificar ambas capas desde el inicio:** policy RLS +
+    GRANT de tabla para el rol que corresponda (`anon` si es pública sin
+    login, `authenticated` si requiere sesión, `service_role` si solo el
+    backend escribe).
+12. **En formularios de subida, el orden de las acciones debe ser a
+    prueba de confusión.** En `/admin/fotos-trabajos`, el dropdown de
+    servicio venía preseleccionado con el primer servicio de la lista y
+    el input de archivo (`<input type="file">` nativo, "Choose File") era
+    un elemento aparte del botón "Agregar foto" — Pedro le daba click a
+    "Agregar foto" sin haber elegido el archivo, y solo salía un
+    `alert()` de "Selecciona una foto". Se corrigió: el dropdown ahora
+    exige selección explícita (placeholder obligatorio, sin
+    preselección), y el botón "Agregar foto" es la única acción visible
+    — funciona como disparador del selector de archivos y sube
+    automáticamente al elegir la imagen, sin pasos intermedios. **Para
+    cualquier formulario de subida futuro, preferir un solo botón que
+    encadene las acciones, en vez de varios controles separados que el
+    usuario deba completar en un orden no obvio.**
 
 ## Panel de administración — secciones
 
@@ -183,6 +207,7 @@ separadas por canal bajo el mismo NIF (ej. serie "LOCAL" en ETPOS, serie
 "WEB" en el proveedor elegido).
 
 **Opciones evaluadas:**
+
 - **Itcons** (conector Stripe–TicketBAI) — empresa de Gipuzkoa,
   referenciada por Stripe, homologada. Pero solo cubre cobros que pasan
   por Stripe Invoices; no tiene API genérica conocida. Descartado por no
@@ -222,6 +247,7 @@ separadas por canal bajo el mismo NIF (ej. serie "LOCAL" en ETPOS, serie
 
 **Correo enviado a soporte@ticketbaiws.eus (9 sept 2026), pendiente de
 respuesta.** Preguntas sin resolver por la documentación pública:
+
 1. Qué pasa exactamente al superar el límite de facturas del plan a
    mitad de mes (cobro extra / bloqueo / subida de plan).
 2. Importe máximo por operación para factura simplificada (límite legal
@@ -240,6 +266,7 @@ tipo "WEB-", guardando `huella_tbai` y el QR devueltos (columna nueva en
 envía por Resend.
 
 **Pendiente de resolver antes de implementar:**
+
 1. Certificado de dispositivo / documento de representación — falta que
    Débora complete el trámite con la Hacienda Foral de Gipuzkoa una vez
    se confirme el proveedor.
@@ -268,6 +295,44 @@ el panel de administración, con subida de archivo (no URL pegada).
 - **Bug encontrado y resuelto:** falta de GRANT de `UPDATE` sobre
   `clientes` para `service_role` — ver bug #9 en la lista de arriba.
 
+## Carrusel de fotos de trabajos en la home (implementado)
+
+A pedido de Débora, sección con fotos de trabajos realizados
+(micropigmentación, estética), cada una asociada a un servicio, en
+carrusel de 3 visibles a la vez en la home pública, gestionadas por
+`admin` desde el panel. **Verificado de punta a punta en producción,
+funcionando correctamente.**
+
+- **Supabase:** tabla `fotos_trabajos` (`id`, `servicio_id` → FK a
+  `servicios`, `storage_path`, `orden`, `creado_en`). RLS habilitado con
+  policy de **lectura pública** (`using (true)` en `select`) — a
+  diferencia de `clientes-fotos`, esta tabla sí necesita ser legible por
+  `anon` porque el carrusel vive en la home sin sesión. GRANTs:
+  `service_role` con `select/insert/update/delete`, y **`anon`,
+  `authenticated` con `select`** (ver bug #11 abajo). Bucket
+  `fotos-trabajos` — **público** (a diferencia de `clientes-fotos`,
+  privado), 5MB, `image/jpeg`/`image/png`/`image/webp`.
+- **Backend:** `POST /api/fotos-trabajos` (sube foto + `servicio_id`,
+  calcula `orden` siguiente, solo `admin`), `PATCH` y `DELETE
+/api/fotos-trabajos/[id]` (reordenar/reasignar, borrar fila + archivo).
+  Todos loguean el error real con `console.error` antes de responder
+  (aplicando la lección de la sesión anterior).
+- **Admin:** sección nueva `/admin/fotos-trabajos` — grid con miniatura,
+  servicio asociado, botones de reordenar y eliminar; formulario de
+  subida con dropdown de los 56 servicios reservables (sin preselección,
+  placeholder "Selecciona un servicio…" obligatorio). Visible solo para
+  `admin` en el nav (staff no lo ve, mismo patrón que `servicios`).
+- **Público:** `CarruselTrabajos.tsx` en la home — 3 fotos visibles en
+  desktop / 1 en mobile, autoplay con pausa en hover, flechas y dots, se
+  oculta por completo si no hay fotos. Lee la tabla con el cliente normal
+  (`createClient()`), no con `service_role` — mínimo privilegio,
+  consistente con el resto del proyecto.
+- **Consentimiento de imagen:** las fotos que sube Débora ya están
+  publicadas previamente en su Instagram, por lo que ya cuenta con el
+  consentimiento de las clientas para uso público/marketing. Si en el
+  futuro sube fotos que **no** vengan ya publicadas en redes, vale la
+  pena confirmar el mismo consentimiento antes de subirlas a la web.
+
 ## Pendiente / próximos pasos
 
 1. **Chatbot con IA** (siguiente sesión de trabajo) — adaptar el proyecto
@@ -293,17 +358,6 @@ el panel de administración, con subida de archivo (no URL pegada).
    dedicada arriba). Correo enviado a TicketBAI WS, pendiente de
    respuesta (3 preguntas sin resolver). Falta también el trámite de
    certificado de dispositivo/documento de representación con Débora.
-7. **Carrusel de fotos de trabajos en la web pública** (siguiente sesión)
-   — Débora quiere una sección con fotos de los trabajos realizados
-   (micropigmentación, estética), mostradas en un carrusel en la web
-   pública, con capacidad de subir/quitar fotos desde su propio panel de
-   administración. Pendiente de diseñar: dónde vive en el panel (¿sección
-   nueva, o dentro de `/admin/servicios`?), modelo de datos (tabla nueva
-   tipo `fotos_trabajos` vs. array en Storage con metadata), y si se
-   asocian a un servicio específico o son una galería general. Aplicar
-   la lección de hoy desde el inicio: loguear errores reales en los
-   `catch`, y revisar/otorgar GRANTs de `service_role` para la tabla
-   nueva antes de probar en vez de descubrirlo por error 500.
 
 ## Cuentas y credenciales (dónde viven, no los valores)
 

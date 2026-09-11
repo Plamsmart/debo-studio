@@ -3,11 +3,14 @@ import Header from '@/components/Header'
 import Hero from '@/components/Hero'
 import Filosofia from '@/components/Filosofia'
 import Servicios from '@/components/Servicios'
+import CarruselTrabajos from '@/components/CarruselTrabajos'
 import Diferenciales from '@/components/Diferenciales'
 import Ubicacion from '@/components/Ubicacion'
 import CtaFinal from '@/components/CtaFinal'
 import Footer from '@/components/Footer'
 import './home.css'
+
+const BUCKET_FOTOS_TRABAJOS = 'fotos-trabajos'
 
 // Descripciones curadas para las categorías destacadas en la portada.
 // (El catálogo completo vive en /reservar)
@@ -41,6 +44,18 @@ export default async function InicioPage() {
     precioMinPorCategoria.has(c)
   )
 
+  const { data: fotosTrabajos } = await supabase
+    .from('fotos_trabajos')
+    .select('id, storage_path, servicios(nombre)')
+    .order('orden', { ascending: true })
+
+  const fotosCarrusel = (fotosTrabajos ?? []).map((foto) => ({
+    id: foto.id,
+    servicioNombre: foto.servicios?.nombre ?? '',
+    url: supabase.storage.from(BUCKET_FOTOS_TRABAJOS).getPublicUrl(foto.storage_path).data
+      .publicUrl,
+  }))
+
   return (
     <div className="pagina-inicio">
       {/* ===== HEADER ===== */}
@@ -59,6 +74,9 @@ export default async function InicioPage() {
         descripciones={CATEGORIAS_DESTACADAS}
         precioMinPorCategoria={precioMinPorCategoria}
       />
+
+      {/* ===== TRABAJOS REALIZADOS ===== */}
+      <CarruselTrabajos fotos={fotosCarrusel} />
 
       {/* ===== POR QUÉ ELEGIRNOS ===== */}
       <Diferenciales />

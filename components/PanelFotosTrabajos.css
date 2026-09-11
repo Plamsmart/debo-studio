@@ -1,0 +1,163 @@
+.panel-fotos-trabajos {
+  font-family: var(--font-body);
+  color: var(--marca-gris);
+  max-width: 1100px;
+}
+
+.panel-fotos-trabajos__form-nuevo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background: var(--marca-crema);
+  border: 1px solid var(--marca-crema-oscuro);
+  margin-bottom: 1.6rem;
+  align-items: center;
+}
+
+.panel-fotos-trabajos__campo-select {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1 1 220px;
+}
+
+.panel-fotos-trabajos__select {
+  padding: 0.5rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid var(--marca-crema-oscuro);
+  background: #fff;
+  font-family: inherit;
+  font-size: 0.88rem;
+  color: var(--marca-gris);
+}
+
+.panel-fotos-trabajos__select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.panel-fotos-trabajos__error {
+  font-size: 0.78rem;
+  color: var(--marca-rojo);
+}
+
+/* Oculto de forma accesible (no display:none) — el <label> de abajo es el
+   disparador visual real; ver mismo patrón en PanelClientes.css. */
+.panel-fotos-trabajos__input-archivo {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.panel-fotos-trabajos__btn-guardar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.1rem;
+  border-radius: 8px;
+  border: none;
+  background: var(--marca-bronce);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.panel-fotos-trabajos__btn-guardar--cargando {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.panel-fotos-trabajos__spinner {
+  width: 0.85em;
+  height: 0.85em;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: panel-fotos-trabajos-girar 0.7s linear infinite;
+}
+
+@keyframes panel-fotos-trabajos-girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.panel-fotos-trabajos__vacio {
+  color: var(--marca-gris-suave);
+  font-size: 0.9rem;
+}
+
+.panel-fotos-trabajos__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.panel-fotos-trabajos__tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: 12px;
+  background: var(--marca-crema);
+  border: 1px solid var(--marca-crema-oscuro);
+}
+
+.panel-fotos-trabajos__imagen {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+}
+
+.panel-fotos-trabajos__servicio {
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.panel-fotos-trabajos__acciones {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.panel-fotos-trabajos__btn-mover {
+  padding: 0.35rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--marca-crema-oscuro);
+  background: #fff;
+  color: var(--marca-gris);
+  font-family: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.panel-fotos-trabajos__btn-mover:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.panel-fotos-trabajos__btn-eliminar {
+  padding: 0.35rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--marca-rojo);
+  background: #fff;
+  color: var(--marca-rojo);
+  font-family: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.panel-fotos-trabajos__btn-eliminar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
