@@ -199,12 +199,35 @@ en España) para los cobros en el local (efectivo y tarjeta), con su
 propio módulo de certificación TicketBAI anual (200€/año — coincide con
 lo que ya paga). Es un sistema cerrado, sin API para inyectar ventas
 externas (confirmado por Pedro, no hay evidencia pública de lo
-contrario). **Esto reduce el alcance real del proyecto:** no hay que
-sustituir nada de lo que ya funciona en el local (~600 cobros/mes); solo
-falta cubrir el canal nuevo que introduce la web (pagos con Stripe, hoy
-inexistente en producción). Es legal y normal tener series de facturación
-separadas por canal bajo el mismo NIF (ej. serie "LOCAL" en ETPOS, serie
-"WEB" en el proveedor elegido).
+contrario).
+
+**Cambio de alcance (11 sept 2026):** el plan original era "TicketBAI WS
+solo para el canal web, ETPOS se queda intacto para el local". **Débora
+quiere ir más allá: dejar de usar ETPOS por completo y tener un solo
+sistema de facturación.** Esto no es solo un cambio de software de
+facturación — ETPOS también es el que corre el datáfono físico del
+local, así que dejarlo implica también resolver cómo se cobra con
+tarjeta en el mostrador. La opción natural es migrar el cobro físico al
+flujo que ya existe en `/admin/cobrar` (QR vía Stripe Checkout o efectivo
+instantáneo), de forma que **todo** cobro — web, QR local, efectivo — se
+inserte en `pagos` y dispare la llamada a TicketBAI WS, sin importar el
+canal. Esto es consistente con el diseño original de la tabla `pagos`
+(que ya contemplaba los tres `metodo_pago`).
+
+**Decisión: migración gradual, no corte abrupto.** Débora seguirá usando
+ETPOS como respaldo activo hasta confirmar al 100% que el nuevo sistema
+funciona bien. Plan de acción:
+
+1. Contratar TicketBAI WS e integrar primero solo el canal web (alcance
+   original), validarlo a fondo.
+2. Ir migrando gradualmente el cobro del local hacia `/admin/cobrar`,
+   con ETPOS corriendo en paralelo como respaldo.
+3. **Antes de apagar ETPOS definitivamente**, revisar la facturación
+   mensual combinada real (ver nota de plan/Avanzado abajo) y confirmar
+   que no hace falta subir de plan antes del corte final.
+
+Es legal y normal tener series de facturación separadas por canal y tipo
+bajo el mismo NIF (confirmado por soporte de TicketBAI WS, ver abajo).
 
 **Opciones evaluadas:**
 
@@ -245,24 +268,44 @@ separadas por canal bajo el mismo NIF (ej. serie "LOCAL" en ETPOS, serie
     imprime con su identificador mientras tanto.
   - Contacto: soporte@ticketbaiws.eus / +34 945 13 84 93.
 
-**Correo enviado a soporte@ticketbaiws.eus (9 sept 2026), pendiente de
-respuesta.** Preguntas sin resolver por la documentación pública:
+**Respuesta de soporte@ticketbaiws.eus (10 sept 2026), confirmada:**
 
-1. Qué pasa exactamente al superar el límite de facturas del plan a
-   mitad de mes (cobro extra / bloqueo / subida de plan).
-2. Importe máximo por operación para factura simplificada (límite legal
-   general, no específico de la API — hay que confirmarlo por si algún
-   tratamiento de micropigmentación lo supera).
-3. Confirmación explícita de que no hay restricción de Hacienda para
-   tener dos software distintos (ETPOS + TicketBAI WS) emitiendo bajo el
-   mismo NIF con series separadas (técnicamente no debería haber problema
-   según la API, pero se pidió confirmación).
+1. El límite de facturas/importe del plan se calcula **trimestralmente**,
+   no mensualmente como sugiere la página de precios. Si se supera, avisan
+   y conversan el cambio de plan — **no bloquean el envío** de forma
+   automática.
+2. La API no valida ningún importe máximo para factura simplificada — la
+   responsabilidad de cumplir ese límite (normativa general de
+   facturación) es del negocio, no de TicketBAI WS.
+3. **Confirmado sin restricciones:** es "operativa muy habitual" tener
+   varios software distintos emitiendo bajo el mismo NIF con series
+   separadas. Único cuidado: que la combinación serie-número nunca se
+   repita entre los sistemas.
+4. **Dato nuevo importante, no contemplado en el diseño original:** la
+   normativa exige **series separadas por tipo de factura** (simplificada
+   / completa / rectificativa), no solo por canal. Esto afecta el
+   esquema de series: en vez de una sola `"WEB-"`, se necesitan variantes
+   como `"WEB-SIMP-"`, `"WEB-COMP-"` (si alguna vez se emite con NIF del
+   cliente) y `"WEB-RECT-"` para anulaciones/rectificativas.
 
-**Enfoque de integración recomendado:** llamar a la API de TicketBAI WS
-justo después de insertar el registro en `pagos` cuando `metodo_pago =
-'web'` (no se toca ETPOS ni el resto de canales), con una serie propia
-tipo "WEB-", guardando `huella_tbai` y el QR devueltos (columna nueva en
-`pagos` o `citas`) e incluyéndolos en el email de confirmación que ya se
+**Plan contratado: Profesional** (14,99€/mes anual o 17,99€/mes mensual
+— se empieza con mensual por flexibilidad, mismo criterio que con el
+Básico originalmente). Razón: aunque el volumen total del negocio es
+~600 facturas/mes, durante la fase de transición (con ETPOS todavía
+activo) solo una fracción de eso pasa por TicketBAI WS, así que el
+Básico se quedaría corto pero el Avanzado sería prematuro.
+
+**⚠️ Checkpoint pendiente antes de apagar ETPOS definitivamente:** la
+facturación mensual total del negocio (repartida hoy entre ETPOS y
+TicketBAI WS) ronda cerca de los 30.000€/mes **sin superarlos** — que es
+justo el tope del Plan Profesional. El riesgo es que, al migrar el 100%
+del volumen a un solo sistema, se supere ese tope (más aún si el negocio
+sigue creciendo). **Antes de dar la migración por completa, revisar la
+facturación mensual combinada real de un mes con datos representativos y
+decidir si toca subir a Avanzado (29,99-35,99€/mes, sin límites, hasta 3
+NIFs) antes del corte**, no después.
+'web'`(no se toca ETPOS ni el resto de canales), con una serie propia
+tipo "WEB-", guardando`huella_tbai`y el QR devueltos (columna nueva en`pagos`o`citas`) e incluyéndolos en el email de confirmación que ya se
 envía por Resend.
 
 **Pendiente de resolver antes de implementar:**
@@ -333,6 +376,88 @@ funcionando correctamente.**
   futuro sube fotos que **no** vengan ya publicadas en redes, vale la
   pena confirmar el mismo consentimiento antes de subirlas a la web.
 
+## Sección de reseñas en la home (implementado)
+
+A pedido de Débora, sección de reseñas/testimonios (generales del
+negocio, no asociadas a un servicio), con calificación de 1-5 estrellas
+y foto opcional de la clienta, cargadas manualmente por Débora desde su
+panel. Ubicada en la home, justo después de `CarruselTrabajos.tsx`.
+
+- **Supabase:** tabla `resenas` (`id`, `nombre_clienta`, `texto`,
+  `calificacion` smallint 1-5 con `check`, `orden`, `creado_en`,
+  `foto_url` nullable agregada después). Mismo patrón de RLS/GRANTs que
+  `fotos_trabajos`: `service_role` con todos los permisos, RLS con
+  policy de lectura pública, GRANT `select` para `anon`/`authenticated`.
+- **Foto opcional:** reutiliza el bucket `fotos-trabajos` (no se creó uno
+  nuevo) bajo el prefijo `resenas/{id}/...` — mismo criterio de "no
+  fragmentar infraestructura" que ya se venía aplicando.
+- **Backend:** `POST`/`PATCH`/`DELETE /api/resenas` (y `/[id]`), solo
+  `admin`, multipart para la foto opcional, logs de error en todos los
+  catch.
+- **Admin:** `/admin/resenas` — selector de estrellas clicable, foto
+  opcional con el mismo patrón de subida ya corregido (botón dispara el
+  selector de archivos, sube al elegir). **Detalle de UX a verificar:**
+  en modo creación la foto se sube junto con el resto del formulario (no
+  de inmediato, porque no hay `id` todavía); en modo edición sí sube al
+  instante — comportamiento intencional pero asimétrico, revisar que se
+  sienta bien en el uso real.
+- **Público:** `SeccionResenas.tsx` — grid de tarjetas (no carrusel, por
+  ser pocas reseñas al inicio), avatar circular solo si hay foto, se
+  oculta si no hay reseñas.
+- **Consentimiento de imagen:** mismo criterio que fotos de trabajos —
+  asumir que Débora tiene permiso de las clientas antes de subir su foto.
+
+## Refactor de `app/home.css` (11-17 sept 2026)
+
+`home.css` había crecido a ~800 líneas mezclando estilos de secciones
+distintas, con al menos una regla que parecía duplicada
+(`.hero__eyebrow`, aparecía dos veces) y que en realidad era una regla
+base + un override específico del Hero (color + animación) — se
+consolidaron en una sola sin cambiar el resultado visual. Los estilos de
+`SeccionResenas` se movieron a su propio archivo
+(`components/SeccionResenas.css`), siguiendo el patrón ya usado en
+`PanelClientes.css`/`PanelFotosTrabajos.css`/`PanelResenas.css` — **cada
+componente nuevo debe traer su propio `.css`, no agregarse a
+`home.css`.** `home.css` sigue siendo grande y compartido entre Hero,
+Filosofía, header, servicios, footer, etc. — no se hizo un refactor
+completo, solo se evitó seguir agrandándolo.
+
+## Cambio de color del Hero (11-17 sept 2026)
+
+A pedido de Débora, el Hero (y la sección "Filosofía", que comparte el
+mismo contenedor `.zona-oscura`) pasó de fondo negro a fondo claro
+(`var(--marca-crema)`), con los textos a `var(--marca-gris)`.
+
+**Se decidió explícitamente NO agregar un toggle dark/light** — Débora
+pidió un cambio de color puntual, no una funcionalidad de elegir tema;
+agregar eso habría sido alcance no solicitado ni presupuestado (mismo
+tipo de expansión silenciosa que se viene vigilando con el presupuesto).
+
+**Lección clave de esta sesión — colores codificados a mano vs.
+variables:** el cambio de `.zona-oscura` reveló varios lugares con
+colores claros escritos directo en el selector (no a través de las
+variables `--hero-texto`/`--hero-texto-suave`/`--hero-dorado-claro`),
+pensados para el fondo oscuro original y que quedaron ilegibles
+(texto claro sobre fondo claro) hasta encontrarlos uno por uno:
+
+- `.header__nombre`, `.header__nav a`, `.nav-movil__toggle span` — texto
+  del header cuando flota sobre el Hero (antes de scroll).
+- `.hero .btn--outline:hover` — usaba `color: var(--hero-fondo)`, se
+  arregló solo al remapear la variable en sí.
+- `.filosofia__texto--secundario` — color fijo `#cdb99c`, no detectado
+  por el cambio de variable porque no pasaba por ninguna.
+- `.filosofia__linea` — línea decorativa con `#e8c68c` fijo, remapeada a
+  `var(--hero-dorado-claro)` (rol de acento, no de texto).
+  El footer (`--footer-fondo`, `--footer-texto`, `--footer-dorado`) es
+  oscuro por diseño propio e independiente de `.zona-oscura` — no se tocó,
+  correctamente identificado como fuera de alcance.
+
+**Convención a partir de ahora:** cualquier cambio de fondo/tema en una
+sección debe ir acompañado de una búsqueda explícita de colores
+codificados a mano dentro de esa sección (`grep` de los hex conocidos),
+no solo del cambio de la(s) variable(s) principal(es) — las variables no
+capturan los colores que nunca pasaron por ellas.
+
 ## Pendiente / próximos pasos
 
 1. **Chatbot con IA** (siguiente sesión de trabajo) — adaptar el proyecto
@@ -349,15 +474,59 @@ funcionando correctamente.**
    tiene. Por ahora se usa Montserrat (gratis) como sustituto.
 3. **Stripe en modo Live** — sigue en Test, falta decidir cuándo pasar a
    cobros reales (requiere cuenta bancaria de Débora conectada).
-4. **Documento de presupuesto formal** — ya generado
-   (`Presupuesto_Estudio_Debora_Pereira.docx`), pendiente de enviárselo a
-   Débora para su aceptación.
+4. **Documento de presupuesto formal — EN REVISIÓN (17 sept 2026),
+   pendiente de cerrar número final antes de enviarlo a Débora.**
+   El documento original (`Presupuesto_Estudio_Debora_Pereira.docx`,
+   700€ implementación) **nunca llegó a comunicarse a Débora** — ni
+   siquiera verbalmente, así que no hay ningún número previo que
+   "actualizar" de cara a ella, es su primera propuesta formal.
+   Se armó un desglose de alcance actualizado
+   (`desglose-alcance-presupuesto.md`, generado en esta sesión) que
+   cubre: plataforma base, panel de admin, fotos de clientes, carrusel
+   de fotos de trabajos, sección de reseñas (con foto opcional),
+   cumplimiento TicketBAI, y chatbot con IA. El mantenimiento mensual de
+   100€ se desglosó explícitamente (dominio, base de datos activa,
+   conexión OpenAI) para que quede claro que no es solo soporte —
+   corre infraestructura real cada mes. El límite de 300
+   conversaciones/mes del chatbot se dejó explícito como "etapa inicial,
+   ajustable si el uso crece" en vez de una promesa rígida o ilimitada.
+   **Pendiente de esta tarde/próxima sesión:** cerrar el número final de
+   implementación (se habló de 1.000€ como piso, sin decisión definitiva
+   todavía) y decidir si el costo mensual de TicketBAI WS
+   (~15-18€/mes) se traslada como línea aparte o se absorbe en el
+   mantenimiento — la sección de "Estructura de costos propuesta" del
+   desglose ya lo deja como línea aparte, confirmar que es la decisión
+   final antes de pasar el documento a Word.
 5. **WhatsApp** — pausado indefinidamente, se retomará como fase aparte
    con presupuesto propio si el negocio lo pide más adelante.
-6. **TicketBAI** — en fase de evaluación de proveedor (ver sección
-   dedicada arriba). Correo enviado a TicketBAI WS, pendiente de
-   respuesta (3 preguntas sin resolver). Falta también el trámite de
-   certificado de dispositivo/documento de representación con Débora.
+6. **TicketBAI** — proveedor decidido: **TicketBAI WS, Plan Profesional**
+   (ver sección dedicada arriba, con las respuestas de soporte ya
+   confirmadas). Alcance ampliado: no solo canal web, sino reemplazo
+   gradual completo de ETPOS (con ETPOS como respaldo activo hasta
+   confirmar el nuevo sistema al 100%). Próximos pasos: dar de alta a
+   Débora en el entorno de pruebas, implementar primero solo el canal web
+   con el esquema de series correcto (separadas por canal Y por tipo:
+   simplificada/completa/rectificativa), completar el trámite de
+   certificado de dispositivo/documento de representación, y — antes de
+   apagar ETPOS — revisar el checkpoint de facturación mensual combinada
+   vs. el tope de 30.000€/mes del plan.
+7. **Proyecto de aprendizaje aparte (sin fecha, después de cerrar
+   debo-studio):** implementación directa de TicketBAI (sin proveedor
+   intermedio) como ejercicio técnico personal de Pedro — generación de
+   XML, firma XAdES-BES, encadenado, envío telemático. Explícitamente
+   **desconectado de la producción real de Débora** — usar entorno de
+   pruebas de Hacienda con NIF/certificado de prueba propios, no tocar la
+   facturación real del negocio. Motivación: no existe librería madura en
+   Node/TypeScript para TicketBAI (solo hay una en PHP,
+   `Barnetik/tbai-php-lib`, y un ejemplo en Java) — sería una pieza de
+   portafolio diferenciada. Se descartó para producción por: registro
+   como entidad desarrolladora vía declaración responsable (baja barrera
+   legal, pero implica responsabilidad como fabricante de software ante
+   fallos, hasta 30.000€ de sanción), la firma XAdES-BES es genuinamente
+   compleja de implementar bien sin librería de apoyo, y el certificado
+   digital de Débora tendría que vivir en la infraestructura del
+   proyecto — riesgo desproporcionado frente al costo de un proveedor
+   (~15-18€/mes) para un solo cliente en producción.
 
 ## Cuentas y credenciales (dónde viven, no los valores)
 

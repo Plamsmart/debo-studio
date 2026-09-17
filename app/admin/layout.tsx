@@ -63,6 +63,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </Link>
           )}
           {esRolAdmin && (
+            <Link href="/admin/resenas" className="admin-layout__link">
+              Reseñas
+            </Link>
+          )}
+          {esRolAdmin && (
             <Link href="/admin/integraciones" className="admin-layout__link">
               Integraciones
             </Link>

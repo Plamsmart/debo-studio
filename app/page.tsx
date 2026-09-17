@@ -4,6 +4,7 @@ import Hero from '@/components/Hero'
 import Filosofia from '@/components/Filosofia'
 import Servicios from '@/components/Servicios'
 import CarruselTrabajos from '@/components/CarruselTrabajos'
+import SeccionResenas from '@/components/SeccionResenas'
 import Diferenciales from '@/components/Diferenciales'
 import Ubicacion from '@/components/Ubicacion'
 import CtaFinal from '@/components/CtaFinal'
@@ -56,6 +57,21 @@ export default async function InicioPage() {
       .publicUrl,
   }))
 
+  const { data: resenas } = await supabase
+    .from('resenas')
+    .select('id, nombre_clienta, texto, calificacion, foto_url')
+    .order('orden', { ascending: true })
+
+  const resenasParaMostrar = (resenas ?? []).map((resena) => ({
+    id: resena.id,
+    nombreClienta: resena.nombre_clienta,
+    texto: resena.texto,
+    calificacion: resena.calificacion,
+    fotoUrl: resena.foto_url
+      ? supabase.storage.from(BUCKET_FOTOS_TRABAJOS).getPublicUrl(resena.foto_url).data.publicUrl
+      : null,
+  }))
+
   return (
     <div className="pagina-inicio">
       {/* ===== HEADER ===== */}
@@ -77,6 +93,9 @@ export default async function InicioPage() {
 
       {/* ===== TRABAJOS REALIZADOS ===== */}
       <CarruselTrabajos fotos={fotosCarrusel} />
+
+      {/* ===== RESEÑAS ===== */}
+      <SeccionResenas resenas={resenasParaMostrar} />
 
       {/* ===== POR QUÉ ELEGIRNOS ===== */}
       <Diferenciales />

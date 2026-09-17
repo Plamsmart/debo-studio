@@ -238,6 +238,36 @@ export type Database = {
           },
         ]
       }
+      resenas: {
+        Row: {
+          calificacion: number
+          creado_en: string
+          foto_url: string | null
+          id: string
+          nombre_clienta: string
+          orden: number
+          texto: string
+        }
+        Insert: {
+          calificacion: number
+          creado_en?: string
+          foto_url?: string | null
+          id?: string
+          nombre_clienta: string
+          orden?: number
+          texto: string
+        }
+        Update: {
+          calificacion?: number
+          creado_en?: string
+          foto_url?: string | null
+          id?: string
+          nombre_clienta?: string
+          orden?: number
+          texto?: string
+        }
+        Relationships: []
+      }
       servicios: {
         Row: {
           activo: boolean | null

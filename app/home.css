@@ -10,8 +10,7 @@
 }
 
 /* ===== Utilidades ===== */
-.seccion__eyebrow,
-.hero__eyebrow {
+.seccion__eyebrow {
   display: block;
   font-family: var(--font-body);
   font-size: 0.72rem;
@@ -89,7 +88,9 @@
   left: 0;
   right: 0;
   z-index: 50;
-  transition: background 0.25s ease, border-color 0.25s ease;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .header--solido {
@@ -114,7 +115,7 @@
   font-family: var(--font-display);
   font-size: 1.3rem;
   letter-spacing: 0.02em;
-  color: #f7f0e4;
+  color: var(--marca-gris);
   transition: color 0.25s ease;
 }
 
@@ -129,7 +130,7 @@
 }
 
 .header__nav a {
-  color: #e7dcc9;
+  color: var(--marca-gris);
   transition: color 0.15s ease;
 }
 
@@ -187,7 +188,7 @@
 .nav-movil__toggle span {
   display: block;
   height: 2px;
-  background: #f7f0e4;
+  background: var(--marca-gris);
   border-radius: 2px;
   transition: background 0.25s ease;
 }
@@ -218,10 +219,10 @@
 
 /* ===== Zona oscura: envuelve hero + filosofía con un solo fondo negro ===== */
 .zona-oscura {
-  --hero-fondo: #14100c;
-  --hero-texto: #f7f0e4;
-  --hero-texto-suave: #cdb99c;
-  --hero-dorado-claro: #e8c68c;
+  --hero-fondo: var(--marca-crema);
+  --hero-texto: var(--marca-gris);
+  --hero-texto-suave: var(--marca-gris);
+  --hero-dorado-claro: var(--marca-bronce);
 
   background: var(--hero-fondo);
   color: var(--hero-texto);
@@ -241,8 +242,14 @@
 }
 
 .hero__eyebrow {
-  animation: aparecer 0.7s ease both;
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  margin-bottom: 0.8rem;
   color: var(--hero-dorado-claro);
+  animation: aparecer 0.7s ease both;
 }
 
 .hero__titulo {
@@ -351,7 +358,7 @@
 .filosofia__linea {
   width: 60px;
   height: 2px;
-  background: #e8c68c;
+  background: var(--hero-dorado-claro);
   margin: 0 auto 2rem;
 }
 
@@ -360,13 +367,13 @@
   font-style: italic;
   font-size: clamp(1.15rem, 2.1vw, 1.4rem);
   line-height: 1.6;
-  color: #f7f0e4;
+  color: var(--marca-gris);
   margin: 0 0 1.4rem 0;
 }
 
 .filosofia__texto--secundario {
   font-size: clamp(1rem, 1.7vw, 1.15rem);
-  color: #cdb99c;
+  color: var(--marca-gris);
   margin-bottom: 0;
 }
 
@@ -391,7 +398,9 @@
   border: 1px solid var(--marca-crema-oscuro);
   border-radius: 16px;
   padding: 1.8rem 1.6rem;
-  transition: border-color 0.2s ease, transform 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .servicio-card:hover {
@@ -478,7 +487,9 @@
   font-size: 1.4rem;
   line-height: 1;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .carrusel-trabajos__flecha:hover {
