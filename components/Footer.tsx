@@ -8,8 +8,7 @@ export default function Footer() {
         <div className="footer__columna footer__columna--marca">
           <div className="footer__marca">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/emblema.png" alt="Estudio Débora Pereira" />
-            <span>Débora Pereira Studio</span>
+            <img src="/logo-horizontal.png" alt="Estudio Débora Pereira" />
           </div>
           <p className="footer__tagline">
             Cuidamos tu imagen, potenciamos tu esencia.

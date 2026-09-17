@@ -35,8 +35,7 @@ export default function Header() {
     <header className={`header ${solido ? 'header--solido' : ''}`}>
       <div className="header__marca">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/emblema.png" alt="Estudio Débora Pereira" />
-        <span className="header__nombre">Débora Pereira Studio</span>
+        <img src="/logo-horizontal.png" alt="Estudio Débora Pereira" />
       </div>
       <nav className="header__nav">
         <a href="#servicios">Servicios</a>

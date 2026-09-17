@@ -107,8 +107,8 @@
 }
 
 .header__marca img {
-  width: 38px;
-  height: auto;
+  height: 80px;
+  width: auto;
 }
 
 .header__nombre {
@@ -621,7 +621,11 @@
 .cta-final {
   text-align: center;
   padding: 4.5rem 4vw;
-  background: var(--marca-cobre-claro);
+  background: linear-gradient(
+    135deg,
+    var(--marca-cobre-oscuro),
+    var(--marca-cobre-claro)
+  );
 }
 
 .cta-final h2 {
@@ -629,6 +633,7 @@
   font-size: clamp(1.8rem, 3.4vw, 2.6rem);
   font-weight: 500;
   margin: 0 0 1.6rem 0;
+  color: #fff;
 }
 
 /* ===== Footer (mismo negro cálido que el hero, como cierre simétrico) ===== */
@@ -694,8 +699,8 @@
 }
 
 .footer__marca img {
-  width: 28px;
-  height: auto;
+  height: 52px;
+  width: auto;
 }
 
 .footer__tagline {

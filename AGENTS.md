@@ -458,6 +458,29 @@ codificados a mano dentro de esa sección (`grep` de los hex conocidos),
 no solo del cambio de la(s) variable(s) principal(es) — las variables no
 capturan los colores que nunca pasaron por ellas.
 
+## Ajustes visuales — logo y CTA final (17 sept 2026)
+
+- **Logo del header/footer:** cambiado de `emblema.png` (solo la flor) +
+  `<span>` de texto por separado, a `public/logo-horizontal.png`
+  (flor + texto integrado, ya extraído del PDF vectorial del manual de
+  marca). Se quitó el `<span>` de texto en ambos componentes para no
+  duplicarlo. Tamaños finales, a ojo hasta verse bien proporcionados:
+  header `height: 80px`, footer `height: 52px` (ambos con `width: auto`,
+  seguido el criterio ya establecido del bug #3 — nunca fijar ambas
+  dimensiones a mano en una imagen, para no distorsionarla).
+- **Token de marca agregado:** `--marca-cobre-oscuro: #af6f49;` en
+  `marca-tokens.css` — existía `--marca-cobre-claro` pero faltaba su par
+  oscuro, a pesar de que el degradado cobre oscuro→claro es parte del
+  manual de marca oficial (ver sección "Identidad de marca" arriba).
+- **CTA final ("Reserva tu momento de cuidado"):** fondo cambiado de
+  color sólido (`var(--marca-cobre-claro)`) a degradado diagonal
+  (`linear-gradient(135deg, var(--marca-cobre-oscuro),
+var(--marca-cobre-claro))`), siguiendo el degradado oficial del
+  emblema. El texto del `h2` no tenía `color` propio (heredaba el gris
+  base de `.pagina-inicio`) — se le agregó `color: #fff` explícito, ya
+  que el gris institucional no tenía suficiente contraste sobre el
+  degradado de cobre saturado.
+
 ## Pendiente / próximos pasos
 
 1. **Chatbot con IA** (siguiente sesión de trabajo) — adaptar el proyecto
