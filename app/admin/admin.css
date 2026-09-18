@@ -58,3 +58,44 @@
 .admin-layout__contenido {
   padding: 2rem;
 }
+
+@media (max-width: 780px) {
+  .admin-layout__nav {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+    padding: 1rem 1.2rem;
+  }
+
+  .admin-layout__usuario-wrap {
+    justify-content: space-between;
+    order: 1;
+  }
+
+  .admin-layout__marca {
+    justify-self: unset;
+    order: 2;
+  }
+
+  .admin-layout__links {
+    order: 3;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.6rem;
+    justify-self: unset;
+  }
+
+  .admin-layout__link {
+    text-align: center;
+    padding: 0.7rem 0.4rem;
+    border: 1px solid var(--marca-crema-oscuro);
+    border-radius: 10px;
+    font-size: 0.85rem;
+    line-height: 1.25;
+  }
+
+  .admin-layout__link:hover {
+    border-color: var(--marca-cobre-claro);
+  }
+}
