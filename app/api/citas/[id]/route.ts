@@ -3,6 +3,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { getResend } from '@/lib/resend'
 import { stripe, SITE_URL } from '@/lib/stripe'
 import { crearEventoCita, eliminarEventoCita } from '@/lib/google-calendar'
+import { esChoquePorConstraint } from '@/lib/disponibilidad'
 
 // PATCH /api/citas/[id]
 // Body: { accion: 'confirmar' | 'cancelar' }
@@ -39,7 +40,21 @@ export async function PATCH(
     .select('*, clientes(nombre, email, telefono), servicios(nombre, precio)')
     .single()
 
+  if (error && esChoquePorConstraint(error)) {
+    console.error('Choque de horario al actualizar la cita:', error)
+    // Reactivar una cita cancelada/no_asistio puede chocar con otra creada en
+    // ese horario mientras estaba inactiva (constraint citas_sin_solape).
+    return NextResponse.json(
+      {
+        error: 'No se puede reactivar esta cita: ya hay otra cita en ese horario.',
+        codigo: 'choque',
+      },
+      { status: 409 }
+    )
+  }
+
   if (error || !citaActualizada) {
+    console.error('Error actualizando la cita:', error)
     return NextResponse.json(
       { error: 'No se pudo actualizar la cita (verifica permisos de administrador)' },
       { status: 403 }

@@ -58,6 +58,51 @@ export async function obtenerConfigCalendario() {
   return data
 }
 
+export type EstadoConexionCalendario =
+  | 'sin_conexion' // no hay ninguna fila en google_calendar_config
+  | 'valida' // Google aceptó el refresh_token
+  | 'invalida' // invalid_grant: expirado o revocado, hay que reconectar
+  | 'no_verificable' // error de red/config: no sabemos, no alarmamos
+
+const TIMEOUT_VERIFICACION_MS = 5000
+
+function esInvalidGrant(err: unknown): boolean {
+  const e = err as { message?: string; response?: { data?: { error?: string } } }
+  return e?.response?.data?.error === 'invalid_grant' || e?.message === 'invalid_grant'
+}
+
+// Comprueba contra Google que el refresh_token guardado siga sirviendo (existir
+// en la tabla no basta: en modo Testing expira a los 7 días, y el usuario puede
+// revocarlo desde su cuenta). Solo lectura: no guarda el access_token nuevo.
+// Solo invalid_grant cuenta como "inválida" — cualquier otro fallo (red, timeout,
+// credenciales del servidor) queda como no_verificable para no mandar a la
+// usuaria a reconectar por un problema que reconectar no arregla.
+export async function verificarConexionCalendario(
+  config: Awaited<ReturnType<typeof obtenerConfigCalendario>>
+): Promise<EstadoConexionCalendario> {
+  if (!config) return 'sin_conexion'
+
+  const oauth2Client = getOAuth2Client()
+  oauth2Client.setCredentials({ refresh_token: config.refresh_token })
+
+  let timer: ReturnType<typeof setTimeout> | undefined
+  try {
+    await Promise.race([
+      oauth2Client.refreshAccessToken(),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error('timeout')), TIMEOUT_VERIFICACION_MS)
+      }),
+    ])
+    return 'valida'
+  } catch (err) {
+    if (esInvalidGrant(err)) return 'invalida'
+    console.error('No se pudo verificar la conexión de Google Calendar:', err)
+    return 'no_verificable'
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
 // Devuelve un cliente OAuth ya autenticado y con el access_token vigente
 // (lo refresca automáticamente si está por vencer). Devuelve null si no
 // hay ninguna conexión configurada — en ese caso, el llamador debe omitir

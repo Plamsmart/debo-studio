@@ -271,3 +271,14 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+@media (max-width: 600px) {
+  .panel-resenas__tarjeta {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .panel-resenas__acciones {
+    justify-content: flex-end;
+  }
+}

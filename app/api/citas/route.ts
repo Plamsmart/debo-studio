@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
-import { HORARIO_NEGOCIO } from '@/lib/horario-negocio'
+import { validarReserva, esChoquePorConstraint, MENSAJE_CHOQUE } from '@/lib/disponibilidad'
 import { getResend, EMAIL_ESTUDIO } from '@/lib/resend'
 
 // POST /api/citas
@@ -35,45 +35,22 @@ export async function POST(request: NextRequest) {
 
   const supabase = createServiceClient()
 
-  // 2. Traer duración y nombre del servicio
-  const { data: servicio, error: errorServicio } = await supabase
-    .from('servicios')
-    .select('nombre, duracion_minutos')
-    .eq('id', servicio_id)
-    .single()
-
-  if (errorServicio || !servicio) {
-    return NextResponse.json({ error: 'Servicio no encontrado' }, { status: 404 })
-  }
-
-  const horaFin = sumarMinutos(hora_inicio, servicio.duracion_minutos)
-
-  // 3. Revalidar disponibilidad en el servidor (nunca confiar solo en el frontend)
-  const { data: citasDelDia, error: errorCitas } = await supabase.rpc(
-    'citas_ocupadas_del_dia',
-    { fecha_consulta: fecha }
-  )
-
-  if (errorCitas) {
-    return NextResponse.json({ error: 'Error validando disponibilidad' }, { status: 500 })
-  }
-
-  const inicioNuevo = minutosDesdeMedianoche(hora_inicio)
-  const finNuevo = minutosDesdeMedianoche(horaFin)
-  const colchon = HORARIO_NEGOCIO.colchonMinutos
-
-  const hayChoque = (citasDelDia || []).some((c) => {
-    const inicioExistente = minutosDesdeMedianoche(c.hora_inicio) - colchon
-    const finExistente = minutosDesdeMedianoche(c.hora_fin) + colchon
-    return inicioNuevo < finExistente && finNuevo > inicioExistente
+  // 2. Revalidar en el servidor (nunca confiar solo en el frontend): formato de
+  //    fecha/hora, fecha pasada, día cerrado, horario de atención, antelación
+  //    mínima, servicio reservable y choque con otras citas. Las reglas viven en
+  //    lib/disponibilidad.ts, las mismas que usa la lista de horarios libres.
+  const validacion = await validarReserva(supabase, {
+    servicioId: servicio_id,
+    fecha,
+    horaInicio: hora_inicio,
   })
 
-  if (hayChoque) {
-    return NextResponse.json(
-      { error: 'Ese horario ya no está disponible, elige otro' },
-      { status: 409 }
-    )
+  if (!validacion.ok) {
+    const { codigo, mensaje, status } = validacion.error
+    return NextResponse.json({ error: mensaje, codigo }, { status })
   }
+
+  const { servicio, horaFin } = validacion.valor
 
   // 4. Buscar si ya existe un cliente con ese email (evita duplicar clientes recurrentes)
   let clienteId: string | null = null
@@ -99,6 +76,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (errorCliente || !nuevoCliente) {
+      console.error('Error creando el cliente:', errorCliente)
       return NextResponse.json({ error: 'No se pudo registrar el cliente' }, { status: 500 })
     }
 
@@ -120,6 +98,12 @@ export async function POST(request: NextRequest) {
     .single()
 
   if (errorInsert) {
+    console.error('Error insertando la cita:', errorInsert)
+    // Condición de carrera: otra reserva ocupó el horario entre la validación
+    // y el insert; lo frena el constraint citas_sin_solape.
+    if (esChoquePorConstraint(errorInsert)) {
+      return NextResponse.json({ error: MENSAJE_CHOQUE, codigo: 'choque' }, { status: 409 })
+    }
     return NextResponse.json({ error: errorInsert.message }, { status: 500 })
   }
 
@@ -155,18 +139,4 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json({ cita: nuevaCita }, { status: 201 })
-}
-
-function minutosDesdeMedianoche(horaStr: string): number {
-  const [h, m] = horaStr.split(':').map(Number)
-  return h * 60 + m
-}
-
-function sumarMinutos(horaStr: string, minutosASumar: number): string {
-  const total = minutosDesdeMedianoche(horaStr) + minutosASumar
-  const h = Math.floor(total / 60)
-    .toString()
-    .padStart(2, '0')
-  const m = (total % 60).toString().padStart(2, '0')
-  return `${h}:${m}`
 }

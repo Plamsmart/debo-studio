@@ -18,6 +18,8 @@ export const HORARIO_POR_DIA: Record<number, HorarioDia> = {
 export const HORARIO_NEGOCIO = {
   intervaloSlotsMinutos: 30, // cada cuánto se ofrece un horario para reservar
   colchonMinutos: 10, // tiempo de descanso/preparación entre una cita y la siguiente
+  antelacionMinimaMinutos: 60, // no se acepta una reserva que empiece en menos tiempo que esto
+  zonaHoraria: "Europe/Madrid", // el servidor corre en UTC: "hoy" y "ahora" se calculan en esta zona
 };
 
 export function esDiaLaboral(fecha: Date): boolean {
