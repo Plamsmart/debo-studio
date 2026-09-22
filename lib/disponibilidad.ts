@@ -32,6 +32,10 @@ export type CodigoError =
   | "servicio_no_encontrado"
   | "servicio_no_reservable"
   | "servicio_inactivo"
+  | "datos_incompletos"
+  | "contacto_requerido"
+  | "email_invalido"
+  | "error_interno"
   | "error_consulta";
 
 // El mensaje está pensado para mostrarse tal cual al usuario (o para que el
@@ -46,7 +50,7 @@ export type Resultado<T> =
   | { ok: true; valor: T }
   | { ok: false; error: ErrorReserva };
 
-function fallo(codigo: CodigoError, mensaje: string, status: number) {
+export function fallo(codigo: CodigoError, mensaje: string, status: number) {
   return { ok: false as const, error: { codigo, mensaje, status } };
 }
 

@@ -14,6 +14,65 @@ export type Database = {
   }
   public: {
     Tables: {
+      chat_conversaciones: {
+        Row: {
+          creado_en: string
+          id: string
+          ip_hash: string | null
+          session_id: string
+        }
+        Insert: {
+          creado_en?: string
+          id?: string
+          ip_hash?: string | null
+          session_id: string
+        }
+        Update: {
+          creado_en?: string
+          id?: string
+          ip_hash?: string | null
+          session_id?: string
+        }
+        Relationships: []
+      }
+      chat_mensajes: {
+        Row: {
+          contenido: string
+          conversacion_id: string
+          creado_en: string
+          herramientas: Json | null
+          id: string
+          ip_hash: string | null
+          rol: string
+        }
+        Insert: {
+          contenido: string
+          conversacion_id: string
+          creado_en?: string
+          herramientas?: Json | null
+          id?: string
+          ip_hash?: string | null
+          rol: string
+        }
+        Update: {
+          contenido?: string
+          conversacion_id?: string
+          creado_en?: string
+          herramientas?: Json | null
+          id?: string
+          ip_hash?: string | null
+          rol?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_mensajes_conversacion_id_fkey"
+            columns: ["conversacion_id"]
+            isOneToOne: false
+            referencedRelation: "chat_conversaciones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       citas: {
         Row: {
           actualizado_en: string | null
