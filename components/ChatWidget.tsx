@@ -114,18 +114,27 @@ export default function ChatWidget() {
         type="button"
         onClick={() => setAbierto((v) => !v)}
         aria-label={abierto ? 'Cerrar chat' : 'Abrir chat'}
-        className="chat-widget__toggle"
+        className={`chat-widget__toggle${abierto ? '' : ' chat-widget__toggle--cerrado'}`}
       >
-        {abierto ? (
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
-          </svg>
-        ) : (
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M4 4h16a2 2 0 012 2v9a2 2 0 01-2 2H9l-5 4v-4H4a2 2 0 01-2-2V6a2 2 0 012-2z" />
-          </svg>
+        {/* Texto del hover (solo con el chat cerrado). aria-hidden: el nombre
+            accesible sigue siendo el aria-label, se vea o no el texto. */}
+        {!abierto && (
+          <span className="chat-widget__toggle-texto" aria-hidden="true">
+            <span>¿Tienes dudas? Habla con nuestra asistente virtual</span>
+          </span>
         )}
+        <span className="chat-widget__toggle-icono">
+          {abierto ? (
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          ) : (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M4 4h16a2 2 0 012 2v9a2 2 0 01-2 2H9l-5 4v-4H4a2 2 0 01-2-2V6a2 2 0 012-2z" />
+            </svg>
+          )}
+        </span>
       </button>
     </div>
   )

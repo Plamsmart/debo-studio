@@ -11,16 +11,23 @@
 }
 
 /* ===== Botón flotante ===== */
+/* Ancho automático: en reposo solo cabe el ícono (58px) y, con radio 999px,
+   es un círculo. El hover ensancha el texto de la izquierda y el botón crece
+   hacia la izquierda (el widget está anclado a la derecha), así que el ícono
+   no se mueve. */
 .chat-widget__toggle {
-  width: 58px;
   height: 58px;
-  border-radius: 50%;
+  min-width: 58px;
+  max-width: calc(100vw - 40px);
+  padding: 0;
+  border-radius: 999px;
   border: none;
   background: var(--marca-bronce);
   color: #fff;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
+  font: inherit;
   cursor: pointer;
   box-shadow: 0 10px 28px rgba(74, 59, 46, 0.28);
   transition:
@@ -36,6 +43,61 @@
 .chat-widget__toggle:focus-visible {
   outline: 2px solid var(--marca-bronce-oscuro);
   outline-offset: 3px;
+}
+
+.chat-widget__toggle-icono {
+  flex-shrink: 0;
+  width: 58px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Columna de 0fr -> 1fr: anima al ancho EXACTO del texto (un max-width fijo
+   dejaría la transición desfasada del contenido real). */
+.chat-widget__toggle-texto {
+  display: grid;
+  grid-template-columns: 0fr;
+  min-width: 0;
+  opacity: 0;
+  transition:
+    grid-template-columns 0.22s ease,
+    padding-left 0.22s ease,
+    opacity 0.22s ease;
+}
+
+.chat-widget__toggle-texto > span {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 0.88rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+/* Solo con ratón: en táctil el :hover se queda "pegado" tras el toque. El
+   foco de teclado también lo despliega, para que se lea igual sin ratón. */
+@media (hover: hover) and (pointer: fine) {
+  .chat-widget__toggle--cerrado:hover,
+  .chat-widget__toggle--cerrado:focus-visible {
+    transform: none;
+  }
+
+  .chat-widget__toggle--cerrado:hover .chat-widget__toggle-texto,
+  .chat-widget__toggle--cerrado:focus-visible .chat-widget__toggle-texto {
+    grid-template-columns: 1fr;
+    opacity: 1;
+    padding-left: 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-widget__toggle,
+  .chat-widget__toggle-texto {
+    transition: none;
+  }
 }
 
 /* ===== Panel ===== */
