@@ -162,6 +162,23 @@ genérico"}, {status: 500})` sin `console.error(error)` antes,
     cualquier formulario de subida futuro, preferir un solo botón que
     encadene las acciones, en vez de varios controles separados que el
     usuario deba completar en un orden no obvio.**
+13. **Variable de entorno en `.env.local` pero nunca copiada a Vercel
+    (Production).** Pasó con el chatbot (25 sept 2026): `OPENAI_API_KEY`
+    y `CHAT_IP_SALT` existían en `.env.local`, así que todo funcionaba en
+    `npm run dev`, pero en producción `/api/chat` respondía 503
+    (`chat_no_disponible`) y el widget mostraba "El asistente virtual no
+    está disponible ahora mismo…" a una usuaria real. Pista para
+    diagnosticarlo: no quedaba ninguna fila en `chat_conversaciones` (el
+    chequeo de config va antes de tocar la base de datos), y el log de
+    Vercel dice el nombre exacto de la variable que falta ("Chat no
+    disponible: falta configurar ..."). Se resolvió agregando las
+    variables en Vercel → Settings → Environment Variables (entorno
+    Production) y **redesplegando** (Vercel no aplica variables nuevas a
+    un deployment ya existente). **Convención a partir de ahora: cada vez
+    que se agregue una variable nueva a `.env.local`, agregarla también
+    en Vercel (Production) en el mismo momento, y después de cualquier
+    cambio relacionado con el chatbot, probar el widget en producción,
+    no solo en local.**
 
 ## Panel de administración — secciones
 
