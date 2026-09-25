@@ -100,11 +100,18 @@ export async function crearCitaInvitado(
   let clienteId: string | null = null;
 
   if (emailLimpio) {
-    const { data: clienteExistente } = await supabase
+    const { data: clienteExistente, error: errorBusqueda } = await supabase
       .from("clientes")
       .select("id")
       .eq("email", emailLimpio)
       .maybeSingle();
+
+    // "Falló la consulta" no es "no existe": seguir de largo crearía una
+    // clienta duplicada en silencio (p.ej. por un GRANT faltante).
+    if (errorBusqueda) {
+      console.error("Error buscando cliente existente por email:", errorBusqueda);
+      return fallo("error_interno", "No se pudo registrar el cliente", 500);
+    }
 
     if (clienteExistente) {
       clienteId = clienteExistente.id;

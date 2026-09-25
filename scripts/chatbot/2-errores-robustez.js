@@ -64,6 +64,15 @@ const cita = (db, svc, o = {}) => db.tablas.citas.push({ id: require('crypto').r
     })
   }
 
+  await test('si falla la BÚSQUEDA de clienta existente -> error_interno, sin crear clienta duplicada ni cita', async () => {
+    const { db, svc } = fresco()
+    db.fallos.select_clientes = true
+    const r = await ejecutar(db, 'crear_cita', base(svc))
+    igual(r.codigo, 'error_interno', 'codigo')
+    igual(db.tablas.clientes.length, 0, 'clientas creadas')
+    igual(db.tablas.citas.length, 0, 'citas creadas')
+  })
+
   await test('error choque por CONDICIÓN DE CARRERA (la app no lo ve, lo frena el constraint 23P01)', async () => {
     const { db, svc } = fresco()
     cita(db, svc)                 // otra petición ya ocupó 10:00-11:00...
