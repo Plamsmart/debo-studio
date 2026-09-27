@@ -5,30 +5,18 @@ import Link from 'next/link'
 import NavMovil from './NavMovil'
 
 export default function Header() {
-  // Por defecto asumimos "sólido" (seguro para páginas sin zona oscura,
-  // como /reservar). En la portada, el efecto de abajo lo corrige apenas monta.
-  const [solido, setSolido] = useState(true)
+  // Transparente solo en la posición inicial (scrollY = 0); con cualquier
+  // scroll pasa a sólido, igual en todas las secciones.
+  const [solido, setSolido] = useState(false)
 
   useEffect(() => {
-    const zonaOscura = document.getElementById('zona-oscura')
-
-    // Si esta página no tiene zona oscura (ej. /reservar), el header
-    // se queda sólido siempre — no hay nada de qué "despegarse".
-    if (!zonaOscura) return
-
     function evaluar() {
-      const alturaZona = zonaOscura!.offsetHeight
-      const alturaHeader = 90 // aprox., suficiente margen para el cambio
-      setSolido(window.scrollY >= alturaZona - alturaHeader)
+      setSolido(window.scrollY > 0)
     }
 
     evaluar()
     window.addEventListener('scroll', evaluar, { passive: true })
-    window.addEventListener('resize', evaluar)
-    return () => {
-      window.removeEventListener('scroll', evaluar)
-      window.removeEventListener('resize', evaluar)
-    }
+    return () => window.removeEventListener('scroll', evaluar)
   }, [])
 
   return (
@@ -45,7 +33,7 @@ export default function Header() {
       <Link href="/reservar" className="header__cta">
         Reservar cita
       </Link>
-      <NavMovil claro={!solido} />
+      <NavMovil />
     </header>
   )
 }

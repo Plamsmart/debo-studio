@@ -3,18 +3,14 @@
 import { useState } from 'react'
 import Link from 'next/link'
 
-type Props = {
-  claro?: boolean
-}
-
-export default function NavMovil({ claro = false }: Props) {
+export default function NavMovil() {
   const [abierto, setAbierto] = useState(false)
 
   return (
     <div className="nav-movil">
       <button
         type="button"
-        className={`nav-movil__toggle ${claro ? 'nav-movil__toggle--claro' : ''}`}
+        className="nav-movil__toggle"
         onClick={() => setAbierto((v) => !v)}
         aria-label={abierto ? 'Cerrar menú' : 'Abrir menú'}
         aria-expanded={abierto}

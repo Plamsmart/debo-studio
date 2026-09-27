@@ -74,8 +74,8 @@
 }
 
 /* ===== Header =====
-   Dos estados: transparente con texto claro (mientras está sobre la
-   "zona oscura" del hero+filosofía) y sólido con blur (al pasarla). */
+   Dos estados: transparente en la posición inicial (scrollY = 0) y
+   sólido con blur en cuanto hay scroll, en cualquier sección. */
 .header {
   display: flex;
   align-items: center;
