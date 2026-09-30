@@ -108,3 +108,14 @@
   font-style: italic;
   font-family: var(--font-body);
 }
+
+/* Eventos de Google Calendar: solo lectura, en gris para no confundirlos
+   con las citas. */
+.lista-citas-dia__tarjeta--google {
+  background: #fff;
+  border-left: 4px solid var(--marca-gris-suave);
+}
+
+.lista-citas-dia__badge--google {
+  background: var(--marca-gris-suave);
+}

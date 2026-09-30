@@ -142,6 +142,50 @@
   color: var(--marca-gris);
 }
 
+/* Eventos de Google Calendar: solo lectura, en gris para no confundirlos
+   con las citas (bronce). */
+.calendario-dia__evento--google {
+  background: #fff;
+  color: var(--marca-gris);
+  border: 1px solid var(--marca-crema-oscuro);
+  border-left: 4px solid var(--marca-gris-suave);
+  box-shadow: none;
+  cursor: default;
+}
+
+.calendario-dia__etiqueta-google {
+  display: inline-block;
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0 0.35rem;
+  border-radius: 4px;
+  background: var(--marca-gris-suave);
+  color: #fff;
+  vertical-align: 1px;
+}
+
+.calendario-dia__todo-el-dia {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.8rem;
+}
+
+.calendario-dia__todo-el-dia-evento {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid var(--marca-crema-oscuro);
+  border-left: 4px solid var(--marca-gris-suave);
+  color: var(--marca-gris);
+  min-width: 0;
+}
+
 .calendario-dia__evento-hora {
   font-size: 0.68rem;
   opacity: 0.85;

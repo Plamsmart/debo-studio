@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { horarioDelDia, esDiaLaboral } from '@/lib/horario-negocio'
+import { obtenerEventosGoogleDelDia } from '@/lib/google-calendar'
 import CalendarioDia from '@/components/CalendarioDia'
 import ListaCitasDelDia from '@/components/ListaCitasDelDia'
 import '@/components/CalendarioDia.css'
@@ -24,14 +25,19 @@ export default async function CalendarioPage({
   const fechaStr = formatoFecha(fecha)
 
   const supabase = await createClient()
-  const { data: citas } = await supabase
-    .from('citas')
-    .select(
-      'id, hora_inicio, hora_fin, estado, servicios(nombre), clientes(nombre, telefono, email)'
-    )
-    .eq('fecha', fechaStr)
-    .neq('estado', 'cancelada')
-    .order('hora_inicio', { ascending: true })
+  // Si Google no está conectado o falla, eventosGoogle llega vacío y el
+  // calendario sigue mostrando las citas como siempre.
+  const [{ data: citas }, eventosGoogle] = await Promise.all([
+    supabase
+      .from('citas')
+      .select(
+        'id, hora_inicio, hora_fin, estado, servicios(nombre), clientes(nombre, telefono, email)'
+      )
+      .eq('fecha', fechaStr)
+      .neq('estado', 'cancelada')
+      .order('hora_inicio', { ascending: true }),
+    obtenerEventosGoogleDelDia(fechaStr),
+  ])
 
   const horario = horarioDelDia(fecha)
   const laboral = esDiaLaboral(fecha)
@@ -54,6 +60,7 @@ export default async function CalendarioPage({
             horario={horario}
             laboral={laboral}
             citas={citas ?? []}
+            eventosGoogle={eventosGoogle}
             esHoy={fechaStr === formatoFecha(hoy)}
             urlAnterior={`/admin/calendario?fecha=${formatoFecha(diaAnterior)}`}
             urlSiguiente={`/admin/calendario?fecha=${formatoFecha(diaSiguiente)}`}
@@ -63,7 +70,7 @@ export default async function CalendarioPage({
 
         <div className="calendario-layout__columna-lista">
           <h3 className="calendario-layout__titulo-lista">Citas de este día</h3>
-          <ListaCitasDelDia citasIniciales={citas ?? []} />
+          <ListaCitasDelDia citasIniciales={citas ?? []} eventosGoogle={eventosGoogle} />
         </div>
       </div>
     </div>

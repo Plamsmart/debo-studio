@@ -210,6 +210,8 @@ function diaSiguiente(fecha: string): string {
 }
 
 type EventoGoogle = {
+  id?: string | null
+  summary?: string | null
   status?: string | null
   transparency?: string | null
   extendedProperties?: { private?: { [clave: string]: string } | null } | null
@@ -217,19 +219,17 @@ type EventoGoogle = {
   end?: { date?: string | null; dateTime?: string | null } | null
 }
 
-// Convierte un evento en el tramo que ocupa dentro de `fecha`, o null si no
-// bloquea nada ese día (cancelado, marcado como "disponible", creado por
-// nosotros, o fuera del día).
-function bloqueDelDia(evento: EventoGoogle, fecha: string): BloqueOcupadoGoogle | null {
-  if (evento.status === 'cancelled') return null
-  if (evento.transparency === 'transparent') return null
-  if (evento.extendedProperties?.private?.origen === ORIGEN_EVENTO_CITA) return null
+type TramoDelDia = { inicio: string; fin: string; diaCompleto: boolean }
 
+// Parte del evento que cae dentro de `fecha`, en hora local del negocio, o
+// null si no toca ese día. No mira el estado ni la transparencia del evento:
+// eso lo decide cada llamador.
+function tramoDelDia(evento: EventoGoogle, fecha: string): TramoDelDia | null {
   // Día completo: end.date es exclusivo (un evento del día 5 trae end.date = 6).
   if (evento.start?.date) {
     const finExclusivo = evento.end?.date ?? diaSiguiente(evento.start.date)
     if (evento.start.date <= fecha && fecha < finExclusivo) {
-      return { inicio: '00:00', fin: '23:59' }
+      return { inicio: '00:00', fin: '23:59', diaCompleto: true }
     }
     return null
   }
@@ -244,10 +244,26 @@ function bloqueDelDia(evento: EventoGoogle, fecha: string): BloqueOcupadoGoogle 
   const horaFin = fin.fecha > fecha ? '23:59' : fin.hora
   if (horaFin <= horaInicio) return null // p.ej. un evento que termina justo a las 00:00
 
-  return { inicio: horaInicio, fin: horaFin }
+  return { inicio: horaInicio, fin: horaFin, diaCompleto: false }
 }
 
-async function leerBloquesDelDia(fecha: string): Promise<BloqueOcupadoGoogle[]> {
+function esCitaDelPanel(evento: EventoGoogle): boolean {
+  return evento.extendedProperties?.private?.origen === ORIGEN_EVENTO_CITA
+}
+
+// Tramo que bloquea disponibilidad, o null si no bloquea nada ese día
+// (cancelado, marcado como "disponible", creado por nosotros, o fuera del día).
+function bloqueDelDia(evento: EventoGoogle, fecha: string): BloqueOcupadoGoogle | null {
+  if (evento.status === 'cancelled') return null
+  if (evento.transparency === 'transparent') return null
+  if (esCitaDelPanel(evento)) return null
+
+  const tramo = tramoDelDia(evento, fecha)
+  return tramo && { inicio: tramo.inicio, fin: tramo.fin }
+}
+
+// Eventos del calendario conectado que tocan `fecha`. [] si no hay conexión.
+async function listarEventosDelDia(fecha: string): Promise<EventoGoogle[]> {
   const oauth2Client = await obtenerClienteAutenticado()
   if (!oauth2Client) return []
 
@@ -255,7 +271,7 @@ async function leerBloquesDelDia(fecha: string): Promise<BloqueOcupadoGoogle[]> 
   const calendar = google.calendar({ version: 'v3', auth: oauth2Client })
 
   // Ventana algo más amplia que el día local (Madrid es +01:00 o +02:00 según
-  // el horario de verano); bloqueDelDia recorta con precisión después.
+  // el horario de verano); tramoDelDia recorta con precisión después.
   const { data } = await calendar.events.list({
     calendarId: config?.calendar_id || 'primary',
     timeMin: `${fecha}T00:00:00+02:00`,
@@ -265,9 +281,21 @@ async function leerBloquesDelDia(fecha: string): Promise<BloqueOcupadoGoogle[]> 
     maxResults: 250,
   })
 
-  return (data.items ?? [])
-    .map((evento) => bloqueDelDia(evento, fecha))
-    .filter((bloque): bloque is BloqueOcupadoGoogle => bloque !== null)
+  return data.items ?? []
+}
+
+async function conTimeout<T>(promesa: Promise<T>, ms: number): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  try {
+    return await Promise.race([
+      promesa,
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error('timeout')), ms)
+      }),
+    ])
+  } finally {
+    clearTimeout(timer)
+  }
 }
 
 // Tramos ocupados en el Google Calendar del negocio para `fecha` (YYYY-MM-DD),
@@ -285,14 +313,11 @@ export async function obtenerEventosOcupadosGoogle(
     if (enCache && enCache.expira > ahora) return enCache.bloques
   }
 
-  let timer: ReturnType<typeof setTimeout> | undefined
   try {
-    const bloques = await Promise.race([
-      leerBloquesDelDia(fecha),
-      new Promise<never>((_, reject) => {
-        timer = setTimeout(() => reject(new Error('timeout')), TIMEOUT_LECTURA_MS)
-      }),
-    ])
+    const eventos = await conTimeout(listarEventosDelDia(fecha), TIMEOUT_LECTURA_MS)
+    const bloques = eventos
+      .map((evento) => bloqueDelDia(evento, fecha))
+      .filter((bloque): bloque is BloqueOcupadoGoogle => bloque !== null)
 
     for (const [clave, entrada] of cacheEventos) {
       if (entrada.expira <= ahora) cacheEventos.delete(clave)
@@ -302,8 +327,41 @@ export async function obtenerEventosOcupadosGoogle(
   } catch (err) {
     console.error(`No se pudieron leer los eventos de Google Calendar (${fecha}):`, err)
     return []
-  } finally {
-    clearTimeout(timer)
+  }
+}
+
+export type EventoGoogleDelDia = {
+  id: string
+  titulo: string
+  inicio: string // "HH:mm"
+  fin: string // "HH:mm"
+  diaCompleto: boolean
+}
+
+// Eventos del Google Calendar del negocio para mostrar (solo lectura) en
+// /admin/calendario. A diferencia de obtenerEventosOcupadosGoogle incluye los
+// marcados como "disponible": es una vista informativa, no de bloqueo. Omite
+// los creados desde el panel porque ya se muestran como citas. Sin caché (solo
+// lo usa el panel) y nunca lanza: si Google falla, el calendario sigue con las
+// citas de la base.
+export async function obtenerEventosGoogleDelDia(fecha: string): Promise<EventoGoogleDelDia[]> {
+  try {
+    const eventos = await conTimeout(listarEventosDelDia(fecha), TIMEOUT_LECTURA_MS)
+    return eventos.flatMap((evento) => {
+      if (evento.status === 'cancelled' || esCitaDelPanel(evento)) return []
+      const tramo = tramoDelDia(evento, fecha)
+      if (!tramo) return []
+      return [
+        {
+          id: evento.id ?? `${tramo.inicio}-${evento.summary ?? ''}`,
+          titulo: evento.summary || '(Sin título)',
+          ...tramo,
+        },
+      ]
+    })
+  } catch (err) {
+    console.error(`No se pudieron leer los eventos de Google Calendar para el panel (${fecha}):`, err)
+    return []
   }
 }
 
