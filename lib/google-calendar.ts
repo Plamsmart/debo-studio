@@ -166,10 +166,145 @@ export async function crearEventoCita(cita: DatosCitaParaEvento): Promise<string
       description: `Cliente: ${cita.nombreCliente}\nEmail: ${cita.emailCliente || '—'}\nTeléfono: ${cita.telefonoCliente || '—'}`,
       start: { dateTime: `${cita.fecha}T${cita.hora_inicio}`, timeZone: 'Europe/Madrid' },
       end: { dateTime: `${cita.fecha}T${cita.hora_fin}`, timeZone: 'Europe/Madrid' },
+      // Marca para que obtenerEventosOcupadosGoogle no cuente dos veces una
+      // cita que ya viene de nuestra base de datos.
+      extendedProperties: { private: { origen: ORIGEN_EVENTO_CITA } },
     },
   })
 
   return evento.data.id ?? null
+}
+
+const ORIGEN_EVENTO_CITA = 'panel-citas'
+const ZONA_HORARIA = 'Europe/Madrid'
+const TIMEOUT_LECTURA_MS = 5000
+const CACHE_EVENTOS_MS = 45_000
+
+export type BloqueOcupadoGoogle = { inicio: string; fin: string } // "HH:mm"
+
+const cacheEventos = new Map<string, { expira: number; bloques: BloqueOcupadoGoogle[] }>()
+
+// Instante -> fecha y hora locales del negocio. Se convierte con Intl en vez
+// de confiar en el offset que devuelve Google.
+function fechaHoraEnNegocio(instante: string): { fecha: string; hora: string } {
+  const partes = new Intl.DateTimeFormat('en-CA', {
+    timeZone: ZONA_HORARIA,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(new Date(instante))
+  const valor = (tipo: string) => partes.find((p) => p.type === tipo)!.value
+  return {
+    fecha: `${valor('year')}-${valor('month')}-${valor('day')}`,
+    hora: `${valor('hour')}:${valor('minute')}`,
+  }
+}
+
+function diaSiguiente(fecha: string): string {
+  const d = new Date(`${fecha}T00:00:00Z`)
+  d.setUTCDate(d.getUTCDate() + 1)
+  return d.toISOString().slice(0, 10)
+}
+
+type EventoGoogle = {
+  status?: string | null
+  transparency?: string | null
+  extendedProperties?: { private?: { [clave: string]: string } | null } | null
+  start?: { date?: string | null; dateTime?: string | null } | null
+  end?: { date?: string | null; dateTime?: string | null } | null
+}
+
+// Convierte un evento en el tramo que ocupa dentro de `fecha`, o null si no
+// bloquea nada ese día (cancelado, marcado como "disponible", creado por
+// nosotros, o fuera del día).
+function bloqueDelDia(evento: EventoGoogle, fecha: string): BloqueOcupadoGoogle | null {
+  if (evento.status === 'cancelled') return null
+  if (evento.transparency === 'transparent') return null
+  if (evento.extendedProperties?.private?.origen === ORIGEN_EVENTO_CITA) return null
+
+  // Día completo: end.date es exclusivo (un evento del día 5 trae end.date = 6).
+  if (evento.start?.date) {
+    const finExclusivo = evento.end?.date ?? diaSiguiente(evento.start.date)
+    if (evento.start.date <= fecha && fecha < finExclusivo) {
+      return { inicio: '00:00', fin: '23:59' }
+    }
+    return null
+  }
+
+  if (!evento.start?.dateTime || !evento.end?.dateTime) return null
+  const inicio = fechaHoraEnNegocio(evento.start.dateTime)
+  const fin = fechaHoraEnNegocio(evento.end.dateTime)
+
+  // Multi-día: recortar a la porción que cae dentro de `fecha`.
+  if (inicio.fecha > fecha || fin.fecha < fecha) return null
+  const horaInicio = inicio.fecha < fecha ? '00:00' : inicio.hora
+  const horaFin = fin.fecha > fecha ? '23:59' : fin.hora
+  if (horaFin <= horaInicio) return null // p.ej. un evento que termina justo a las 00:00
+
+  return { inicio: horaInicio, fin: horaFin }
+}
+
+async function leerBloquesDelDia(fecha: string): Promise<BloqueOcupadoGoogle[]> {
+  const oauth2Client = await obtenerClienteAutenticado()
+  if (!oauth2Client) return []
+
+  const config = await obtenerConfigCalendario()
+  const calendar = google.calendar({ version: 'v3', auth: oauth2Client })
+
+  // Ventana algo más amplia que el día local (Madrid es +01:00 o +02:00 según
+  // el horario de verano); bloqueDelDia recorta con precisión después.
+  const { data } = await calendar.events.list({
+    calendarId: config?.calendar_id || 'primary',
+    timeMin: `${fecha}T00:00:00+02:00`,
+    timeMax: `${diaSiguiente(fecha)}T00:00:00+01:00`,
+    singleEvents: true,
+    timeZone: ZONA_HORARIA,
+    maxResults: 250,
+  })
+
+  return (data.items ?? [])
+    .map((evento) => bloqueDelDia(evento, fecha))
+    .filter((bloque): bloque is BloqueOcupadoGoogle => bloque !== null)
+}
+
+// Tramos ocupados en el Google Calendar del negocio para `fecha` (YYYY-MM-DD),
+// en hora local de Madrid. Nunca lanza: sin conexión, con token inválido o
+// con Google caído devuelve [] (se reserva solo con las citas de la base), para
+// no tumbar la disponibilidad — en modo Testing el token caduca cada 7 días.
+// Los fallos no se guardan en caché, así la siguiente consulta reintenta.
+export async function obtenerEventosOcupadosGoogle(
+  fecha: string,
+  { sinCache = false }: { sinCache?: boolean } = {}
+): Promise<BloqueOcupadoGoogle[]> {
+  const ahora = Date.now()
+  if (!sinCache) {
+    const enCache = cacheEventos.get(fecha)
+    if (enCache && enCache.expira > ahora) return enCache.bloques
+  }
+
+  let timer: ReturnType<typeof setTimeout> | undefined
+  try {
+    const bloques = await Promise.race([
+      leerBloquesDelDia(fecha),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error('timeout')), TIMEOUT_LECTURA_MS)
+      }),
+    ])
+
+    for (const [clave, entrada] of cacheEventos) {
+      if (entrada.expira <= ahora) cacheEventos.delete(clave)
+    }
+    cacheEventos.set(fecha, { expira: ahora + CACHE_EVENTOS_MS, bloques })
+    return bloques
+  } catch (err) {
+    console.error(`No se pudieron leer los eventos de Google Calendar (${fecha}):`, err)
+    return []
+  } finally {
+    clearTimeout(timer)
+  }
 }
 
 // Borra el evento (cuando una cita ya confirmada se cancela después).

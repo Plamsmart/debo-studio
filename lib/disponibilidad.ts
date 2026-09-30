@@ -5,6 +5,7 @@ import {
   horarioDelDia,
   type HorarioDia,
 } from "./horario-negocio";
+import { obtenerEventosOcupadosGoogle } from "./google-calendar";
 
 // Lógica compartida de disponibilidad y validación de reservas.
 // La usan GET /api/disponibilidad, POST /api/citas y (más adelante) el chatbot,
@@ -284,15 +285,26 @@ export async function obtenerServicioReservable(
   };
 }
 
+// Apagado por defecto: solo se activa con GOOGLE_CALENDAR_BLOQUEA_DISPONIBILIDAD=true.
+function googleBloqueaDisponibilidad(): boolean {
+  return process.env.GOOGLE_CALENDAR_BLOQUEA_DISPONIBILIDAD === "true";
+}
+
 // Citas vigentes de un día vía RPC (evita que RLS oculte citas de otros
-// usuarios, sin exponer datos del cliente).
+// usuarios, sin exponer datos del cliente). Con el flag activo, suma también
+// los eventos ocupados del Google Calendar del negocio (si Google falla, esa
+// parte llega vacía y se sigue solo con la base de datos).
 async function obtenerCitasOcupadas(
   supabase: Cliente,
   fecha: string,
+  opcionesGoogle: { sinCache?: boolean } = {},
 ): Promise<Resultado<CitaOcupada[]>> {
-  const { data, error } = await supabase.rpc("citas_ocupadas_del_dia", {
-    fecha_consulta: fecha,
-  });
+  const [{ data, error }, eventosGoogle] = await Promise.all([
+    supabase.rpc("citas_ocupadas_del_dia", { fecha_consulta: fecha }),
+    googleBloqueaDisponibilidad()
+      ? obtenerEventosOcupadosGoogle(fecha, opcionesGoogle)
+      : Promise.resolve([]),
+  ]);
 
   if (error) {
     console.error("Error en RPC citas_ocupadas_del_dia:", error);
@@ -305,7 +317,10 @@ async function obtenerCitasOcupadas(
 
   return {
     ok: true,
-    valor: (data || []).map((c) => ({ inicio: c.hora_inicio, fin: c.hora_fin })),
+    valor: [
+      ...(data || []).map((c) => ({ inicio: c.hora_inicio, fin: c.hora_fin })),
+      ...eventosGoogle,
+    ],
   };
 }
 
@@ -418,7 +433,8 @@ export async function validarReserva(
   const servicio = await obtenerServicioReservable(supabase, servicioId);
   if (!servicio.ok) return servicio;
 
-  const citas = await obtenerCitasOcupadas(supabase, fecha);
+  // Al reservar, Google siempre en tiempo real (sin la caché de la lista de horarios).
+  const citas = await obtenerCitasOcupadas(supabase, fecha, { sinCache: true });
   if (!citas.ok) return citas;
 
   const duracionMinutos = servicio.valor.duracion_minutos;
