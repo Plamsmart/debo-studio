@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 
 type CitaResumen = {
   estado: string | null
@@ -397,15 +398,23 @@ export default function PanelClientes({ clientesIniciales, esAdmin }: Props) {
                     ))}
                 </div>
 
-                {esAdmin && (
-                  <button
-                    type="button"
-                    onClick={() => eliminarCliente(cliente)}
-                    className="panel-clientes__btn-eliminar"
+                <div className="panel-clientes__acciones-tarjeta">
+                  <Link
+                    href={`/admin/clientes/${cliente.id}/expediente`}
+                    className="panel-clientes__btn-expediente"
                   >
-                    Eliminar
-                  </button>
-                )}
+                    Ver expediente
+                  </Link>
+                  {esAdmin && (
+                    <button
+                      type="button"
+                      onClick={() => eliminarCliente(cliente)}
+                      className="panel-clientes__btn-eliminar"
+                    >
+                      Eliminar
+                    </button>
+                  )}
+                </div>
               </div>
             )
           })}

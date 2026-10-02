@@ -163,6 +163,94 @@ export type Database = {
         }
         Relationships: []
       }
+      expedientes_clientes: {
+        Row: {
+          actualizado_en: string
+          alergias: string | null
+          antecedentes: string | null
+          cliente_id: string
+          consentimiento_fecha: string | null
+          consentimiento_firmado: boolean
+          contraindicaciones: string | null
+          creado_en: string
+          embarazo_lactancia: string | null
+          id: string
+          medicacion_actual: string | null
+          tipo_piel: string | null
+        }
+        Insert: {
+          actualizado_en?: string
+          alergias?: string | null
+          antecedentes?: string | null
+          cliente_id: string
+          consentimiento_fecha?: string | null
+          consentimiento_firmado?: boolean
+          contraindicaciones?: string | null
+          creado_en?: string
+          embarazo_lactancia?: string | null
+          id?: string
+          medicacion_actual?: string | null
+          tipo_piel?: string | null
+        }
+        Update: {
+          actualizado_en?: string
+          alergias?: string | null
+          antecedentes?: string | null
+          cliente_id?: string
+          consentimiento_fecha?: string | null
+          consentimiento_firmado?: boolean
+          contraindicaciones?: string | null
+          creado_en?: string
+          embarazo_lactancia?: string | null
+          id?: string
+          medicacion_actual?: string | null
+          tipo_piel?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expedientes_clientes_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: true
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fotos_expediente: {
+        Row: {
+          creado_en: string
+          id: string
+          orden: number
+          ruta: string
+          sesion_id: string
+          tipo: string
+        }
+        Insert: {
+          creado_en?: string
+          id?: string
+          orden?: number
+          ruta: string
+          sesion_id: string
+          tipo: string
+        }
+        Update: {
+          creado_en?: string
+          id?: string
+          orden?: number
+          ruta?: string
+          sesion_id?: string
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fotos_expediente_sesion_id_fkey"
+            columns: ["sesion_id"]
+            isOneToOne: false
+            referencedRelation: "sesiones_expediente"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fotos_trabajos: {
         Row: {
           creado_en: string
@@ -365,6 +453,57 @@ export type Database = {
           reservable?: boolean
         }
         Relationships: []
+      }
+      sesiones_expediente: {
+        Row: {
+          cliente_id: string
+          creado_en: string
+          creado_por: string | null
+          fecha: string
+          id: string
+          notas: string | null
+          producto: string | null
+          tratamiento: string | null
+          zona: string | null
+        }
+        Insert: {
+          cliente_id: string
+          creado_en?: string
+          creado_por?: string | null
+          fecha: string
+          id?: string
+          notas?: string | null
+          producto?: string | null
+          tratamiento?: string | null
+          zona?: string | null
+        }
+        Update: {
+          cliente_id?: string
+          creado_en?: string
+          creado_por?: string | null
+          fecha?: string
+          id?: string
+          notas?: string | null
+          producto?: string | null
+          tratamiento?: string | null
+          zona?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sesiones_expediente_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sesiones_expediente_creado_por_fkey"
+            columns: ["creado_por"]
+            isOneToOne: false
+            referencedRelation: "usuarios_admin"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       usuarios_admin: {
         Row: {
