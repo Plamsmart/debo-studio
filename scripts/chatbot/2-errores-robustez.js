@@ -22,6 +22,7 @@ const cita = (db, svc, o = {}) => db.tablas.citas.push({ id: require('crypto').r
     ['fecha_invalida',          'crear_cita', (s) => base(s, { fecha: '2026-02-31' })],
     ['hora_invalida',           'crear_cita', (s) => base(s, { hora_inicio: '25:99' })],
     ['fecha_pasada',            'crear_cita', (s) => base(s, { fecha: '2026-09-20' })],
+    ['fuera_de_rango',          'crear_cita', (s) => base(s, { fecha: '2026-11-23' })],
     ['dia_cerrado',             'crear_cita', (s) => base(s, { fecha: '2026-09-26' })],
     ['fuera_de_horario',        'crear_cita', (s) => base(s, { hora_inicio: '18:00' })],
     ['fuera_de_intervalo',      'crear_cita', (s) => base(s, { hora_inicio: '10:10' })],
@@ -39,6 +40,7 @@ const cita = (db, svc, o = {}) => db.tablas.citas.push({ id: require('crypto').r
     ['error_interno',           'crear_cita', (s, db) => { db.fallos.insert_citas = true; return base(s) }],
     ['error_consulta',          'consultar_disponibilidad', (s, db) => { db.fallos.rpc = true; return { servicio_id: s.id, fecha: '2026-09-22' } }],
     ['fecha_invalida',          'consultar_disponibilidad', (s) => ({ servicio_id: s.id, fecha: 'mañana' })],
+    ['fuera_de_rango',          'consultar_disponibilidad', (s) => ({ servicio_id: s.id, fecha: '2026-11-23' })],
     ['servicio_no_encontrado',  'consultar_disponibilidad', () => ({ servicio_id: 'abc', fecha: '2026-09-22' })],
     ['argumentos_invalidos',    'consultar_disponibilidad', () => ({ servicio_id: 123, fecha: '2026-09-22' })],
     ['argumentos_invalidos',    'consultar_disponibilidad', () => '{esto no es json'],
@@ -87,11 +89,64 @@ const cita = (db, svc, o = {}) => db.tablas.citas.push({ id: require('crypto').r
     const { db, svc } = fresco()
     let r = await ejecutar(db, 'consultar_disponibilidad', { servicio_id: svc.id, fecha: '2026-09-26' })
     assert(r.ok && r.horarios_disponibles.length === 0 && /cerrado/i.test(r.que_paso) && r.que_hacer.length > 10, 'cerrado: ' + JSON.stringify(r))
+    igual(r.motivo, 'dia_cerrado', 'motivo cerrado')
     r = await ejecutar(db, 'consultar_disponibilidad', { servicio_id: svc.id, fecha: '2026-09-20' })
     assert(r.ok && r.horarios_disponibles.length === 0 && /pasó/i.test(r.que_paso), 'pasada')
+    igual(r.motivo, 'fecha_pasada', 'motivo pasada')
     cita(db, svc, { hora_inicio: '09:30', hora_fin: '18:30' })
     r = await ejecutar(db, 'consultar_disponibilidad', { servicio_id: svc.id, fecha: '2026-09-22' })
     assert(r.ok && r.horarios_disponibles.length === 0 && /otro día/i.test(r.que_hacer), 'día completo: ' + JSON.stringify(r))
+    igual(r.motivo, 'sin_huecos', 'motivo día completo')
+  })
+
+  // Reloj fijo: lunes 2026-09-21 -> fecha máxima = hoy + 60 = viernes 2026-11-20.
+  await test('rango de fechas: pasada / fuera de rango / sin huecos son tres respuestas distintas', async () => {
+    const { db, svc } = fresco()
+    const pasada = await ejecutar(db, 'consultar_disponibilidad', { servicio_id: svc.id, fecha: '2026-09-18' })
+    const fuera = await ejecutar(db, 'consultar_disponibilidad', { servicio_id: svc.id, fecha: '2026-11-23' })
+    cita(db, svc, { fecha: '2026-11-20', hora_inicio: '09:30', hora_fin: '16:00' })
+    const llena = await ejecutar(db, 'consultar_disponibilidad', { servicio_id: svc.id, fecha: '2026-11-20' })
+
+    assert(pasada.ok && pasada.motivo === 'fecha_pasada' && !('fecha_maxima' in pasada), 'pasada: ' + JSON.stringify(pasada))
+    assert(llena.ok && llena.motivo === 'sin_huecos' && llena.horarios_disponibles.length === 0, 'sin huecos: ' + JSON.stringify(llena))
+
+    igual(fuera.ok, false, 'fuera de rango es un error, no una lista vacía')
+    igual(fuera.codigo, 'fuera_de_rango')
+    assert(!('horarios_disponibles' in fuera), 'fuera de rango no trae lista de horarios (el bot no puede leer "no hay")')
+    igual(fuera.fecha_maxima, '2026-11-20', 'fecha máxima calculada')
+    assert(/viernes 20 de noviembre de 2026/.test(fuera.detalle) && /60 días/.test(fuera.detalle), 'detalle con la fecha legible: ' + fuera.detalle)
+    assert(/NO le digas que no hay horarios/.test(fuera.que_hacer) && /web/.test(fuera.que_hacer), 'que_hacer: no decir "no hay", ofrecer otra fecha o la web')
+  })
+
+  await test('rango de fechas: el último día (hoy + 60) sí se consulta y reserva; el siguiente no, aunque esté cerrado', async () => {
+    const { db, svc } = fresco()
+    let r = await ejecutar(db, 'consultar_disponibilidad', { servicio_id: svc.id, fecha: '2026-11-20' })
+    assert(r.ok && r.horarios_disponibles.includes('09:30'), 'último día con horarios: ' + JSON.stringify(r))
+    r = await ejecutar(db, 'crear_cita', base(svc, { fecha: '2026-11-20', hora_inicio: '09:30' }))
+    assert(r.ok, 'crear_cita el último día: ' + JSON.stringify(r))
+    r = await ejecutar(db, 'consultar_disponibilidad', { servicio_id: svc.id, fecha: '2026-11-21' }) // sábado
+    igual(r.codigo, 'fuera_de_rango', 'el rango se comprueba antes que el día cerrado')
+  })
+
+  await test('rango de fechas: fuera de rango no consulta la BD ni Google (corta antes)', async () => {
+    const { db, svc } = fresco()
+    db.fallos.rpc = true // si llegara a consultar las citas ocupadas, saldría error_consulta
+    const r = await ejecutar(db, 'consultar_disponibilidad', { servicio_id: svc.id, fecha: '2027-01-15' })
+    igual(r.codigo, 'fuera_de_rango')
+  })
+
+  await test('GET /api/disponibilidad: fuera de rango -> 400 con el mismo código y mensaje que usa el bot', async () => {
+    const { db, svc } = fresco()
+    const { GET } = load('app/api/disponibilidad/route.ts')
+    const { NextRequest } = S
+    const res = await GET(new NextRequest(`http://localhost/api/disponibilidad?fecha=2026-11-23&servicio_id=${svc.id}`))
+    igual(res.status, 400, 'status')
+    const body = await res.json()
+    igual(body.codigo, 'fuera_de_rango', 'codigo')
+    const bot = await ejecutar(db, 'consultar_disponibilidad', { servicio_id: svc.id, fecha: '2026-11-23' })
+    igual(body.error, bot.detalle, 'mismo mensaje en la API y en el bot')
+    const ok = await GET(new NextRequest(`http://localhost/api/disponibilidad?fecha=2026-11-20&servicio_id=${svc.id}`))
+    igual(ok.status, 200, 'el último día responde 200')
   })
 
   await test('crear_cita: con email dice "enlace de pago"; solo con teléfono avisa que el estudio la llamará', async () => {

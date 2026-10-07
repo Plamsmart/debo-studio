@@ -25,6 +25,12 @@ M=[
  ("se añade un executor de cancelar_cita (el bot podría cancelar)", 'lib/chatbot/tools.ts',
   "    return terminar(args, errorHerramienta('herramienta_desconocida'))",
   "    if (nombre === 'cancelar_cita') { await supabase.from('citas').update({ estado: 'cancelada' }).eq('id', String(args.cita_id)); return terminar(args, { ok: true }) }\n    return terminar(args, errorHerramienta('herramienta_desconocida'))", '2-errores-robustez.js'),
+ ("disponibilidad: se quita el tope de días de antelación (vuelve el 'no hay horarios' engañoso)", 'lib/disponibilidad.ts',
+  "  // Antes de tocar la base o Google: una fecha fuera de rango no cuesta llamadas.\n  if (diasEntre(ahora.fecha, fecha) > MAX_DIAS_ANTELACION) {",
+  "  if (false) {", '2-errores-robustez.js'),
+ ("validarReserva: se quita el tope de días de antelación (se podría reservar a un año vista)", 'lib/disponibilidad.ts',
+  "    return fallo(\"fecha_pasada\", \"Esa fecha ya pasó.\", 400);\n  }\n\n  if (diasEntre(ahora.fecha, fecha) > MAX_DIAS_ANTELACION) {",
+  "    return fallo(\"fecha_pasada\", \"Esa fecha ya pasó.\", 400);\n  }\n\n  if (false) {", '2-errores-robustez.js'),
  ("fallo ABIERTO: si el conteo falla, se deja pasar", 'lib/chatbot/limites.ts',
   "    throw new Error(`No se pudo comprobar el límite (${descripcion})`)", "    return 0", '3-limites.js'),
 ]

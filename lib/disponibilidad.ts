@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "./supabase/database.types";
 import {
   HORARIO_NEGOCIO,
+  MAX_DIAS_ANTELACION,
   horarioDelDia,
   type HorarioDia,
 } from "./horario-negocio";
@@ -24,6 +25,7 @@ export type CodigoError =
   | "fecha_invalida"
   | "hora_invalida"
   | "fecha_pasada"
+  | "fuera_de_rango"
   | "dia_cerrado"
   | "fuera_de_horario"
   | "fuera_de_intervalo"
@@ -129,6 +131,40 @@ function diasEntre(desde: string, hasta: string): number {
   return Math.round(
     (Date.parse(`${hasta}T00:00:00Z`) - Date.parse(`${desde}T00:00:00Z`)) /
       86_400_000,
+  );
+}
+
+// "YYYY-MM-DD" + N días de calendario -> "YYYY-MM-DD".
+export function sumarDias(fecha: string, dias: number): string {
+  const [a, m, d] = fecha.split("-").map(Number);
+  return new Date(Date.UTC(a, m - 1, d + dias)).toISOString().slice(0, 10);
+}
+
+const NOMBRES_DIA = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+const NOMBRES_MES = [
+  "enero", "febrero", "marzo", "abril", "mayo", "junio",
+  "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+];
+
+// "2026-12-06" -> "domingo 6 de diciembre de 2026".
+export function formatearFechaLarga(fecha: string): string {
+  const d = parsearFecha(fecha);
+  if (!d) return fecha;
+  return `${NOMBRES_DIA[d.getDay()]} ${d.getDate()} de ${NOMBRES_MES[d.getMonth()]} de ${d.getFullYear()}`;
+}
+
+// Último día que se puede consultar/reservar (hoy + MAX_DIAS_ANTELACION).
+export function fechaMaximaReserva(ahora: Ahora = ahoraEnNegocio()): string {
+  return sumarDias(ahora.fecha, MAX_DIAS_ANTELACION);
+}
+
+// Fecha posterior al máximo: no es "no hay horarios", es "aún no se puede
+// consultar". Mismo código y mensaje para la API, validarReserva y el chatbot.
+function falloFueraDeRango(ahora: Ahora) {
+  return fallo(
+    "fuera_de_rango",
+    `Solo se pueden consultar y reservar fechas hasta el ${formatearFechaLarga(fechaMaximaReserva(ahora))} (${MAX_DIAS_ANTELACION} días desde hoy). Esa fecha todavía no está abierta para reservas.`,
+    400,
   );
 }
 
@@ -359,6 +395,11 @@ export async function obtenerHorariosDisponibles(
     };
   }
 
+  // Antes de tocar la base o Google: una fecha fuera de rango no cuesta llamadas.
+  if (diasEntre(ahora.fecha, fecha) > MAX_DIAS_ANTELACION) {
+    return falloFueraDeRango(ahora);
+  }
+
   const horario = horarioDelDia(fechaDate);
   if (!horario) {
     return {
@@ -423,6 +464,10 @@ export async function validarReserva(
 
   if (diasEntre(ahora.fecha, fecha) < 0) {
     return fallo("fecha_pasada", "Esa fecha ya pasó.", 400);
+  }
+
+  if (diasEntre(ahora.fecha, fecha) > MAX_DIAS_ANTELACION) {
+    return falloFueraDeRango(ahora);
   }
 
   const horario = horarioDelDia(fechaDate);

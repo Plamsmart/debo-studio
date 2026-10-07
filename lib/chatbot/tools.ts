@@ -2,7 +2,8 @@ import type OpenAI from 'openai'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase/database.types'
 import { crearCitaInvitado } from '@/lib/citas'
-import { obtenerHorariosDisponibles, type CodigoError } from '@/lib/disponibilidad'
+import { fechaMaximaReserva, obtenerHorariosDisponibles, type CodigoError } from '@/lib/disponibilidad'
+import { MAX_DIAS_ANTELACION } from '@/lib/horario-negocio'
 import { CONTACTO_ESTUDIO } from './conocimiento'
 
 type Cliente = SupabaseClient<Database>
@@ -16,7 +17,7 @@ export const HERRAMIENTAS: OpenAI.Chat.Completions.ChatCompletionFunctionTool[] 
     function: {
       name: 'consultar_disponibilidad',
       description:
-        'Devuelve los horarios libres para un servicio en una fecha concreta. Llámala SIEMPRE antes de proponer horas a la clienta.',
+        `Devuelve los horarios libres para un servicio en una fecha concreta. Llámala SIEMPRE antes de proponer horas a la clienta. Solo admite fechas desde hoy hasta ${MAX_DIAS_ANTELACION} días después (la fecha máxima exacta está en el mensaje del sistema); para una fecha posterior devuelve el error fuera_de_rango, que NO significa que no haya horarios.`,
       parameters: {
         type: 'object',
         properties: {
@@ -76,6 +77,10 @@ const TRADUCCION_ERRORES: Record<CodigoHerramienta, { que_paso: string; que_hace
   fecha_pasada: {
     que_paso: 'Esa fecha ya pasó.',
     que_hacer: 'Pídele otro día a partir de hoy.',
+  },
+  fuera_de_rango: {
+    que_paso: `Esa fecha está más allá de lo que se puede consultar (como máximo ${MAX_DIAS_ANTELACION} días desde hoy). NO significa que no haya horarios: simplemente aún no está abierta para reservas.`,
+    que_hacer: `NO le digas que no hay horarios ni que está completo. Explícale que esa fecha queda fuera de lo que puedes consultar, dile hasta qué fecha puedes ver (fecha_maxima) y ofrécele revisar otra fecha hasta entonces o, cuando se acerque el día, reservar desde la web o por este chat. Si lo necesita ya, puede contactar con el estudio: ${CONTACTO}.`,
   },
   dia_cerrado: {
     que_paso: 'El estudio está cerrado ese día.',
@@ -145,11 +150,19 @@ const TRADUCCION_ERRORES: Record<CodigoHerramienta, { que_paso: string; que_hace
 
 export type ResultadoHerramienta =
   | { ok: true; [clave: string]: unknown }
-  | { ok: false; codigo: CodigoHerramienta; que_paso: string; que_hacer: string; detalle?: string }
+  | { ok: false; codigo: CodigoHerramienta; que_paso: string; que_hacer: string; detalle?: string; fecha_maxima?: string }
 
 function errorHerramienta(codigo: CodigoHerramienta, detalle?: string): ResultadoHerramienta {
   const { que_paso, que_hacer } = TRADUCCION_ERRORES[codigo]
-  return { ok: false, codigo, que_paso, que_hacer, ...(detalle ? { detalle } : {}) }
+  return {
+    ok: false,
+    codigo,
+    que_paso,
+    que_hacer,
+    ...(detalle ? { detalle } : {}),
+    // Calculada en cada llamada (no al cargar el módulo): el servidor puede seguir vivo días.
+    ...(codigo === 'fuera_de_rango' ? { fecha_maxima: fechaMaximaReserva() } : {}),
+  }
 }
 
 // Texto no vacío y recortado, o null (también si el modelo mandó otro tipo).
@@ -202,10 +215,12 @@ export async function ejecutarHerramienta(
 
       const { disponibles, motivo, mensaje } = resultado.valor
       if (disponibles.length === 0) {
+        // `motivo` separa explícitamente "día pasado", "día cerrado" y "día lleno".
         return terminar(args, {
           ok: true,
           fecha,
           horarios_disponibles: [],
+          motivo: motivo ?? 'sin_huecos',
           que_paso: mensaje ?? 'No queda ningún horario libre ese día para ese servicio.',
           que_hacer:
             motivo === 'dia_cerrado'

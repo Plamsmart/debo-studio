@@ -22,6 +22,12 @@ export const HORARIO_NEGOCIO = {
   zonaHoraria: "Europe/Madrid", // el servidor corre en UTC: "hoy" y "ahora" se calculan en esta zona
 };
 
+// Hasta cuántos días desde hoy se puede consultar y reservar (hoy + N, incluido).
+// ÚNICA fuente de la cifra: la usan la API, validarReserva, el chatbot (prompt y
+// herramientas) y el calendario de SelectorCitas. Vive aquí y no en
+// disponibilidad.ts porque SelectorCitas es un componente de cliente.
+export const MAX_DIAS_ANTELACION = 60;
+
 export function esDiaLaboral(fecha: Date): boolean {
   return HORARIO_POR_DIA[fecha.getDay()] !== null;
 }

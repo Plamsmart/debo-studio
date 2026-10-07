@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { esDiaLaboral } from '@/lib/horario-negocio'
+import { esDiaLaboral, MAX_DIAS_ANTELACION } from '@/lib/horario-negocio'
 
 type Props = {
   servicioId: string
@@ -33,12 +33,18 @@ function primerDiaDelMes(fecha: Date): Date {
 
 export default function SelectorCitas({ servicioId, onSeleccion }: Props) {
   const hoy = useMemo(() => inicioDelDia(new Date()), [])
+  // Mismo máximo que valida el servidor (hoy + MAX_DIAS_ANTELACION, incluido).
+  const fechaMaxima = useMemo(
+    () => new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() + MAX_DIAS_ANTELACION),
+    [hoy]
+  )
   const [mesMostrado, setMesMostrado] = useState<Date>(() => primerDiaDelMes(new Date()))
   const [fechaSeleccionada, setFechaSeleccionada] = useState<Date | null>(null)
   const [horaSeleccionada, setHoraSeleccionada] = useState<string | null>(null)
   const [horariosDisponibles, setHorariosDisponibles] = useState<string[]>([])
   const [cargando, setCargando] = useState(false)
   const [diaCerrado, setDiaCerrado] = useState(false)
+  const [aviso, setAviso] = useState<string | null>(null)
 
   const celdas = useMemo(() => {
     const primerDia = mesMostrado.getDay() // 0=domingo
@@ -58,6 +64,9 @@ export default function SelectorCitas({ servicioId, onSeleccion }: Props) {
     mesMostrado.getFullYear() < hoy.getFullYear() ||
     (mesMostrado.getFullYear() === hoy.getFullYear() && mesMostrado.getMonth() <= hoy.getMonth())
 
+  const esUltimoMesReservable =
+    new Date(mesMostrado.getFullYear(), mesMostrado.getMonth() + 1, 1) > fechaMaxima
+
   function mesAnterior() {
     if (esMesActualOAnterior) return
     const d = new Date(mesMostrado)
@@ -66,13 +75,14 @@ export default function SelectorCitas({ servicioId, onSeleccion }: Props) {
   }
 
   function mesSiguiente() {
+    if (esUltimoMesReservable) return
     const d = new Date(mesMostrado)
     d.setMonth(d.getMonth() + 1)
     setMesMostrado(d)
   }
 
   function diaDeshabilitado(dia: Date): boolean {
-    return dia < hoy || !esDiaLaboral(dia)
+    return dia < hoy || dia > fechaMaxima || !esDiaLaboral(dia)
   }
 
   function elegirDia(dia: Date) {
@@ -87,11 +97,16 @@ export default function SelectorCitas({ servicioId, onSeleccion }: Props) {
     setCargando(true)
     setHoraSeleccionada(null)
     setDiaCerrado(false)
+    setAviso(null)
 
     fetch(`/api/disponibilidad?fecha=${fechaStr}&servicio_id=${servicioId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.motivo === 'dia_cerrado') {
+      .then(async (res) => ({ ok: res.ok, data: await res.json() }))
+      .then(({ ok, data }) => {
+        if (!ok) {
+          // Un error (p. ej. fuera_de_rango) no es "no quedan horarios".
+          setAviso(data.error || 'No se pudo consultar la disponibilidad, inténtalo de nuevo.')
+          setHorariosDisponibles([])
+        } else if (data.motivo === 'dia_cerrado') {
           setDiaCerrado(true)
           setHorariosDisponibles([])
         } else {
@@ -129,6 +144,7 @@ export default function SelectorCitas({ servicioId, onSeleccion }: Props) {
             <button
               type="button"
               onClick={mesSiguiente}
+              disabled={esUltimoMesReservable}
               className="selector-citas__flecha"
               aria-label="Mes siguiente"
             >
@@ -180,7 +196,9 @@ export default function SelectorCitas({ servicioId, onSeleccion }: Props) {
             <p className="selector-citas__estado">Ese día el estudio está cerrado.</p>
           )}
 
-          {!cargando && !diaCerrado && horariosDisponibles.length === 0 && (
+          {!cargando && aviso && <p className="selector-citas__estado">{aviso}</p>}
+
+          {!cargando && !diaCerrado && !aviso && horariosDisponibles.length === 0 && (
             <p className="selector-citas__estado">No quedan horarios disponibles ese día.</p>
           )}
 
