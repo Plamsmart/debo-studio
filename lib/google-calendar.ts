@@ -11,13 +11,20 @@ export function getOAuth2Client() {
   )
 }
 
+// Cookie httpOnly con el `state` del OAuth: la crea /conectar y el callback
+// la valida y la borra. Así el callback solo acepta un `code` de un flujo que
+// empezó en este navegador (protección CSRF del OAuth).
+export const COOKIE_ESTADO_OAUTH = 'google_oauth_state'
+export const RUTA_COOKIE_ESTADO_OAUTH = '/api/admin/google-calendar'
+
 // Genera la URL a la que mandamos a Débora para que autorice el acceso.
-export function getAuthUrl() {
+export function getAuthUrl(state: string) {
   const oauth2Client = getOAuth2Client()
   return oauth2Client.generateAuthUrl({
     access_type: 'offline', // necesario para recibir un refresh_token (si no, el acceso expira en 1h y no se puede renovar solo)
     prompt: 'consent', // fuerza que Google siempre entregue el refresh_token, incluso si ya había autorizado antes
     scope: ['https://www.googleapis.com/auth/calendar.events'],
+    state,
   })
 }
 
@@ -35,7 +42,13 @@ export async function guardarTokensDesdeCode(code: string, adminId: string) {
   const supabase = createServiceClient()
 
   // Solo debe existir una conexión activa a la vez — si ya había una, la reemplazamos.
-  await supabase.from('google_calendar_config').delete().not('id', 'is', null)
+  const { error: errorBorrado } = await supabase
+    .from('google_calendar_config')
+    .delete()
+    .not('id', 'is', null)
+  if (errorBorrado) {
+    console.error('Error borrando la conexión anterior de Google Calendar:', errorBorrado)
+  }
 
   const { error } = await supabase.from('google_calendar_config').insert({
     access_token: tokens.access_token,
@@ -125,7 +138,7 @@ async function obtenerClienteAutenticado() {
     oauth2Client.setCredentials(credentials)
 
     const supabase = createServiceClient()
-    await supabase
+    const { error: errorGuardado } = await supabase
       .from('google_calendar_config')
       .update({
         access_token: credentials.access_token,
@@ -134,6 +147,10 @@ async function obtenerClienteAutenticado() {
           : null,
       })
       .eq('id', config.id)
+    if (errorGuardado) {
+      // No es grave: el token nuevo sirve igual para esta llamada; la próxima lo vuelve a refrescar.
+      console.error('Error guardando el access_token renovado de Google Calendar:', errorGuardado)
+    }
   }
 
   return oauth2Client

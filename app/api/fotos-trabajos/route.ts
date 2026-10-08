@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
 
   if (errorSubida) {
     console.error("Error subiendo a Storage:", errorSubida);
-    return NextResponse.json({ error: errorSubida.message }, { status: 500 });
+    return NextResponse.json({ error: "No se pudo subir la foto" }, { status: 500 });
   }
 
   const { data: fotoCreada, error: errorInsercion } = await supabaseService
@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
     console.error("Error insertando fotos_trabajos:", errorInsercion);
     await supabaseService.storage.from(BUCKET).remove([ruta]);
     return NextResponse.json(
-      { error: errorInsercion?.message ?? "No se pudo guardar la foto" },
+      { error: "No se pudo guardar la foto" },
       { status: 500 },
     );
   }

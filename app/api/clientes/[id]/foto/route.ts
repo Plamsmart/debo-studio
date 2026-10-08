@@ -91,7 +91,7 @@ export async function POST(
 
   if (errorSubida) {
     console.error("Error subiendo a Storage:", errorSubida);
-    return NextResponse.json({ error: errorSubida.message }, { status: 500 });
+    return NextResponse.json({ error: "No se pudo subir la foto" }, { status: 500 });
   }
 
   const { data: clienteActualizado, error: errorActualizacion } =
@@ -106,7 +106,7 @@ export async function POST(
     console.error("Error actualizando cliente:", errorActualizacion);
     await supabaseService.storage.from(BUCKET).remove([nuevaRuta]);
     return NextResponse.json(
-      { error: errorActualizacion?.message ?? "Cliente no actualizado" },
+      { error: "No se pudo guardar la foto del cliente" },
       { status: 500 },
     );
   }

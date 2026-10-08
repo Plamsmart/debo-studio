@@ -129,7 +129,7 @@ export async function PATCH(
 
     if (errorSubida) {
       console.error("Error subiendo foto de reseña:", errorSubida);
-      return NextResponse.json({ error: errorSubida.message }, { status: 500 });
+      return NextResponse.json({ error: "No se pudo subir la foto" }, { status: 500 });
     }
 
     cambios.foto_url = rutaFotoNueva;

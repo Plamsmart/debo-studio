@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
 
     if (errorSubida) {
       console.error("Error subiendo foto de reseña:", errorSubida);
-      return NextResponse.json({ error: errorSubida.message }, { status: 500 });
+      return NextResponse.json({ error: "No se pudo subir la foto" }, { status: 500 });
     }
   }
 
@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
       await supabaseService.storage.from(BUCKET).remove([rutaFoto]);
     }
     return NextResponse.json(
-      { error: errorInsercion?.message ?? "No se pudo guardar la reseña" },
+      { error: "No se pudo guardar la reseña" },
       { status: 500 },
     );
   }
