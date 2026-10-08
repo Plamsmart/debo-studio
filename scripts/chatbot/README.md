@@ -22,6 +22,7 @@ node scripts/chatbot/1-flujo.js              # flujo feliz, prompt, modelo/tools
 node scripts/chatbot/2-errores-robustez.js   # cada código de error + robustez (prompt injection, etc.)
 node scripts/chatbot/3-limites.js            # límites: mensaje, rate limit, mensual, citas por conversación
 node scripts/chatbot/4-regresion-citas.js    # /api/citas: compara route-antigua.ts (pre-refactor) vs la actual
+node scripts/chatbot/5-pagos.js              # cita -> pago: doble confirmación, precio 0, fallos de Stripe, webhook sin fila, cobros QR
 node scripts/chatbot/tam.js                  # tamaño del system prompt con 56 servicios (sin red)
 python3 scripts/chatbot/mutaciones.py        # mutation testing: confirma que las pruebas SÍ detectan bugs reales
 ```
@@ -43,6 +44,9 @@ OPENAI_API_KEY=sk-... node scripts/chatbot/live.js
 - `fake-db.js` — Supabase en memoria específico del chatbot: reproduce el
   `UNIQUE(chat_conversaciones.session_id)` (23505) y el
   `EXCLUDE citas_sin_solape` (23P01), con fallos inyectables por tabla/RPC.
+- `5-pagos.js` — trae su propio Supabase en memoria (con `update`, `in` y
+  joins de `clientes`/`servicios`) y dobles de Stripe, Resend y Google; no
+  usa `setup.js` porque necesita mocks distintos.
 - `fake-supabase.js` — doble genérico más simple, usado por
   `4-regresion-citas.js` a través de `route-antigua.ts`.
 - `route-antigua.ts` — snapshot de `app/api/citas/route.ts` **antes** de
