@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { getResend } from '@/lib/resend'
+import { escaparHtml } from '@/lib/html'
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
@@ -23,11 +24,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Solo el equipo del estudio puede registrar cobros' }, { status: 403 })
   }
 
-  const body = await request.json()
+  let body
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: 'El cuerpo de la petición no es JSON válido' }, { status: 400 })
+  }
   const { concepto, monto, servicio_id, nombre, email, telefono } = body
 
-  if (!concepto?.trim() || !monto || monto <= 0) {
+  const montoNumero = Number(monto)
+  if (typeof concepto !== 'string' || !concepto.trim() || !Number.isFinite(montoNumero)) {
     return NextResponse.json({ error: 'Faltan datos: concepto y monto son requeridos' }, { status: 400 })
+  }
+  if (montoNumero < 0.01) {
+    return NextResponse.json({ error: 'El monto debe ser mayor que 0 €' }, { status: 400 })
   }
 
   const supabaseService = createServiceClient()
@@ -74,7 +84,7 @@ export async function POST(request: NextRequest) {
       servicio_id: servicio_id || null,
       concepto: concepto.trim(),
       stripe_session_id: null,
-      monto: Number(monto),
+      monto: montoNumero,
       estado: 'pagado',
       metodo_pago: 'efectivo',
     })
@@ -97,12 +107,12 @@ export async function POST(request: NextRequest) {
           subject: 'Recibo de tu compra ✨',
           html: `
             <h2>¡Gracias por tu compra!</h2>
-            <p>Hola ${nombre?.trim() || ''}, este es tu recibo.</p>
-            <p><strong>Concepto:</strong> ${concepto.trim()}</p>
+            <p>Hola ${escaparHtml(nombre?.trim() || '')}, este es tu recibo.</p>
+            <p><strong>Concepto:</strong> ${escaparHtml(concepto.trim())}</p>
             <p><strong>Monto:</strong> ${new Intl.NumberFormat('es-ES', {
               style: 'currency',
               currency: 'EUR',
-            }).format(Number(monto))}</p>
+            }).format(montoNumero)}</p>
             <p><strong>Método de pago:</strong> Efectivo (en el estudio)</p>
             <p>Gracias por confiar en Estudio Débora Pereira.</p>
           `,

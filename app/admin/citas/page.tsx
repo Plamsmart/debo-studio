@@ -30,6 +30,7 @@ export default async function AdminCitasPage({
   const { data: citas, error } = await query
 
   if (error) {
+    console.error('Error cargando las citas:', error)
     return (
       <div>
         <h1>Citas</h1>

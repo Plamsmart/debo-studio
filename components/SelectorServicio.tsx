@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { Tables } from '@/lib/supabase/database.types'
 
 type Servicio = Tables<'servicios'>
@@ -28,19 +28,13 @@ export default function SelectorServicio({
   onSeleccionar,
 }: Props) {
   const [busqueda, setBusqueda] = useState('')
-  const [categoriasAbiertas, setCategoriasAbiertas] = useState<Set<string>>(new Set())
-
-  // Al montar, si ya hay un servicio seleccionado, abrir su categoría de entrada
-  useEffect(() => {
-    if (servicioSeleccionadoId) {
-      const servicio = servicios.find((s) => s.id === servicioSeleccionadoId)
-      if (servicio) {
-        const categoria = servicio.categoria || 'Otros'
-        setCategoriasAbiertas((prev) => new Set(prev).add(categoria))
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  // Al montar, si ya hay un servicio seleccionado, su categoría arranca abierta
+  const [categoriasAbiertas, setCategoriasAbiertas] = useState<Set<string>>(() => {
+    const servicio = servicioSeleccionadoId
+      ? servicios.find((s) => s.id === servicioSeleccionadoId)
+      : undefined
+    return servicio ? new Set([servicio.categoria || 'Otros']) : new Set()
+  })
 
   const porCategoria = useMemo(() => {
     return servicios.reduce<Record<string, Servicio[]>>((acc, s) => {

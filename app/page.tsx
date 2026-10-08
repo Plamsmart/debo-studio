@@ -77,12 +77,12 @@ export default async function InicioPage() {
       {/* ===== HEADER ===== */}
       <Header />
 
-      {/* ===== ZONA OSCURA: HERO + FILOSOFÍA ===== */}
+      {/* ===== HERO + FILOSOFÍA (contenedor .zona-oscura, hoy con fondo claro) ===== */}
       <div id="zona-oscura" className="zona-oscura">
         <Hero />
         <Filosofia />
       </div>
-      {/* ===== FIN ZONA OSCURA ===== */}
+      {/* ===== FIN HERO + FILOSOFÍA ===== */}
 
       {/* ===== SERVICIOS DESTACADOS ===== */}
       <Servicios

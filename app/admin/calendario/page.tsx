@@ -27,7 +27,7 @@ export default async function CalendarioPage({
   const supabase = await createClient()
   // Si Google no está conectado o falla, eventosGoogle llega vacío y el
   // calendario sigue mostrando las citas como siempre.
-  const [{ data: citas }, eventosGoogle] = await Promise.all([
+  const [{ data: citas, error: errorCitas }, eventosGoogle] = await Promise.all([
     supabase
       .from('citas')
       .select(
@@ -38,6 +38,10 @@ export default async function CalendarioPage({
       .order('hora_inicio', { ascending: true }),
     obtenerEventosGoogleDelDia(fechaStr),
   ])
+
+  if (errorCitas) {
+    console.error(`Error cargando las citas del ${fechaStr} para el calendario:`, errorCitas)
+  }
 
   const horario = horarioDelDia(fecha)
   const laboral = esDiaLaboral(fecha)

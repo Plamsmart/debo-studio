@@ -62,6 +62,7 @@ export async function PATCH(
     .single()
 
   if (error || !clienteActualizado) {
+    console.error('Error actualizando el cliente:', error)
     return NextResponse.json(
       { error: 'No se pudo actualizar el cliente (verifica permisos de administrador)' },
       { status: 403 }
@@ -102,6 +103,7 @@ export async function DELETE(
   const { error } = await supabase.from('clientes').delete().eq('id', id)
 
   if (error) {
+    console.error('Error eliminando el cliente:', error)
     if (error.code === '23503') {
       return NextResponse.json(
         {

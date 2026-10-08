@@ -90,14 +90,23 @@ export default function SelectorCitas({ servicioId, onSeleccion }: Props) {
     setFechaSeleccionada(dia)
   }
 
+  // Al cambiar de día o de servicio se limpia el estado de la consulta anterior
+  // durante el render (no dentro del efecto), y el efecto solo hace el fetch.
+  const [consultaAnterior, setConsultaAnterior] = useState({ fecha: fechaSeleccionada, servicioId })
+  if (consultaAnterior.fecha !== fechaSeleccionada || consultaAnterior.servicioId !== servicioId) {
+    setConsultaAnterior({ fecha: fechaSeleccionada, servicioId })
+    if (fechaSeleccionada && servicioId) {
+      setCargando(true)
+      setHoraSeleccionada(null)
+      setDiaCerrado(false)
+      setAviso(null)
+    }
+  }
+
   useEffect(() => {
     if (!fechaSeleccionada || !servicioId) return
 
     const fechaStr = formatoFecha(fechaSeleccionada)
-    setCargando(true)
-    setHoraSeleccionada(null)
-    setDiaCerrado(false)
-    setAviso(null)
 
     fetch(`/api/disponibilidad?fecha=${fechaStr}&servicio_id=${servicioId}`)
       .then(async (res) => ({ ok: res.ok, data: await res.json() }))

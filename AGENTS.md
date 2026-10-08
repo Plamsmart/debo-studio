@@ -77,8 +77,9 @@ table X", primero revisar GRANTs, no solo políticas RLS.
 - Gris institucional (Cool Gray 11C): `#53565A`
 - Cobre oscuro/claro (degradado del emblema): `#AF6F49` / `#E0B689`
 - Logo: extraído en alta calidad directo del PDF vectorial del manual
-  (no de capturas) — `public/emblema.png` (solo la flor),
-  `public/logo-vertical.png`, `public/logo-horizontal.png`
+  (no de capturas) — `public/emblema.png` (solo la flor) y
+  `public/logo-horizontal.png` (flor + texto). No hay versión vertical en
+  `public/`.
 
 ## Bugs recurrentes / patrones a recordar
 
@@ -189,7 +190,12 @@ genérico"}, {status: 500})` sin `console.error(error)` antes,
 - `/admin/clientes` — historial de pagos por cliente, notas (solo admin)
 - `/admin/cobrar` — cobro en el local (QR vía Stripe Checkout, o efectivo
   instantáneo)
-- `/admin/integraciones` — conectar/ver estado de Google Calendar
+- `/admin/clientes/[id]/expediente` — expediente de la clienta (datos de
+  salud, sesiones y fotos antes/después); admin y staff
+- `/admin/fotos-trabajos` — fotos del carrusel de la home (solo admin)
+- `/admin/resenas` — reseñas de la home (solo admin)
+- `/admin/integraciones` — conectar/ver estado de Google Calendar (solo
+  admin; el OAuth valida un `state` guardado en cookie httpOnly)
 
 ## TicketBAI (facturación electrónica, en evaluación)
 
@@ -321,16 +327,22 @@ sigue creciendo). **Antes de dar la migración por completa, revisar la
 facturación mensual combinada real de un mes con datos representativos y
 decidir si toca subir a Avanzado (29,99-35,99€/mes, sin límites, hasta 3
 NIFs) antes del corte**, no después.
-'web'`(no se toca ETPOS ni el resto de canales), con una serie propia
-tipo "WEB-", guardando`huella_tbai`y el QR devueltos (columna nueva en`pagos`o`citas`) e incluyéndolos en el email de confirmación que ya se
-envía por Resend.
+**Plan de integración (fase 1):** llamar a TicketBAI WS solo para los
+cobros con `metodo_pago = 'web'` (no se toca ETPOS ni el resto de
+canales), con series propias separadas por tipo (`WEB-SIMP-`,
+`WEB-COMP-`, `WEB-RECT-`, ver punto 4 de la respuesta de soporte),
+guardando `huella_tbai` y el QR devueltos (columna nueva en `pagos` o
+`citas`) e incluyéndolos en el email de confirmación que ya se envía por
+Resend.
 
 **Pendiente de resolver antes de implementar:**
 
 1. Certificado de dispositivo / documento de representación — falta que
-   Débora complete el trámite con la Hacienda Foral de Gipuzkoa una vez
-   se confirme el proveedor.
-2. Respuesta de TicketBAI WS a las 3 preguntas pendientes de arriba.
+   Débora complete el trámite con la Hacienda Foral de Gipuzkoa (el
+   proveedor ya está decidido: TicketBAI WS).
+
+(Las preguntas a soporte de TicketBAI WS ya están respondidas: ver
+"Respuesta de soporte" más arriba.)
 
 ## Foto de perfil circular en /admin/clientes (implementado)
 
@@ -500,16 +512,15 @@ var(--marca-cobre-claro))`), siguiendo el degradado oficial del
 
 ## Pendiente / próximos pasos
 
-1. **Chatbot con IA** (siguiente sesión de trabajo) — adaptar el proyecto
-   `zorion-chat` (repo separado: `Plamsmart/zorion-chat`, construido
-   originalmente para un gimnasio con integración a AimHarder) hacia
-   `debo-studio`. Decisión ya tomada: **clonar y simplificar el código
-   dentro de `debo-studio`** (no conectar como tenant de zorion-chat), por
-   temas de aislamiento de seguridad/datos entre clientes futuros.
-   Las herramientas de reserva del bot deben reescribirse para llamar a
-   `/api/disponibilidad` y `/api/citas` (las propias), no a AimHarder.
-   Ya incluido en el presupuesto formal (700€) con límite de 300
-   conversaciones/mes en el mantenimiento.
+1. **Chatbot con IA — implementado** (en producción desde sept 2026).
+   Se clonó y simplificó `zorion-chat` dentro de `debo-studio` (no como
+   tenant, por aislamiento de datos entre clientes). Vive en
+   `lib/chatbot/` + `POST /api/chat` + `components/ChatWidget.tsx`; sus
+   herramientas llaman directamente a `lib/disponibilidad.ts` y
+   `lib/citas.ts` (la misma lógica que `/api/disponibilidad` y
+   `/api/citas`, sin pasar por HTTP). Límite de 300 conversaciones/mes
+   configurable con `CHAT_LIMITE_CONVERSACIONES_MES`. Pruebas en
+   `scripts/chatbot/` (ver su README).
 2. **Licencia de Gotham** — pendiente de que Débora confirme si ya la
    tiene. Por ahora se usa Montserrat (gratis) como sustituto.
 3. **Stripe en modo Live** — sigue en Test, falta decidir cuándo pasar a

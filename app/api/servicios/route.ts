@@ -37,9 +37,25 @@ export async function POST(request: NextRequest) {
   const body = await request.json()
   const { nombre, descripcion, categoria, duracion_minutos, precio, activo } = body
 
-  if (!nombre?.trim() || !duracion_minutos || precio == null) {
+  if (!nombre?.trim() || duracion_minutos == null || precio == null) {
     return NextResponse.json(
       { error: 'Faltan datos requeridos (nombre, duración, precio)' },
+      { status: 400 }
+    )
+  }
+
+  const duracion = Number(duracion_minutos)
+  if (!Number.isInteger(duracion) || duracion < 1) {
+    return NextResponse.json(
+      { error: 'La duración debe ser un número entero de minutos (mínimo 1)' },
+      { status: 400 }
+    )
+  }
+
+  const precioNumero = Number(precio)
+  if (!Number.isFinite(precioNumero) || precioNumero < 0) {
+    return NextResponse.json(
+      { error: 'El precio debe ser un número igual o mayor que 0' },
       { status: 400 }
     )
   }
@@ -50,14 +66,15 @@ export async function POST(request: NextRequest) {
       nombre: nombre.trim(),
       descripcion: descripcion?.trim() || null,
       categoria: categoria?.trim() || null,
-      duracion_minutos,
-      precio,
+      duracion_minutos: duracion,
+      precio: precioNumero,
       activo: activo ?? true,
     })
     .select()
     .single()
 
   if (error) {
+    console.error('Error creando el servicio:', error)
     return NextResponse.json(
       { error: 'No se pudo crear el servicio (verifica permisos de administrador)' },
       { status: 403 }

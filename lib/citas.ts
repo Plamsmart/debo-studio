@@ -9,6 +9,7 @@ import {
   type ServicioReservable,
 } from "./disponibilidad";
 import { getResend, EMAIL_ESTUDIO } from "./resend";
+import { escaparHtml } from "./html";
 
 // Creación de citas de invitado (sin cuenta), compartida por POST /api/citas y
 // por el chatbot, que la llama directamente sin pasar por HTTP. Toda la
@@ -32,15 +33,6 @@ export type CitaCreada = {
   servicio: ServicioReservable;
   horaFin: string;
 };
-
-function escaparHtml(texto: string): string {
-  return texto
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
 
 // Crea la cita en estado 'pendiente' (la confirma después el estudio desde el
 // panel). Los errores traen un `codigo` estable y un `mensaje` legible: el

@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Arnés de pruebas en CommonJS (require), se corre directo con node.
+    "scripts/**",
   ]),
 ]);
 

@@ -46,8 +46,26 @@ export async function PATCH(
   if (nombre !== undefined) cambios.nombre = nombre.trim()
   if (descripcion !== undefined) cambios.descripcion = descripcion?.trim() || null
   if (categoria !== undefined) cambios.categoria = categoria?.trim() || null
-  if (duracion_minutos !== undefined) cambios.duracion_minutos = duracion_minutos
-  if (precio !== undefined) cambios.precio = precio
+  if (duracion_minutos !== undefined) {
+    const duracion = Number(duracion_minutos)
+    if (!Number.isInteger(duracion) || duracion < 1) {
+      return NextResponse.json(
+        { error: 'La duración debe ser un número entero de minutos (mínimo 1)' },
+        { status: 400 }
+      )
+    }
+    cambios.duracion_minutos = duracion
+  }
+  if (precio !== undefined) {
+    const precioNumero = Number(precio)
+    if (precio === null || !Number.isFinite(precioNumero) || precioNumero < 0) {
+      return NextResponse.json(
+        { error: 'El precio debe ser un número igual o mayor que 0' },
+        { status: 400 }
+      )
+    }
+    cambios.precio = precioNumero
+  }
   if (activo !== undefined) cambios.activo = activo
 
   if (Object.keys(cambios).length === 0) {
@@ -62,6 +80,7 @@ export async function PATCH(
     .single()
 
   if (error || !servicioActualizado) {
+    console.error('Error actualizando el servicio:', error)
     return NextResponse.json(
       { error: 'No se pudo actualizar el servicio (verifica permisos de administrador)' },
       { status: 403 }

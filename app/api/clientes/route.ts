@@ -34,6 +34,7 @@ export async function POST(request: NextRequest) {
     .single()
 
   if (error) {
+    console.error('Error creando el cliente:', error)
     return NextResponse.json(
       { error: 'No se pudo crear el cliente (verifica permisos de administrador)' },
       { status: 403 }
