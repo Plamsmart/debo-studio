@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { ETIQUETA_METODO_PAGO } from '@/lib/metodos-pago'
 
 type CitaResumen = {
   estado: string | null
@@ -47,11 +48,7 @@ const FORM_VACIO: FormCliente = { nombre: '', email: '', telefono: '', notas: ''
 const TIPOS_FOTO_PERMITIDOS = ['image/jpeg', 'image/png', 'image/webp']
 const TAMANO_MAXIMO_FOTO_BYTES = 5 * 1024 * 1024
 
-const ETIQUETA_METODO: Record<string, string> = {
-  web: 'Web',
-  qr_local: 'QR en el local',
-  efectivo: 'Efectivo',
-}
+const ETIQUETA_METODO: Record<string, string> = ETIQUETA_METODO_PAGO
 
 function serviciosConsumidos(citas: CitaResumen[] | null): string[] {
   if (!citas) return []

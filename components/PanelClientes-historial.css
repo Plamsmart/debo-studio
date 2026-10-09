@@ -79,3 +79,7 @@
 .panel-clientes__badge-metodo--efectivo {
   background: var(--marca-gris-suave);
 }
+
+.panel-clientes__badge-metodo--tarjeta_datafono {
+  background: var(--marca-cobre-oscuro);
+}

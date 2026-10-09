@@ -1,7 +1,8 @@
 // Flujo cita -> pago: PATCH /api/citas/[id], POST /api/cobros y el webhook de
 // Stripe, con Supabase, Stripe, Resend y Google en memoria (sin red).
 // Cubre: doble confirmación (secuencial y simultánea), precio 0, fallo de
-// Stripe, insert de pagos fallido y webhook sin fila en pagos.
+// Stripe, insert de pagos fallido, webhook sin fila en pagos y cobros
+// manuales (efectivo/datáfono, /api/cobros/manual y /api/cobros/efectivo).
 const path = require('path')
 const crypto = require('crypto')
 
@@ -126,6 +127,12 @@ async function webhook(evento) {
 async function postCobro(body) {
   const route = load('app/api/cobros/route.ts')
   const r = await route.POST(new NextRequest('http://localhost/api/cobros', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }))
+  return { status: r.status, body: await r.json() }
+}
+
+async function postCobroManual(body, ruta = 'manual') {
+  const route = load(`app/api/cobros/${ruta}/route.ts`)
+  const r = await route.POST(new NextRequest(`http://localhost/api/cobros/${ruta}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }))
   return { status: r.status, body: await r.json() }
 }
 
@@ -318,6 +325,80 @@ function igual(a, b, msg) { if (a !== b) throw new Error(`${msg ?? 'no coincide'
     const r = await postCobro({ concepto: 'Retoque', monto: '20' })
     igual(r.status, 200, 'status'); igual(db.tablas.pagos[0].monto, 20, 'monto numérico'); igual(db.tablas.pagos[0].metodo_pago, 'qr_local', 'metodo')
     igual(state.stripe.creadas[0].metadata.tipo, 'cobro_local', 'metadata.tipo')
+  })
+
+  // ===== Cobros manuales (efectivo / datáfono): solo se registran, sin Stripe =====
+  await test('cobro manual: monto inválido -> 400 sin fila en pagos', async () => {
+    const { db } = preparar()
+    for (const monto of ['abc', 0, -5, 0.001, null, 'Infinity']) {
+      igual((await postCobroManual({ metodo: 'tarjeta_datafono', concepto: 'Retoque', monto })).status, 400, `monto ${monto}`)
+    }
+    igual((await postCobroManual({ metodo: 'tarjeta_datafono', concepto: '  ', monto: 20 })).status, 400, 'concepto vacío')
+    igual(db.tablas.pagos.length, 0, 'pagos'); igual(state.stripe.creadas.length, 0, 'Stripe')
+  })
+
+  await test('cobro manual: método inválido o ausente -> 400 sin fila en pagos', async () => {
+    const { db } = preparar()
+    for (const metodo of [undefined, 'qr_local', 'web', 'tarjeta', 'EFECTIVO', 42]) {
+      igual((await postCobroManual({ metodo, concepto: 'Retoque', monto: 20 })).status, 400, `metodo ${metodo}`)
+    }
+    igual(db.tablas.pagos.length, 0, 'pagos')
+  })
+
+  await test('datáfono con cliente nuevo: crea cliente, pago pagado tarjeta_datafono y recibo', async () => {
+    const { db } = preparar()
+    const r = await postCobroManual({ metodo: 'tarjeta_datafono', concepto: 'Retoque <b>cejas</b>', monto: '35.5', nombre: ' Eva <script> ', email: 'eva@x.com', telefono: '611' })
+    igual(r.status, 201, 'status'); igual(r.body.aviso, null, 'sin aviso')
+    igual(db.tablas.clientes.length, 2, 'cliente creado')
+    const nueva = db.tablas.clientes[1]
+    igual(nueva.nombre, 'Eva <script>', 'nombre recortado'); igual(nueva.email, 'eva@x.com', 'email'); igual(nueva.telefono, '611', 'teléfono')
+    const p = db.tablas.pagos[0]
+    igual(p.metodo_pago, 'tarjeta_datafono', 'metodo'); igual(p.estado, 'pagado', 'estado'); igual(p.monto, 35.5, 'monto numérico')
+    igual(p.cliente_id, nueva.id, 'cliente_id'); igual(p.stripe_session_id, null, 'sin sesión'); igual(state.stripe.creadas.length, 0, 'Stripe')
+    igual(state.emails.length, 1, 'recibo'); igual(state.emails[0].to, 'eva@x.com', 'destinatario')
+    const html = state.emails[0].html
+    assert(html.includes('Tarjeta (datáfono)'), 'método en el recibo')
+    assert(html.includes('Eva &lt;script&gt;') && html.includes('Retoque &lt;b&gt;cejas&lt;/b&gt;'), 'nombre y concepto escapados')
+    assert(/<strong>Fecha:<\/strong> \d{1,2} de [a-z]+ de \d{4} a las \d{2}:\d{2}</.test(html), 'fecha y hora en el recibo')
+  })
+
+  await test('datáfono con cliente existente (mismo email): no duplica, vincula al existente', async () => {
+    const { db } = preparar()
+    const r = await postCobroManual({ metodo: 'tarjeta_datafono', concepto: 'Retoque', monto: 20, nombre: 'Ana', email: ' ana@x.com ' })
+    igual(r.status, 201, 'status'); igual(db.tablas.clientes.length, 1, 'sin duplicar'); igual(db.tablas.pagos[0].cliente_id, 'cli1', 'cliente_id')
+  })
+
+  await test('cobro manual sin nombre: no crea cliente; sin email: no manda recibo', async () => {
+    const { db } = preparar()
+    const r = await postCobroManual({ metodo: 'tarjeta_datafono', concepto: 'Retoque', monto: 20 })
+    igual(r.status, 201, 'status'); igual(db.tablas.clientes.length, 1, 'clientes'); igual(db.tablas.pagos[0].cliente_id, null, 'cliente_id'); igual(state.emails.length, 0, 'emails')
+  })
+
+  await test('cobro manual: insert de pagos falla -> 500 con mensaje genérico y log del error real', async (logs) => {
+    const { db } = preparar()
+    db.fallos.insert_pagos = true
+    const r = await postCobroManual({ metodo: 'tarjeta_datafono', concepto: 'Retoque', monto: 20 })
+    igual(r.status, 500, 'status'); assert(!JSON.stringify(r.body).includes('boom'), 'no filtra el error interno')
+    assert(logs.some((l) => l.includes('Error registrando pago manual (tarjeta_datafono)')), 'console.error del fallo')
+  })
+
+  await test('ruta histórica /api/cobros/efectivo: sigue registrando efectivo e ignora body.metodo', async () => {
+    const { db } = preparar()
+    const r = await postCobroManual({ metodo: 'tarjeta_datafono', concepto: 'Retoque', monto: 20, nombre: 'Ana', email: 'ana@x.com' }, 'efectivo')
+    igual(r.status, 201, 'status'); igual(db.tablas.pagos[0].metodo_pago, 'efectivo', 'metodo fijo')
+    assert(state.emails[0].html.includes('Efectivo (en el estudio)'), 'etiqueta de efectivo en el recibo')
+  })
+
+  await test('/api/cobros/manual con efectivo: misma fila que la ruta histórica', async () => {
+    const { db } = preparar()
+    igual((await postCobroManual({ metodo: 'efectivo', concepto: 'Retoque', monto: 20 })).status, 201, 'status')
+    igual(db.tablas.pagos[0].metodo_pago, 'efectivo', 'metodo'); igual(db.tablas.pagos[0].estado, 'pagado', 'estado')
+  })
+
+  await test('fecha del recibo en hora del estudio (Europe/Madrid), con hora a 2 dígitos', async () => {
+    const { formatearFechaHoraRecibo } = load('lib/cobros-manuales.ts')
+    igual(formatearFechaHoraRecibo(new Date('2026-10-09T12:30:00Z')), '9 de octubre de 2026 a las 14:30', 'verano (UTC+2)')
+    igual(formatearFechaHoraRecibo(new Date('2026-12-31T23:30:00Z')), '1 de enero de 2027 a las 00:30', 'invierno (UTC+1), cambio de año')
   })
 
   for (const [ok, n, m] of resultados) console.log(`${ok ? 'OK  ' : 'FAIL'} ${n}${ok ? '' : '\n       -> ' + m}`)

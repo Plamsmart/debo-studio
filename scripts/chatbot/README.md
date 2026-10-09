@@ -22,7 +22,7 @@ node scripts/chatbot/1-flujo.js              # flujo feliz, prompt, modelo/tools
 node scripts/chatbot/2-errores-robustez.js   # cada código de error + robustez (prompt injection, etc.)
 node scripts/chatbot/3-limites.js            # límites: mensaje, rate limit, mensual, citas por conversación
 node scripts/chatbot/4-regresion-citas.js    # /api/citas: compara route-antigua.ts (pre-refactor) vs la actual
-node scripts/chatbot/5-pagos.js              # cita -> pago: doble confirmación, precio 0, fallos de Stripe, webhook sin fila, cobros QR
+node scripts/chatbot/5-pagos.js              # cita -> pago: doble confirmación, precio 0, fallos de Stripe, webhook sin fila, cobros QR, cobros manuales (efectivo/datáfono)
 node scripts/chatbot/tam.js                  # tamaño del system prompt con 56 servicios (sin red)
 python3 scripts/chatbot/mutaciones.py        # mutation testing: confirma que las pruebas SÍ detectan bugs reales
 ```

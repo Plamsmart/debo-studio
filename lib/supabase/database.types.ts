@@ -547,7 +547,7 @@ export type Database = {
         | "completada"
         | "no_asistio"
       estado_pago: "pendiente" | "pagado" | "reembolsado" | "fallido"
-      metodo_pago: "web" | "qr_local" | "efectivo"
+      metodo_pago: "web" | "qr_local" | "efectivo" | "tarjeta_datafono"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -683,7 +683,7 @@ export const Constants = {
         "no_asistio",
       ],
       estado_pago: ["pendiente", "pagado", "reembolsado", "fallido"],
-      metodo_pago: ["web", "qr_local", "efectivo"],
+      metodo_pago: ["web", "qr_local", "efectivo", "tarjeta_datafono"],
     },
   },
 } as const

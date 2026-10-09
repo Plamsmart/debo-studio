@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import QRCode from 'qrcode'
+import { ETIQUETA_METODO_PAGO, type MetodoCobroManual } from '@/lib/metodos-pago'
 
 type Servicio = {
   id: string
@@ -14,7 +15,12 @@ type Props = {
 }
 
 type Modo = 'formulario' | 'cobrando' | 'pagado'
-type MetodoElegido = 'qr' | 'efectivo'
+type MetodoElegido = 'qr' | MetodoCobroManual
+
+const TEXTO_BOTON_REGISTRAR: Record<MetodoCobroManual, string> = {
+  efectivo: 'Registrar pago en efectivo',
+  tarjeta_datafono: 'Registrar pago con datáfono',
+}
 
 export default function PanelCobrar({ servicios }: Props) {
   const [modo, setModo] = useState<Modo>('formulario')
@@ -87,21 +93,22 @@ export default function PanelCobrar({ servicios }: Props) {
     }
   }
 
-  async function registrarEfectivo(e: React.FormEvent) {
+  async function registrarCobroManual(e: React.FormEvent, metodoManual: MetodoCobroManual) {
     e.preventDefault()
     setError(null)
 
-    if (!concepto.trim() || !monto || Number(monto) <= 0) {
+    const montoNumero = Number(monto)
+    if (!concepto.trim() || !monto || !Number.isFinite(montoNumero) || montoNumero < 0.01) {
       setError('Completa el concepto y un monto válido')
       return
     }
 
     setCargando(true)
     try {
-      const res = await fetch('/api/cobros/efectivo', {
+      const res = await fetch('/api/cobros/manual', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ concepto, monto: Number(monto), ...datosClienteBody() }),
+        body: JSON.stringify({ metodo: metodoManual, concepto, monto: montoNumero, ...datosClienteBody() }),
       })
 
       const data = await res.json()
@@ -117,7 +124,7 @@ export default function PanelCobrar({ servicios }: Props) {
     }
   }
 
-  // Polling: solo aplica al modo QR (el efectivo se confirma al instante)
+  // Polling: solo aplica al modo QR (efectivo y datáfono se confirman al instante)
   useEffect(() => {
     if (modo !== 'cobrando' || !sessionId || metodo !== 'qr') return
 
@@ -157,7 +164,7 @@ export default function PanelCobrar({ servicios }: Props) {
         <h2>¡Pago recibido!</h2>
         <p>
           {concepto} — {Number(monto).toFixed(2)} €
-          {metodo === 'efectivo' ? ' (efectivo)' : ''}
+          {metodo !== 'qr' ? ` · ${ETIQUETA_METODO_PAGO[metodo]}` : ''}
         </p>
         <button type="button" onClick={nuevoCobro} className="panel-cobrar__btn">
           Nuevo cobro
@@ -190,7 +197,7 @@ export default function PanelCobrar({ servicios }: Props) {
   return (
     <form
       className="panel-cobrar__form"
-      onSubmit={metodo === 'qr' ? generarCobroQR : registrarEfectivo}
+      onSubmit={(e) => (metodo === 'qr' ? generarCobroQR(e) : registrarCobroManual(e, metodo))}
     >
       <div className="panel-cobrar__metodo-toggle">
         <button
@@ -198,14 +205,21 @@ export default function PanelCobrar({ servicios }: Props) {
           className={`panel-cobrar__metodo-btn ${metodo === 'qr' ? 'panel-cobrar__metodo-btn--activo' : ''}`}
           onClick={() => setMetodo('qr')}
         >
-          Cobrar con QR
+          QR (Stripe)
         </button>
         <button
           type="button"
           className={`panel-cobrar__metodo-btn ${metodo === 'efectivo' ? 'panel-cobrar__metodo-btn--activo' : ''}`}
           onClick={() => setMetodo('efectivo')}
         >
-          Registrar efectivo
+          Efectivo
+        </button>
+        <button
+          type="button"
+          className={`panel-cobrar__metodo-btn ${metodo === 'tarjeta_datafono' ? 'panel-cobrar__metodo-btn--activo' : ''}`}
+          onClick={() => setMetodo('tarjeta_datafono')}
+        >
+          {ETIQUETA_METODO_PAGO.tarjeta_datafono}
         </button>
       </div>
 
@@ -276,7 +290,7 @@ export default function PanelCobrar({ servicios }: Props) {
           ? 'Procesando…'
           : metodo === 'qr'
             ? 'Generar cobro'
-            : 'Registrar pago en efectivo'}
+            : TEXTO_BOTON_REGISTRAR[metodo]}
       </button>
     </form>
   )

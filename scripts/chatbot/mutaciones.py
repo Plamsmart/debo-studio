@@ -33,6 +33,12 @@ M=[
   "    return fallo(\"fecha_pasada\", \"Esa fecha ya pasó.\", 400);\n  }\n\n  if (false) {", '2-errores-robustez.js'),
  ("fallo ABIERTO: si el conteo falla, se deja pasar", 'lib/chatbot/limites.ts',
   "    throw new Error(`No se pudo comprobar el límite (${descripcion})`)", "    return 0", '3-limites.js'),
+ ("cobro manual: se acepta cualquier método (p.ej. 'qr_local' sin Stripe)", 'lib/cobros-manuales.ts',
+  "  if (!esMetodoCobroManual(metodo)) {", "  if (false) {", '5-pagos.js'),
+ ("cobro manual: la ruta histórica de efectivo obedece body.metodo", 'lib/cobros-manuales.ts',
+  "  const metodo = metodoFijo ?? body?.metodo", "  const metodo = body?.metodo ?? metodoFijo", '5-pagos.js'),
+ ("cobro manual: el recibo vuelve a mostrar la fecha en UTC", 'lib/cobros-manuales.ts',
+  "    timeZone: HORARIO_NEGOCIO.zonaHoraria,", "    timeZone: 'UTC',", '5-pagos.js'),
 ]
 ok_total=0
 for desc, arch, orig, mut, prueba in M:
