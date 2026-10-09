@@ -538,6 +538,58 @@ export type Database = {
           hora_inicio: string
         }[]
       }
+      ventas_comparativa: {
+        Args: {
+          p_anterior_desde?: string
+          p_anterior_hasta?: string
+          p_desde: string
+          p_hasta: string
+        }
+        Returns: {
+          actual_desde: string
+          actual_hasta: string
+          actual_num_cobros: number
+          actual_ticket_medio: number
+          actual_total: number
+          anterior_desde: string
+          anterior_hasta: string
+          anterior_num_cobros: number
+          anterior_ticket_medio: number
+          anterior_total: number
+          diferencia: number
+          variacion_pct: number
+        }[]
+      }
+      ventas_ingresos_por_periodo: {
+        Args: { p_agrupacion?: string; p_desde: string; p_hasta: string }
+        Returns: {
+          num_cobros: number
+          periodo_inicio: string
+          ticket_medio: number
+          total: number
+        }[]
+      }
+      ventas_por_metodo: {
+        Args: { p_desde: string; p_hasta: string }
+        Returns: {
+          metodo_pago: Database["public"]["Enums"]["metodo_pago"]
+          num_cobros: number
+          porcentaje_cobros: number
+          porcentaje_importe: number
+          total: number
+        }[]
+      }
+      ventas_ranking_servicios: {
+        Args: { p_desde: string; p_hasta: string }
+        Returns: {
+          es_mas_vendido: boolean
+          es_menos_vendido: boolean
+          num_ventas: number
+          servicio_id: string
+          servicio_nombre: string
+          total: number
+        }[]
+      }
     }
     Enums: {
       estado_cita:

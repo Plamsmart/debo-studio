@@ -29,7 +29,7 @@ Module._resolveFilename = function (request, ...rest) {
   if (mocks[request]) return request
   if (request.startsWith('@/')) {
     const base = path.join(ROOT, request.slice(2))
-    for (const ext of ['.ts', '/index.ts']) if (fs.existsSync(base + ext)) return base + ext
+    for (const ext of ['.ts', '.tsx', '/index.ts']) if (fs.existsSync(base + ext)) return base + ext
   }
   if (request.startsWith('./') && rest[0]?.filename?.startsWith(ROOT)) {
     const base = path.resolve(path.dirname(rest[0].filename), request)

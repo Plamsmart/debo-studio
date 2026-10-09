@@ -39,6 +39,18 @@ M=[
   "  const metodo = metodoFijo ?? body?.metodo", "  const metodo = body?.metodo ?? metodoFijo", '5-pagos.js'),
  ("cobro manual: el recibo vuelve a mostrar la fecha en UTC", 'lib/cobros-manuales.ts',
   "    timeZone: HORARIO_NEGOCIO.zonaHoraria,", "    timeZone: 'UTC',", '5-pagos.js'),
+ ("pagos/estado: deja pasar a cualquier usuario autenticado", 'app/api/pagos/estado/route.ts',
+  "  if (!miembro) {", "  if (false) {", '5-pagos.js'),
+ ("pagos/estado: vuelve a leer pagos con la sesión (rompe al staff con la RLS restringida)", 'app/api/pagos/estado/route.ts',
+  "  const { data: pago, error } = await supabaseService", "  const { data: pago, error } = await supabase", '5-pagos.js'),
+ ("/admin/ventas: el staff entra a la página", 'app/admin/ventas/page.tsx',
+  "  if (usuarioAdmin?.rol !== 'admin') {", "  if (!usuarioAdmin) {", '6-ventas.js'),
+ ("ventas: la fecha de hoy se calcula en UTC", 'lib/ventas.ts',
+  "    timeZone: HORARIO_NEGOCIO.zonaHoraria,\n    year: 'numeric',", "    timeZone: 'UTC',\n    year: 'numeric',", '6-ventas.js'),
+ ("ventas: semanas que empiezan en domingo", 'lib/ventas.ts',
+  "  return sumarDias(texto, -((diaSemana + 6) % 7))", "  return sumarDias(texto, -diaSemana)", '6-ventas.js'),
+ ("ventas: sin base se muestra un % igualmente", 'components/InformeVentas.tsx',
+  "  const hayBase = anterior > 0 && resumen.variacion_pct !== null", "  const hayBase = true", '6-ventas.js'),
 ]
 ok_total=0
 for desc, arch, orig, mut, prueba in M:

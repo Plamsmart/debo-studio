@@ -1,0 +1,312 @@
+/* Informe de ventas (/admin/ventas). Móvil primero: una columna, tarjetas de 2 en 2. */
+.panel-ventas {
+  max-width: 960px;
+  font-family: var(--font-body);
+}
+
+.panel-ventas h2 {
+  font-size: 1.05rem;
+  margin: 0 0 0.8rem;
+}
+
+.panel-ventas__nota,
+.panel-ventas__rango-actual,
+.panel-ventas__aviso {
+  font-size: 0.8rem;
+  color: var(--marca-gris-suave);
+  margin: 0 0 0.8rem;
+}
+
+.panel-ventas__aviso {
+  color: var(--marca-bronce-oscuro);
+}
+
+/* --- Filtros --- */
+.panel-ventas__filtros {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  margin-bottom: 0.8rem;
+}
+
+.panel-ventas__rango {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  align-items: end;
+}
+
+.panel-ventas__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--marca-gris-suave);
+}
+
+.panel-ventas__campo select,
+.panel-ventas__campo input {
+  padding: 0.65rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid var(--marca-crema-oscuro);
+  background: #fff;
+  font-family: inherit;
+  font-size: 1rem; /* 16px: evita el zoom automático de iOS al enfocar */
+  color: var(--marca-gris);
+  min-width: 0;
+}
+
+.panel-ventas__aplicar {
+  grid-column: 1 / -1;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: none;
+  background: var(--marca-bronce);
+  color: #fff;
+  font-family: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.panel-ventas__aplicar:disabled {
+  opacity: 0.6;
+}
+
+/* --- Estados --- */
+.panel-ventas__resultados--cargando {
+  opacity: 0.5;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.panel-ventas__cargando {
+  color: var(--marca-bronce);
+}
+
+.panel-ventas__vacio,
+.panel-ventas__error {
+  padding: 1.2rem;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px dashed var(--marca-crema-oscuro);
+  text-align: center;
+  color: var(--marca-gris-suave);
+}
+
+.panel-ventas__error {
+  border-style: solid;
+  border-color: var(--marca-rojo);
+  color: var(--marca-rojo);
+}
+
+.panel-ventas__esqueleto {
+  height: 5.5rem;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #fff, var(--marca-crema-oscuro), #fff);
+  background-size: 200% 100%;
+  animation: panel-ventas-brillo 1.2s ease-in-out infinite;
+  margin-bottom: 0.8rem;
+}
+
+@keyframes panel-ventas-brillo {
+  to { background-position: -200% 0; }
+}
+
+/* --- Tarjetas --- */
+.panel-ventas__tarjetas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.panel-ventas__tarjeta,
+.panel-ventas__bloque,
+.panel-ventas__destacado {
+  background: #fff;
+  border: 1px solid var(--marca-crema-oscuro);
+  border-radius: 12px;
+  padding: 0.9rem;
+}
+
+.panel-ventas__tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.panel-ventas__comparativa {
+  grid-column: 1 / -1;
+}
+
+.panel-ventas__tarjeta-titulo {
+  font-size: 0.75rem;
+  color: var(--marca-gris-suave);
+}
+
+.panel-ventas__tarjeta-valor {
+  font-size: 1.25rem;
+  color: var(--marca-gris);
+}
+
+.panel-ventas__tarjeta-valor--suave {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--marca-gris-suave);
+}
+
+.panel-ventas__tarjeta-pct,
+.panel-ventas__tarjeta-detalle,
+.panel-ventas__fila-cifras {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--marca-gris-suave);
+}
+
+.panel-ventas__comparativa--sube .panel-ventas__tarjeta-valor { color: var(--marca-verde); }
+.panel-ventas__comparativa--baja .panel-ventas__tarjeta-valor { color: var(--marca-rojo); }
+
+/* --- Bloques --- */
+.panel-ventas__bloque {
+  margin-bottom: 1rem;
+}
+
+.panel-ventas__grafico {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 180px;
+  padding-bottom: 1.4rem; /* sitio para las etiquetas */
+}
+
+.panel-ventas__barra-col {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  position: relative;
+}
+
+.panel-ventas__barra {
+  background: linear-gradient(180deg, var(--marca-cobre-claro), var(--marca-cobre-oscuro));
+  border-radius: 3px 3px 0 0;
+  min-height: 1px;
+}
+
+.panel-ventas__barra-etiqueta {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 0.3rem;
+  font-size: 0.65rem;
+  color: var(--marca-gris-suave);
+  white-space: nowrap;
+}
+
+.panel-ventas__detalle summary {
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+  color: var(--marca-bronce);
+  cursor: pointer;
+}
+
+.panel-ventas__tabla {
+  width: 100%;
+  margin-top: 0.6rem;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.panel-ventas__tabla th,
+.panel-ventas__tabla td {
+  padding: 0.35rem 0.3rem;
+  border-bottom: 1px solid var(--marca-crema-oscuro);
+  text-align: right;
+}
+
+.panel-ventas__tabla th:first-child,
+.panel-ventas__tabla td:first-child {
+  text-align: left;
+}
+
+.panel-ventas__destacados {
+  display: grid;
+  gap: 0.6rem;
+  margin-bottom: 0.9rem;
+}
+
+.panel-ventas__destacado {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  background: var(--marca-crema);
+}
+
+.panel-ventas__destacado-nombre {
+  font-weight: 600;
+}
+
+.panel-ventas__lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.panel-ventas__fila-texto {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.2rem 0.6rem;
+  font-size: 0.9rem;
+}
+
+.panel-ventas__fila-barra {
+  height: 6px;
+  margin-top: 0.3rem;
+  border-radius: 3px;
+  background: var(--marca-cobre-claro);
+}
+
+.panel-ventas__sin-servicio {
+  margin: 0.9rem 0 0;
+  padding-top: 0.7rem;
+  border-top: 1px dashed var(--marca-crema-oscuro);
+  font-size: 0.85rem;
+  color: var(--marca-gris-suave);
+}
+
+@media (min-width: 720px) {
+  .panel-ventas__filtros {
+    grid-template-columns: repeat(2, minmax(0, 220px));
+  }
+
+  .panel-ventas__rango {
+    grid-template-columns: repeat(2, minmax(0, 220px)) auto;
+  }
+
+  .panel-ventas__aplicar {
+    grid-column: auto;
+  }
+
+  .panel-ventas__tarjetas {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .panel-ventas__comparativa {
+    grid-column: auto;
+  }
+
+  .panel-ventas__destacados {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .panel-ventas__grafico {
+    height: 240px;
+  }
+}
