@@ -11,7 +11,7 @@ const state = { db: null, stripe: null, emails: [], eventos: [] }
 global.__extraMocks = {
   '@/lib/supabase/server': () => ({
     createClient: async () => state.db.cliente,
-    createServiceClient: () => state.db.cliente,
+    createServiceClient: () => state.db.servicio,
   }),
   '@/lib/stripe': () => ({
     stripe: {
@@ -82,8 +82,15 @@ function crearDb() {
     return b
   }
 
-  const cliente = { from, auth: { getUser: async () => ({ data: { user: { id: 'u1' } } }) } }
-  return { cliente, tablas, fallos }
+  // Mismo almacén para los dos clientes, pero se registra quién lee qué tabla
+  // ('sesion:pagos', 'service:pagos'…) para comprobar qué rutas usan service_role.
+  const accesos = []
+  const conRegistro = (quien) => (tabla) => { accesos.push(`${quien}:${tabla}`); return from(tabla) }
+  const usuario = { id: 'u1' }
+  const auth = { getUser: async () => ({ data: { user: usuario } }) }
+  const cliente = { from: conRegistro('sesion'), auth }
+  const servicio = { from: conRegistro('service'), auth }
+  return { cliente, servicio, tablas, fallos, accesos, usuario }
 }
 
 function crearStripe() {
@@ -133,6 +140,13 @@ async function postCobro(body) {
 async function postCobroManual(body, ruta = 'manual') {
   const route = load(`app/api/cobros/${ruta}/route.ts`)
   const r = await route.POST(new NextRequest(`http://localhost/api/cobros/${ruta}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }))
+  return { status: r.status, body: await r.json() }
+}
+
+async function getEstado(sessionId) {
+  const route = load('app/api/pagos/estado/route.ts')
+  const qs = sessionId === undefined ? '' : `?session_id=${encodeURIComponent(sessionId)}`
+  const r = await route.GET(new NextRequest(`http://localhost/api/pagos/estado${qs}`))
   return { status: r.status, body: await r.json() }
 }
 
@@ -399,6 +413,54 @@ function igual(a, b, msg) { if (a !== b) throw new Error(`${msg ?? 'no coincide'
     const { formatearFechaHoraRecibo } = load('lib/cobros-manuales.ts')
     igual(formatearFechaHoraRecibo(new Date('2026-10-09T12:30:00Z')), '9 de octubre de 2026 a las 14:30', 'verano (UTC+2)')
     igual(formatearFechaHoraRecibo(new Date('2026-12-31T23:30:00Z')), '1 de enero de 2027 a las 00:30', 'invierno (UTC+1), cambio de año')
+  })
+
+  // ===== /api/pagos/estado (polling del cobro QR): equipo sí, resto no; solo `estado`, con service_role =====
+  function prepararEstado() {
+    const { db } = preparar()
+    db.tablas.pagos.push({ id: 'pg1', stripe_session_id: 'cs_test_abc', estado: 'pagado', monto: 20, concepto: 'Retoque', cliente_id: 'cli1', metodo_pago: 'qr_local' })
+    return db
+  }
+
+  await test('estado: staff (y admin) ven el estado; solo se devuelve `estado`, leído con service_role', async () => {
+    const db = prepararEstado()
+    db.tablas.usuarios_admin = [{ id: 'u1', rol: 'staff' }]
+    const r = await getEstado('cs_test_abc')
+    igual(r.status, 200, 'status staff'); igual(JSON.stringify(r.body), '{"estado":"pagado"}', 'solo estado')
+    assert(db.accesos.includes('service:pagos'), 'lee pagos con service_role')
+    assert(!db.accesos.includes('sesion:pagos'), 'no lee pagos con la sesión')
+    db.tablas.usuarios_admin = [{ id: 'u1', rol: 'admin' }]
+    igual((await getEstado('cs_test_abc')).status, 200, 'status admin')
+  })
+
+  await test('estado: usuario autenticado fuera de usuarios_admin -> 403 sin tocar pagos', async () => {
+    const db = prepararEstado()
+    db.tablas.usuarios_admin = []
+    const r = await getEstado('cs_test_abc')
+    igual(r.status, 403, 'status'); igual(r.body.estado, undefined, 'sin estado')
+    assert(!db.accesos.some((a) => a.endsWith(':pagos')), 'no lee pagos')
+  })
+
+  await test('estado: sin sesión -> 401', async () => {
+    const db = prepararEstado()
+    db.cliente.auth.getUser = async () => ({ data: { user: null } })
+    igual((await getEstado('cs_test_abc')).status, 401, 'status')
+  })
+
+  await test('estado: session_id ausente o con formato raro -> 400; inexistente -> 404', async () => {
+    prepararEstado()
+    igual((await getEstado(undefined)).status, 400, 'ausente')
+    igual((await getEstado("cs_x' or 1=1")).status, 400, 'formato')
+    igual((await getEstado('pi_123')).status, 400, 'no es de checkout')
+    igual((await getEstado('cs_test_otra')).status, 404, 'inexistente')
+  })
+
+  await test('estado: si falla la lectura -> 500 genérico con log', async (logs) => {
+    const db = prepararEstado()
+    db.fallos.select_pagos = true
+    const r = await getEstado('cs_test_abc')
+    igual(r.status, 500, 'status'); assert(!JSON.stringify(r.body).includes('boom'), 'no filtra el error')
+    assert(logs.some((l) => l.includes('cs_test_abc')), 'console.error con la sesión')
   })
 
   for (const [ok, n, m] of resultados) console.log(`${ok ? 'OK  ' : 'FAIL'} ${n}${ok ? '' : '\n       -> ' + m}`)
