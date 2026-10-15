@@ -1,5 +1,6 @@
 // Bloques del informe de ventas. Sin estado ni efectos: se pinta en el servidor.
 import { ETIQUETA_METODO_PAGO, type MetodoPago } from '@/lib/metodos-pago'
+import GraficoRepartoServicios from '@/components/GraficoRepartoServicios'
 import {
   etiquetaPeriodo,
   formatearEuros,
@@ -63,6 +64,7 @@ export default function InformeVentas({ datos, agrupacion }: Props) {
       ) : (
         <>
           <GraficoIngresos filas={datos.ingresos} agrupacion={agrupacion} />
+          <GraficoRepartoServicios filas={datos.ranking} />
           <RankingServicios filas={datos.ranking} />
           <RepartoMetodos filas={datos.metodos} />
         </>

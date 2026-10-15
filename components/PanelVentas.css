@@ -310,3 +310,184 @@
     height: 240px;
   }
 }
+
+/* --- Reparto por servicio (anillo, GraficoRepartoServicios.tsx) ---
+   Paleta derivada del cobre de marca y validada para daltonismo (protan/deutan)
+   y separación entre vecinas sobre fondo blanco. El orden importa: las porciones
+   contiguas usan colores contiguos. Ocre y rosa quedan por debajo de 3:1 sobre
+   blanco, por eso la leyenda siempre muestra nombre, cifra y %.
+   La app no tiene modo oscuro: si se añade, definir aquí sus variantes. */
+.panel-ventas {
+  --reparto-1: #b5622f; /* cobre */
+  --reparto-2: #008ba3; /* petróleo */
+  --reparto-3: #d4a03a; /* ocre */
+  --reparto-4: #8a4a86; /* ciruela */
+  --reparto-5: #3c7a3f; /* verde */
+  --reparto-6: #e6929a; /* rosa: sexto servicio u "Otros" */
+  --reparto-sin-servicio: var(--marca-gris-suave);
+}
+
+.reparto__selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 0.9rem;
+  border: 1px solid var(--marca-crema-oscuro);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.reparto__selector button {
+  padding: 0.6rem 0.4rem;
+  border: none;
+  background: #fff;
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: var(--marca-gris);
+  cursor: pointer;
+}
+
+.reparto__selector button + button {
+  border-left: 1px solid var(--marca-crema-oscuro);
+}
+
+.reparto__selector button[aria-pressed='true'] {
+  background: var(--marca-bronce);
+  color: #fff;
+}
+
+.reparto {
+  display: grid;
+  gap: 1rem;
+}
+
+.reparto__anillo {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.reparto__anillo svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.reparto__porcion {
+  stroke-width: 30;
+  cursor: pointer;
+  transition: opacity 0.15s ease, stroke-width 0.15s ease;
+}
+
+.reparto__porcion--activa {
+  stroke-width: 36;
+}
+
+.reparto__porcion--atenuada {
+  opacity: 0.3;
+}
+
+/* Texto en HTML encima del hueco del anillo (diámetro interior ≈ 65 %). */
+.reparto__centro {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 54%;
+  height: 54%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  text-align: center;
+  pointer-events: none;
+}
+
+.reparto__centro-titulo {
+  font-size: 0.75rem;
+  color: var(--marca-gris-suave);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.reparto__centro-valor {
+  font-size: 1.2rem;
+  color: var(--marca-gris);
+}
+
+.reparto__leyenda {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.reparto__item-boton {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.1rem 0.6rem;
+  align-items: center;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: var(--marca-gris);
+  text-align: left;
+  cursor: pointer;
+}
+
+.reparto__item--activo .reparto__item-boton {
+  background: var(--marca-crema);
+}
+
+.reparto__item-boton:focus-visible {
+  outline: 2px solid var(--marca-bronce);
+  outline-offset: 1px;
+}
+
+.reparto__muestra {
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 3px;
+}
+
+.reparto__item-cifras {
+  grid-column: 2;
+  font-size: 0.8rem;
+  color: var(--marca-gris-suave);
+}
+
+.reparto__otros {
+  margin: 0 0.5rem 0.3rem 1.95rem;
+  font-size: 0.8rem;
+  color: var(--marca-gris-suave);
+}
+
+.reparto__otros summary {
+  color: var(--marca-bronce);
+  cursor: pointer;
+}
+
+.reparto__otros ul {
+  margin: 0.3rem 0 0;
+  padding-left: 1rem;
+}
+
+@media (min-width: 720px) {
+  .reparto {
+    grid-template-columns: 260px 1fr;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .reparto__selector {
+    max-width: 360px;
+  }
+}

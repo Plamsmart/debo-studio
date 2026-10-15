@@ -125,6 +125,88 @@ test('formato: euros, signos y etiquetas en español', () => {
   igual(v.formatearRangoFechas('2026-10-01', '2026-10-09'), '1 oct 2026 – 9 oct 2026')
 })
 
+// --- Reparto por servicio (lib/reparto-servicios.ts, gráfico de anillo) ---
+const r = require(path.join(ROOT, 'lib/reparto-servicios.ts'))
+const fila = (id, nombre, total, num) => ({ servicio_id: id, servicio_nombre: nombre, total, num_ventas: num })
+const sumaDecimas = (rep) => rep.porciones.reduce((a, p) => a + p.decimas, 0)
+
+test('reparto: 9 servicios -> 5 + "Otros" (con detalle), ordenados por la métrica', () => {
+  const filas = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => fila(`s${n}`, `Servicio ${n}`, n * 10, 10 - n))
+  const rep = r.calcularReparto(filas, 'ingresos')
+  igual(rep.porciones.length, 6, 'porciones')
+  igual(rep.porciones.map((p) => p.clave).join(), 's9,s8,s7,s6,s5,otros', 'orden por ingresos')
+  const otros = rep.porciones[5]
+  igual(otros.valor, 100, 'otros = 10+20+30+40'); igual(otros.nombre, 'Otros (4 servicios)')
+  igual(otros.agrupados.map((s) => s.nombre).join(), 'Servicio 4,Servicio 3,Servicio 2,Servicio 1', 'detalle')
+  igual(rep.total, 450, 'total')
+  igual(r.calcularReparto(filas, 'ventas').porciones[0].clave, 's1', 'orden por nº de ventas')
+})
+
+test('reparto: "Sin servicio asignado" aparte, al final y dentro del máximo de 6', () => {
+  const filas = [fila(null, 'Sin servicio asignado', 500, 9), ...[1, 2, 3, 4, 5, 6].map((n) => fila(`s${n}`, `S${n}`, n, 1))]
+  const rep = r.calcularReparto(filas, 'ingresos')
+  igual(rep.porciones.length, 6, 'porciones')
+  igual(rep.porciones.map((p) => p.tipo).join(), 'servicio,servicio,servicio,servicio,otros,sin_servicio', 'tipos')
+  igual(rep.porciones[4].agrupados.map((s) => s.nombre).join(), 'S2,S1', 'otros con los 2 más pequeños')
+  // Con justo 5 servicios + sin servicio caben todos, sin "Otros".
+  const cinco = r.calcularReparto(filas.slice(0, 6), 'ingresos')
+  assert(!cinco.porciones.some((p) => p.tipo === 'otros'), 'sin otros'); igual(cinco.porciones.at(-1).tipo, 'sin_servicio')
+})
+
+test('reparto: los porcentajes suman siempre 100,0 % (resto mayor, sin huecos)', () => {
+  igual(r.repartirDecimas([1, 1, 1]).join(), '334,333,333', 'tercios')
+  igual(r.repartirDecimas([2, 1]).join(), '667,333', 'dos tercios')
+  for (const valores of [[1, 1, 1, 1, 1, 1], [999999, 1], [33.33, 33.33, 33.34], [0.01, 0.02, 1000], [7, 13, 17, 19, 23, 29]]) {
+    const d = r.repartirDecimas(valores)
+    igual(d.reduce((a, b) => a + b, 0), 1000, JSON.stringify(valores))
+    assert(d.every((x) => x >= 0), 'sin negativos')
+  }
+  // Muchos servicios con importes con céntimos: la suma del reparto final también es 100.
+  const filas = Array.from({ length: 20 }, (_, i) => fila(`s${i}`, `S${i}`, 12.34 * (i + 1), i + 1))
+  igual(sumaDecimas(r.calcularReparto(filas, 'ingresos')), 1000, 'reparto real')
+})
+
+test('reparto: sin ventas -> vacío; importes a 0 no cuentan', () => {
+  const vacio = r.calcularReparto([], 'ingresos')
+  igual(vacio.total, 0); igual(vacio.porciones.length, 0)
+  igual(r.geometriaAnillo([], 100).length, 0, 'sin arcos')
+  const gratis = [fila('s1', 'Retoque gratis', 0, 2)]
+  igual(r.calcularReparto(gratis, 'ingresos').porciones.length, 0, 'por ingresos')
+  igual(r.calcularReparto(gratis, 'ventas').porciones[0].decimas, 1000, 'por ventas')
+})
+
+test('reparto: un solo servicio -> 100 % y anillo completo sin hueco', () => {
+  const rep = r.calcularReparto([fila('s1', 'Microblading', 170, 3)], 'ingresos')
+  igual(rep.porciones.length, 1); igual(rep.porciones[0].decimas, 1000)
+  igual(JSON.stringify(r.geometriaAnillo([170], 500)), '[{"inicio":0,"largo":500}]', 'anillo completo')
+})
+
+test('reparto: una porción minúscula se ve (mínimo) y nada se solapa ni se sale del anillo', () => {
+  const C = 2 * Math.PI * 80
+  const arcos = r.geometriaAnillo([10000, 1, 5000, 1], C, 2, 2)
+  arcos.forEach((a) => assert(a.largo >= 2 - 1e-9, `largo ${a.largo}`))
+  for (let i = 1; i < arcos.length; i++) assert(arcos[i].inicio >= arcos[i - 1].inicio + arcos[i - 1].largo + 2 - 1e-9, 'hueco entre porciones')
+  const fin = arcos.at(-1).inicio + arcos.at(-1).largo + 2
+  assert(Math.abs(fin - C) < 1e-9, `cierra en la circunferencia: ${fin} vs ${C}`)
+  // Proporciones normales no se tocan.
+  const normal = r.geometriaAnillo([1, 1], 100, 2, 2)
+  igual(JSON.stringify(normal), '[{"inicio":0,"largo":48},{"inicio":50,"largo":48}]', 'mitades')
+})
+
+test('reparto: cada servicio conserva su color al cambiar de métrica; "Otros" siempre el 6', () => {
+  const filas = [fila('a', 'A', 100, 1), fila('b', 'B', 50, 9), fila('c', 'C', 10, 5)]
+  const ing = r.calcularReparto(filas, 'ingresos').porciones
+  const ven = r.calcularReparto(filas, 'ventas').porciones
+  const c1 = r.asignarColores(ing, ing); const c2 = r.asignarColores(ing, ven)
+  for (const k of ['a', 'b', 'c']) igual(c2.get(k), c1.get(k), `color de ${k}`)
+  const muchos = [1, 2, 3, 4, 5, 6, 7].map((n) => fila(`s${n}`, `S${n}`, n * 10, 8 - n))
+  const refM = r.calcularReparto(muchos, 'ingresos').porciones
+  const colores = r.asignarColores(refM, r.calcularReparto(muchos, 'ventas').porciones)
+  igual(colores.get('otros'), 6, 'otros')
+  const servicios = [...colores].filter(([k]) => k !== 'otros').map(([, v]) => v)
+  igual(new Set(servicios).size, servicios.length, 'sin colores repetidos'); assert(servicios.every((v) => v >= 1 && v <= 5), 'servicios en 1-5')
+})
+
 // --- Página /admin/ventas: protección en servidor y llamadas a las RPC ---
 async function abrirPagina(params = {}) {
   estado.rpcs = []
@@ -202,7 +284,9 @@ const pruebasAsync = [
     assert(h.includes('QR en el local') && h.includes('Tarjeta (datáfono)'), 'etiquetas de método')
     assert(h.includes('Más vendido') && h.includes('Menos vendido'), 'destacados')
     assert(h.includes('Sin servicio asignado: 1 cobro'), 'sin servicio aparte')
-    assert(!/<li[^>]*>.{0,200}Sin servicio asignado/.test(h), 'sin servicio fuera del ranking')
+    const ranking = h.match(/<ol class="panel-ventas__lista">.*?<\/ol>/)?.[0] ?? ''
+    assert(ranking.includes('Microblading') && !ranking.includes('Sin servicio asignado'), 'sin servicio fuera del ranking')
+    assert(h.includes('Reparto por servicio') && h.includes('role="img"') && h.includes('205,00 €'), 'anillo con el total')
     h = html({ ...datos, resumen: { ...resumen, anterior_total: 0, diferencia: 205, variacion_pct: null } })
     assert(h.includes('Sin datos del periodo anterior') && !h.includes('Infinity') && !h.includes('+0 %'), 'sin base')
     h = html({ ingresos: [], ranking: [], metodos: [], resumen: { ...resumen, actual_total: 0, actual_num_cobros: 0, actual_ticket_medio: null, diferencia: -40, variacion_pct: -100 } })
