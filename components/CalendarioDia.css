@@ -199,6 +199,25 @@
   white-space: nowrap;
 }
 
+/* Bloques cortos (menos de ~40 px, p.ej. 20 min o menos): hora y título en
+   una sola línea; el título se trunca con «…». */
+.calendario-dia__evento--corto {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.4rem;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.calendario-dia__evento--corto .calendario-dia__evento-hora {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.calendario-dia__evento--corto .calendario-dia__evento-titulo {
+  min-width: 0;
+}
+
 @media (max-width: 600px) {
   .calendario-dia__grid {
     margin-left: 44px;

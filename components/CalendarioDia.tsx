@@ -26,6 +26,9 @@ type Props = {
 }
 
 const PX_POR_HORA = 84
+// Por debajo de esta altura no caben hora y título apilados (con 30 min = 42 px
+// sí caben): el bloque pasa a una sola línea con --corto.
+const ALTO_MINIMO_DOS_LINEAS = 40
 
 function minutosDesdeHHMM(hhmm: string): number {
   const [h, m] = hhmm.split(':').map(Number)
@@ -215,6 +218,7 @@ function CalendarioGrid({
         {bloques.map((bloque, i) => {
           const top = (bloque.inicio - apertura) * pxPorMin
           const alto = Math.max((bloque.fin - bloque.inicio) * pxPorMin, 22)
+          const corto = alto < ALTO_MINIMO_DOS_LINEAS ? ' calendario-dia__evento--corto' : ''
           const { columna, columnas: total } = columnas[i]
           // Con una sola columna se mantiene el ancho completo del CSS.
           const posicion =
@@ -231,7 +235,7 @@ function CalendarioGrid({
             return (
               <div
                 key={`google-${evento.id}`}
-                className="calendario-dia__evento calendario-dia__evento--google"
+                className={`calendario-dia__evento calendario-dia__evento--google${corto}`}
                 style={{ top, height: alto, ...posicion }}
                 title={`${evento.titulo}\n${evento.inicio} - ${evento.fin}\nGoogle Calendar (solo lectura)`}
               >
@@ -251,7 +255,7 @@ function CalendarioGrid({
               key={cita.id}
               className={`calendario-dia__evento ${
                 pendiente ? 'calendario-dia__evento--pendiente' : ''
-              }`}
+              }${corto}`}
               style={{ top, height: alto, ...posicion }}
               title={`${cita.servicios?.nombre ?? 'Servicio'} — ${cita.clientes?.nombre ?? 'Cliente'}\n${cita.hora_inicio.slice(0, 5)} - ${cita.hora_fin.slice(0, 5)}\n${cita.clientes?.telefono ?? ''}`}
             >

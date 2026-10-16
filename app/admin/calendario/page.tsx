@@ -74,7 +74,9 @@ export default async function CalendarioPage({
 
         <div className="calendario-layout__columna-lista">
           <h3 className="calendario-layout__titulo-lista">Citas de este día</h3>
-          <ListaCitasDelDia citasIniciales={citas ?? []} eventosGoogle={eventosGoogle} />
+          {/* key: al cambiar de día (‹ › Hoy) Next reutiliza el componente y su
+              useState conservaría las citas del primer día abierto. */}
+          <ListaCitasDelDia key={fechaStr} citasIniciales={citas ?? []} eventosGoogle={eventosGoogle} />
         </div>
       </div>
     </div>
