@@ -138,9 +138,9 @@ create table public.citas_tokens_pago (
     constraint citas_tokens_pago_hash_formato check (token_hash ~ '^[0-9a-f]{64}$'),
   creado_en timestamptz not null default now(),
   -- Nulo = activo. Se rellena al cancelar la cita o al sustituir el token.
-  revocado_en timestamptz,
-  constraint citas_tokens_pago_revocado_posterior
-    check (revocado_en is null or revocado_en >= creado_en)
+  -- (Sin check revocado_en >= creado_en: revocado_en lo escribe el backend con
+  -- la hora del servidor y un desfase de reloj con la base haría fallar la revocación.)
+  revocado_en timestamptz
 );
 
 comment on table public.citas_tokens_pago is

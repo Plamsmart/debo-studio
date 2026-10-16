@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.15"
   }
   public: {
     Tables: {
@@ -85,6 +85,8 @@ export type Database = {
           hora_inicio: string
           id: string
           notas: string | null
+          preferencia_pago: string | null
+          preferencia_pago_en: string | null
           servicio_id: string
         }
         Insert: {
@@ -98,6 +100,8 @@ export type Database = {
           hora_inicio: string
           id?: string
           notas?: string | null
+          preferencia_pago?: string | null
+          preferencia_pago_en?: string | null
           servicio_id: string
         }
         Update: {
@@ -111,6 +115,8 @@ export type Database = {
           hora_inicio?: string
           id?: string
           notas?: string | null
+          preferencia_pago?: string | null
+          preferencia_pago_en?: string | null
           servicio_id?: string
         }
         Relationships: [
@@ -126,6 +132,38 @@ export type Database = {
             columns: ["servicio_id"]
             isOneToOne: false
             referencedRelation: "servicios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      citas_tokens_pago: {
+        Row: {
+          cita_id: string
+          creado_en: string
+          id: string
+          revocado_en: string | null
+          token_hash: string
+        }
+        Insert: {
+          cita_id: string
+          creado_en?: string
+          id?: string
+          revocado_en?: string | null
+          token_hash: string
+        }
+        Update: {
+          cita_id?: string
+          creado_en?: string
+          id?: string
+          revocado_en?: string | null
+          token_hash?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "citas_tokens_pago_cita_id_fkey"
+            columns: ["cita_id"]
+            isOneToOne: false
+            referencedRelation: "citas"
             referencedColumns: ["id"]
           },
         ]
