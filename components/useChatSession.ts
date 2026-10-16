@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { CONTACTO_ESTUDIO } from '@/lib/chatbot/conocimiento'
 
 export type ChatMessage = {
@@ -13,17 +13,18 @@ export type ChatMessage = {
   esError?: boolean
 }
 
-const CLAVE_SESSION_ID = 'debo-chat-session-id'
+export const CLAVE_SESSION_ID = 'debo-chat-session-id'
 
 function generarId(): string {
   return crypto.randomUUID()
 }
 
 // El session_id se guarda en localStorage (no en memoria, como en
-// zorion-chat): si la clienta recarga la página o vuelve más tarde en la
-// misma pestaña, retoma la misma conversación en vez de empezar de cero.
-function obtenerSessionId(): string {
-  if (typeof window === 'undefined') return generarId() // SSR: se descarta, nunca se pinta
+// zorion-chat): si la clienta recarga la página o vuelve más tarde, el bot
+// retoma la misma conversación en vez de empezar de cero. Solo se crea cuando
+// la persona envía su primer mensaje (nunca al cargar la página: así lo
+// describe contenido-legal/cookies.md); si ya existía, se reutiliza.
+export function obtenerOCrearSessionId(): string {
   try {
     const guardado = window.localStorage.getItem(CLAVE_SESSION_ID)
     if (guardado) return guardado
@@ -42,7 +43,9 @@ const MENSAJE_ERROR_GENERICO =
   `${CONTACTO_ESTUDIO.telefono} · ${CONTACTO_ESTUDIO.email}.`
 
 export function useChatSession() {
-  const [sessionId] = useState(obtenerSessionId)
+  // Se rellena en el primer envío y se mantiene durante la vida del widget
+  // (también si el almacenamiento está bloqueado y el id solo vive en memoria).
+  const sessionIdRef = useRef<string | null>(null)
   const [mensajes, setMensajes] = useState<ChatMessage[]>([])
   const [cargando, setCargando] = useState(false)
 
@@ -50,6 +53,9 @@ export function useChatSession() {
     async (contenido: string) => {
       const texto = contenido.trim()
       if (!texto || cargando) return
+
+      sessionIdRef.current ??= obtenerOCrearSessionId()
+      const sessionId = sessionIdRef.current
 
       setMensajes((prev) => [...prev, { id: generarId(), rol: 'user', contenido: texto }])
       setCargando(true)
@@ -78,7 +84,7 @@ export function useChatSession() {
         setCargando(false)
       }
     },
-    [sessionId, cargando]
+    [cargando]
   )
 
   return { mensajes, cargando, enviarMensaje }
