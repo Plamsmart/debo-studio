@@ -154,9 +154,14 @@ export async function PATCH(
   const precio = cita.servicios?.precio ?? 0
   const nombreServicio = cita.servicios?.nombre || 'Servicio'
 
+  // Interruptor provisional: con PAGO_ONLINE_ACTIVO=false no se crea sesión de
+  // Stripe ni fila en `pagos`; la cita se confirma igual y el email dice que se
+  // paga en el estudio. Sin la variable (o con cualquier otro valor) = activado.
+  const pagoOnlineActivo = process.env.PAGO_ONLINE_ACTIVO !== 'false'
+
   // Con precio 0 (o sin precio) Stripe rechaza la sesión: se frena ANTES de
   // tocar nada, la cita sigue pendiente y el panel muestra el motivo.
-  if (emailCliente && (!Number.isFinite(precio) || precio <= 0)) {
+  if (pagoOnlineActivo && emailCliente && (!Number.isFinite(precio) || precio <= 0)) {
     return NextResponse.json(
       {
         error: `No se puede generar el link de pago: el servicio "${nombreServicio}" no tiene un precio mayor que 0 €. Corrige el precio en Servicios y vuelve a confirmar. La cita sigue pendiente.`,
@@ -173,7 +178,7 @@ export async function PATCH(
     : 'Cita confirmada, pero el cliente no tiene email para enviarle el link de pago.'
 
   let session: { id: string; url: string | null } | null = null
-  if (emailCliente) {
+  if (emailCliente && pagoOnlineActivo) {
     try {
       session = await stripe.checkout.sessions.create({
         mode: 'payment',
@@ -240,49 +245,56 @@ export async function PATCH(
     return respuestaSinFilas(supabase, id, 'confirmar')
   }
 
-  if (!session) {
+  if (!emailCliente) {
     return NextResponse.json({ cita: citaActualizada, aviso })
   }
 
-  // Guardamos el registro de pago en 'pendiente'. Usamos service_role porque
-  // la tabla `pagos` solo tiene policy de SELECT para admin — el insert real
-  // de pagos está pensado para pasar por procesos de servidor controlados
-  // (este endpoint, y el webhook de Stripe), nunca desde el navegador.
-  const supabaseService = createServiceClient()
-  const { error: errorPago } = await supabaseService.from('pagos').insert({
-    cita_id: citaActualizada.id,
-    stripe_session_id: session.id,
-    monto: precio,
-    estado: 'pendiente',
-    concepto: nombreServicio,
-    cliente_id: citaActualizada.cliente_id,
-    servicio_id: citaActualizada.servicio_id,
-  })
+  if (session) {
+    // Guardamos el registro de pago en 'pendiente'. Usamos service_role porque
+    // la tabla `pagos` solo tiene policy de SELECT para admin — el insert real
+    // de pagos está pensado para pasar por procesos de servidor controlados
+    // (este endpoint, y el webhook de Stripe), nunca desde el navegador.
+    const supabaseService = createServiceClient()
+    const { error: errorPago } = await supabaseService.from('pagos').insert({
+      cita_id: citaActualizada.id,
+      stripe_session_id: session.id,
+      monto: precio,
+      estado: 'pendiente',
+      concepto: nombreServicio,
+      cliente_id: citaActualizada.cliente_id,
+      servicio_id: citaActualizada.servicio_id,
+    })
 
-  if (errorPago) {
-    // No bloqueamos la respuesta: la cita ya está confirmada y el link existe.
-    // Si la clienta paga, el webhook crea la fila desde la metadata de la sesión.
-    console.error(
-      `Error guardando el registro de pago (sesión ${session.id}, cita ${citaActualizada.id}):`,
-      errorPago
-    )
+    if (errorPago) {
+      // No bloqueamos la respuesta: la cita ya está confirmada y el link existe.
+      // Si la clienta paga, el webhook crea la fila desde la metadata de la sesión.
+      console.error(
+        `Error guardando el registro de pago (sesión ${session.id}, cita ${citaActualizada.id}):`,
+        errorPago
+      )
+    }
   }
 
-  // Enviamos el email con el link de pago real
+  // Enviamos el email con el link de pago real (o, con el pago online
+  // desactivado, el aviso de que se paga en el estudio)
   const resend = getResend()
   if (resend) {
     try {
       const { error: errorResend } = await resend.emails.send({
         from: 'Estudio Débora Pereira <reservas@estudiodeborapereira.com>',
         to: emailCliente!,
-        subject: 'Tu cita fue confirmada ✨ — Completa tu pago',
+        subject: session ? 'Tu cita fue confirmada ✨ — Completa tu pago' : 'Tu cita fue confirmada ✨',
         html: `
           <h2>¡Tu cita quedó confirmada!</h2>
           <p><strong>Servicio:</strong> ${escaparHtml(nombreServicio)}</p>
           <p><strong>Fecha:</strong> ${escaparHtml(citaActualizada.fecha)}</p>
           <p><strong>Hora:</strong> ${escaparHtml(citaActualizada.hora_inicio)}</p>
-          <p>Para completar tu reserva, realiza el pago aquí:</p>
-          <p><a href="${session.url}" style="display:inline-block;padding:12px 20px;background:#b08d57;color:#fff;text-decoration:none;border-radius:8px;">Pagar ahora</a></p>
+          ${
+            session
+              ? `<p>Para completar tu reserva, realiza el pago aquí:</p>
+          <p><a href="${session.url}" style="display:inline-block;padding:12px 20px;background:#b08d57;color:#fff;text-decoration:none;border-radius:8px;">Pagar ahora</a></p>`
+              : '<p>El pago se realiza en el estudio el día de tu cita.</p>'
+          }
           ${pieLegalEmail()}
         `,
       })
@@ -324,5 +336,5 @@ export async function PATCH(
     // No bloqueamos la confirmación de la cita si esto falla
   }
 
-  return NextResponse.json({ cita: citaActualizada, linkPago: session.url })
+  return NextResponse.json(session ? { cita: citaActualizada, linkPago: session.url } : { cita: citaActualizada })
 }

@@ -177,6 +177,62 @@ function igual(a, b, msg) { if (a !== b) throw new Error(`${msg ?? 'no coincide'
     igual(state.stripe.creadas[0].metadata.cliente_id, 'cli1', 'metadata.cliente_id')
   })
 
+  // ===== Interruptor provisional PAGO_ONLINE_ACTIVO =====
+  async function conPagoOnline(valor, fn) {
+    const antes = process.env.PAGO_ONLINE_ACTIVO
+    if (valor === undefined) delete process.env.PAGO_ONLINE_ACTIVO
+    else process.env.PAGO_ONLINE_ACTIVO = valor
+    try { await fn() } finally {
+      if (antes === undefined) delete process.env.PAGO_ONLINE_ACTIVO
+      else process.env.PAGO_ONLINE_ACTIVO = antes
+    }
+  }
+
+  await test('PAGO_ONLINE_ACTIVO=false: confirma sin Stripe ni pagos; email sin botón y con el aviso del estudio', () =>
+    conPagoOnline('false', async () => {
+      const { db } = preparar()
+      const r = await patchCita('confirmar')
+      igual(r.status, 200, 'status')
+      igual(db.tablas.citas[0].estado, 'confirmada', 'estado')
+      igual(state.stripe.creadas.length, 0, 'sesiones'); igual(db.tablas.pagos.length, 0, 'pagos')
+      igual(r.body.linkPago, undefined, 'linkPago en la respuesta')
+      igual(state.emails.length, 1, 'emails'); igual(state.eventos.length, 1, 'eventos')
+      const { html, subject } = state.emails[0]
+      assert(html.includes('El pago se realiza en el estudio el día de tu cita.'), 'falta la frase del pago en el estudio')
+      assert(!html.includes('Pagar ahora') && !html.includes('stripe.test'), 'el email no debe llevar botón ni enlace de pago')
+      assert(!/Completa tu pago/.test(subject), `asunto: ${subject}`)
+    }))
+
+  await test('PAGO_ONLINE_ACTIVO=false: un servicio a 0 € se confirma (sin Stripe no hay 422)', () =>
+    conPagoOnline('false', async () => {
+      const { db } = preparar({ precio: 0 })
+      const r = await patchCita('confirmar')
+      igual(r.status, 200, 'status'); igual(db.tablas.citas[0].estado, 'confirmada', 'estado')
+      igual(state.stripe.creadas.length, 0, 'sesiones'); igual(db.tablas.pagos.length, 0, 'pagos')
+    }))
+
+  await test('PAGO_ONLINE_ACTIVO=false sin email: se confirma igual, sin email ni Stripe', () =>
+    conPagoOnline('false', async () => {
+      const { db } = preparar({ email: null })
+      const r = await patchCita('confirmar')
+      igual(r.status, 200, 'status'); igual(db.tablas.citas[0].estado, 'confirmada', 'estado')
+      igual(state.stripe.creadas.length, 0, 'sesiones'); igual(db.tablas.pagos.length, 0, 'pagos'); igual(state.emails.length, 0, 'emails')
+    }))
+
+  await test('PAGO_ONLINE_ACTIVO sin definir o "true": flujo normal con Stripe y botón de pago', async () => {
+    for (const valor of [undefined, 'true']) {
+      await conPagoOnline(valor, async () => {
+        const { db } = preparar()
+        const r = await patchCita('confirmar')
+        igual(r.status, 200, `status (${valor})`)
+        igual(state.stripe.creadas.length, 1, `sesiones (${valor})`); igual(db.tablas.pagos.length, 1, `pagos (${valor})`)
+        igual(r.body.linkPago, state.stripe.creadas[0].url, `linkPago (${valor})`)
+        assert(state.emails[0].html.includes('Pagar ahora'), `botón de pago (${valor})`)
+        assert(!state.emails[0].html.includes('El pago se realiza en el estudio'), `sin la frase del estudio (${valor})`)
+      })
+    }
+  })
+
   await test('doble confirmación secuencial: la 2ª da 409 y no crea nada más', async () => {
     const { db } = preparar()
     await patchCita('confirmar')
