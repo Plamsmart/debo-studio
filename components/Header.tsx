@@ -21,14 +21,15 @@ export default function Header() {
 
   return (
     <header className={`header ${solido ? 'header--solido' : ''}`}>
-      <div className="header__marca">
+      {/* Enlace a la home: desde las páginas legales es la vía de vuelta. */}
+      <Link href="/" className="header__marca">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/logo-horizontal.png" alt="Estudio Débora Pereira" />
-      </div>
+      </Link>
       <nav className="header__nav">
-        <a href="#servicios">Servicios</a>
-        <a href="#nosotras">Sobre nosotros</a>
-        <a href="#ubicacion">Ubicación</a>
+        <Link href="/#servicios">Servicios</Link>
+        <Link href="/#nosotras">Sobre nosotros</Link>
+        <Link href="/#ubicacion">Ubicación</Link>
       </nav>
       <Link href="/reservar" className="header__cta">
         Reservar cita

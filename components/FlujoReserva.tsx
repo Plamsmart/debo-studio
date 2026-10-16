@@ -14,11 +14,13 @@ type Servicio = Tables<'servicios'>
 
 type Props = {
   servicios: Servicio[]
+  // Aviso de privacidad (A) ya convertido a HTML desde contenido-legal/avisos-cortos.md
+  avisoPrivacidadHtml: string
 }
 
 type EstadoEnvio = 'idle' | 'enviando' | 'exito' | 'error'
 
-export default function FlujoReserva({ servicios }: Props) {
+export default function FlujoReserva({ servicios, avisoPrivacidadHtml }: Props) {
   const [servicioElegido, setServicioElegido] = useState<Servicio | null>(null)
   const [seleccion, setSeleccion] = useState<{ fecha: string; hora: string } | null>(null)
   const [estadoEnvio, setEstadoEnvio] = useState<EstadoEnvio>('idle')
@@ -113,7 +115,11 @@ export default function FlujoReserva({ servicios }: Props) {
           <p className="flujo-reserva__resumen-linea">
             <strong>{servicioElegido.nombre}</strong> — {seleccion.fecha} a las {seleccion.hora}
           </p>
-          <FormularioCliente onConfirmar={confirmarReserva} enviando={estadoEnvio === 'enviando'} />
+          <FormularioCliente
+            onConfirmar={confirmarReserva}
+            enviando={estadoEnvio === 'enviando'}
+            avisoPrivacidadHtml={avisoPrivacidadHtml}
+          />
           {estadoEnvio === 'error' && mensajeError && (
             <p className="flujo-reserva__error">{mensajeError}</p>
           )}

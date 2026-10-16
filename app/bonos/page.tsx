@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
+import PieLegal from '@/components/PieLegal'
 
 function formatearPrecio(precio: number): string {
   return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(precio)
@@ -20,72 +21,75 @@ export default async function BonosPage() {
   const formaciones = (items ?? []).filter((i) => i.categoria === 'Formaciones')
 
   return (
-    <main style={{ padding: '2rem', fontFamily: 'Montserrat, sans-serif', maxWidth: 640, margin: '0 auto' }}>
-      <h1 style={{ color: '#53565a' }}>Bonos y formaciones</h1>
-      <p style={{ color: '#8a8d90', marginBottom: '2rem' }}>
-        Estos servicios se contratan directamente con el estudio — contáctanos para más
-        información o para activarlos.
-      </p>
+    <>
+      <main style={{ padding: '2rem', fontFamily: 'Montserrat, sans-serif', maxWidth: 640, margin: '0 auto' }}>
+        <h1 style={{ color: '#53565a' }}>Bonos y formaciones</h1>
+        <p style={{ color: '#8a8d90', marginBottom: '2rem' }}>
+          Estos servicios se contratan directamente con el estudio — contáctanos para más
+          información o para activarlos.
+        </p>
 
-      <h2 style={{ color: '#53565a', fontSize: '1.2rem', marginBottom: '1rem' }}>
-        Bonos (paquetes de sesiones)
-      </h2>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', marginBottom: '2.5rem' }}>
-        {bonos.map((bono, i) => (
-          <div
-            key={i}
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: '1rem 1.2rem',
-              borderRadius: 12,
-              background: '#faf6f0',
-              border: '1px solid #f0e8dc',
-            }}
-          >
-            <div>
-              <div style={{ fontWeight: 600, color: '#53565a' }}>{bono.nombre}</div>
-              {bono.descripcion && (
-                <div style={{ fontSize: '0.85rem', color: '#8a8d90' }}>{bono.descripcion}</div>
-              )}
+        <h2 style={{ color: '#53565a', fontSize: '1.2rem', marginBottom: '1rem' }}>
+          Bonos (paquetes de sesiones)
+        </h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', marginBottom: '2.5rem' }}>
+          {bonos.map((bono, i) => (
+            <div
+              key={i}
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '1rem 1.2rem',
+                borderRadius: 12,
+                background: '#faf6f0',
+                border: '1px solid #f0e8dc',
+              }}
+            >
+              <div>
+                <div style={{ fontWeight: 600, color: '#53565a' }}>{bono.nombre}</div>
+                {bono.descripcion && (
+                  <div style={{ fontSize: '0.85rem', color: '#8a8d90' }}>{bono.descripcion}</div>
+                )}
+              </div>
+              <div style={{ fontWeight: 600, color: '#8f654d' }}>{formatearPrecio(bono.precio)}</div>
             </div>
-            <div style={{ fontWeight: 600, color: '#8f654d' }}>{formatearPrecio(bono.precio)}</div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
-      <h2 style={{ color: '#53565a', fontSize: '1.2rem', marginBottom: '1rem' }}>Formaciones</h2>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-        {formaciones.map((form, i) => (
-          <div
-            key={i}
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: '1rem 1.2rem',
-              borderRadius: 12,
-              background: '#faf6f0',
-              border: '1px solid #f0e8dc',
-            }}
-          >
-            <div>
-              <div style={{ fontWeight: 600, color: '#53565a' }}>{form.nombre}</div>
-              {form.descripcion && (
-                <div style={{ fontSize: '0.85rem', color: '#8a8d90' }}>{form.descripcion}</div>
-              )}
+        <h2 style={{ color: '#53565a', fontSize: '1.2rem', marginBottom: '1rem' }}>Formaciones</h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+          {formaciones.map((form, i) => (
+            <div
+              key={i}
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '1rem 1.2rem',
+                borderRadius: 12,
+                background: '#faf6f0',
+                border: '1px solid #f0e8dc',
+              }}
+            >
+              <div>
+                <div style={{ fontWeight: 600, color: '#53565a' }}>{form.nombre}</div>
+                {form.descripcion && (
+                  <div style={{ fontSize: '0.85rem', color: '#8a8d90' }}>{form.descripcion}</div>
+                )}
+              </div>
+              <div style={{ fontWeight: 600, color: '#8f654d' }}>{formatearPrecio(form.precio)}</div>
             </div>
-            <div style={{ fontWeight: 600, color: '#8f654d' }}>{formatearPrecio(form.precio)}</div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
-      <p style={{ marginTop: '2rem' }}>
-        <Link href="/reservar" style={{ color: '#8f654d' }}>
-          ← Volver a reservar una cita
-        </Link>
-      </p>
-    </main>
+        <p style={{ marginTop: '2rem' }}>
+          <Link href="/reservar" style={{ color: '#8f654d' }}>
+            ← Volver a reservar una cita
+          </Link>
+        </p>
+      </main>
+      <PieLegal />
+    </>
   )
 }

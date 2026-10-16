@@ -22,13 +22,13 @@ export default function NavMovil() {
 
       {abierto && (
         <div className="nav-movil__panel">
-          <Link href="#servicios" onClick={() => setAbierto(false)}>
+          <Link href="/#servicios" onClick={() => setAbierto(false)}>
             Servicios
           </Link>
-          <Link href="#nosotras" onClick={() => setAbierto(false)}>
+          <Link href="/#nosotras" onClick={() => setAbierto(false)}>
             Sobre nosotros
           </Link>
-          <Link href="#ubicacion" onClick={() => setAbierto(false)}>
+          <Link href="/#ubicacion" onClick={() => setAbierto(false)}>
             Ubicación
           </Link>
           <Link href="/reservar" className="nav-movil__cta" onClick={() => setAbierto(false)}>

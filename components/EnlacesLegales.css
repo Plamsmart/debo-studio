@@ -1,0 +1,50 @@
+.enlaces-legales {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem 1.4rem;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+}
+
+nav.enlaces-legales a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  /* Área táctil cómoda en móvil sin agrandar el texto. */
+  padding: 0.35rem 0;
+}
+
+nav.enlaces-legales a:hover {
+  color: var(--enlaces-legales-hover, var(--marca-bronce-oscuro));
+}
+
+/* Pie compacto de las páginas sin <Footer /> (reservar, bonos, pago-*) */
+.pie-legal {
+  margin-top: auto;
+  padding: 1.6rem 16px 1.8rem;
+  border-top: 1px solid var(--marca-crema-oscuro);
+  background: var(--marca-crema);
+  color: var(--marca-gris-suave);
+  text-align: center;
+  font-family: var(--font-body);
+}
+
+.pie-legal__copy {
+  margin: 0.5rem 0 0;
+  font-size: 0.78rem;
+}
+
+/* Dentro del <Footer /> oscuro de la home y las páginas legales */
+.footer__legal {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-top: 1.4rem;
+  color: var(--footer-texto-suave);
+  --enlaces-legales-hover: var(--footer-dorado);
+}
+
+.footer__legal + .footer__copy {
+  padding-top: 0.8rem;
+}

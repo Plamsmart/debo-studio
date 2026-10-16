@@ -3,6 +3,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { getResend } from '@/lib/resend'
 import { stripe, SITE_URL } from '@/lib/stripe'
 import { crearEventoCita, eliminarEventoCita } from '@/lib/google-calendar'
+import { pieLegalEmail } from '@/lib/legal'
 import { esChoquePorConstraint } from '@/lib/disponibilidad'
 import { escaparHtml } from '@/lib/html'
 
@@ -282,6 +283,7 @@ export async function PATCH(
           <p><strong>Hora:</strong> ${escaparHtml(citaActualizada.hora_inicio)}</p>
           <p>Para completar tu reserva, realiza el pago aquí:</p>
           <p><a href="${session.url}" style="display:inline-block;padding:12px 20px;background:#b08d57;color:#fff;text-decoration:none;border-radius:8px;">Pagar ahora</a></p>
+          ${pieLegalEmail()}
         `,
       })
       if (errorResend) {

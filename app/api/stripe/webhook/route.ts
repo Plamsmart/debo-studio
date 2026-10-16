@@ -3,6 +3,7 @@ import { stripe } from '@/lib/stripe'
 import { createServiceClient } from '@/lib/supabase/server'
 import { getResend } from '@/lib/resend'
 import { escaparHtml } from '@/lib/html'
+import { pieLegalEmail } from '@/lib/legal'
 import Stripe from 'stripe'
 
 type SupabaseService = ReturnType<typeof createServiceClient>
@@ -144,6 +145,7 @@ export async function POST(request: NextRequest) {
                     : ''
                 }
                 <p>Te esperamos en el estudio. ¡Gracias por tu reserva!</p>
+                ${pieLegalEmail()}
               `,
             })
             if (errorResend) {
@@ -189,6 +191,7 @@ export async function POST(request: NextRequest) {
                 }).format(pagoConCliente.monto)}</p>
                 <p><strong>Método de pago:</strong> Tarjeta (en el estudio)</p>
                 <p>Gracias por confiar en Estudio Débora Pereira.</p>
+                ${pieLegalEmail()}
               `,
             })
             if (errorResend) {

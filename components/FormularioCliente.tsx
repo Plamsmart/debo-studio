@@ -11,9 +11,10 @@ export type DatosCliente = {
 type Props = {
   onConfirmar: (datos: DatosCliente) => void
   enviando: boolean
+  avisoPrivacidadHtml: string
 }
 
-export default function FormularioCliente({ onConfirmar, enviando }: Props) {
+export default function FormularioCliente({ onConfirmar, enviando, avisoPrivacidadHtml }: Props) {
   const [nombre, setNombre] = useState('')
   const [email, setEmail] = useState('')
   const [telefono, setTelefono] = useState('')
@@ -78,6 +79,9 @@ export default function FormularioCliente({ onConfirmar, enviando }: Props) {
       <button type="submit" disabled={enviando} className="formulario-cliente__btn">
         {enviando ? 'Enviando solicitud…' : 'Solicitar cita'}
       </button>
+
+      {/* Primera capa de información (RGPD art. 13), debajo del botón. */}
+      <div className="formulario-cliente__aviso" dangerouslySetInnerHTML={{ __html: avisoPrivacidadHtml }} />
     </form>
   )
 }

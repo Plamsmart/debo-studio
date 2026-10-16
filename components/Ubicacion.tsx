@@ -1,3 +1,5 @@
+import MapaUbicacion from './MapaUbicacion'
+
 export default function Ubicacion() {
   return (
     <section className="ubicacion" id="ubicacion">
@@ -36,15 +38,7 @@ export default function Ubicacion() {
         </table>
       </div>
       <div className="ubicacion__mapa">
-        <iframe
-          src="https://www.google.com/maps?q=Eihera+Plaza+15+Irun+Gipuzkoa&output=embed"
-          width="100%"
-          height="100%"
-          style={{ border: 0 }}
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-          title="Ubicación de Estudio Débora Pereira en Irun"
-        />
+        <MapaUbicacion />
       </div>
     </section>
   )

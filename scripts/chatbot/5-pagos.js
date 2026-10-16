@@ -306,7 +306,8 @@ function igual(a, b, msg) { if (a !== b) throw new Error(`${msg ?? 'no coincide'
     db.tablas.clientes[0].nombre = '<a href="https://phish.test">Ana</a>'
     await webhook(completado({ id: 'cs_html', amount_total: 5000, metadata: { cita_id: 'cita1' } }))
     igual(state.emails.length, 1, 'emails')
-    assert(!state.emails[0].html.includes('<a href'), 'no debe quedar HTML sin escapar')
+    // (el pie legal trae su propio <a href> a /privacidad: se busca solo el inyectado)
+    assert(!state.emails[0].html.includes('<a href="https://phish.test"'), 'no debe quedar HTML sin escapar')
     assert(state.emails[0].html.includes('&lt;a href=&quot;'), 'texto escapado')
   })
 

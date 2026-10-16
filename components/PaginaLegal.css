@@ -1,0 +1,176 @@
+/* Páginas legales: lectura cómoda, móvil primero. Hereda fondo, color y
+   tipografía de .pagina-inicio (home.css) y el header/footer de la home. */
+.pagina-legal {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.pagina-legal__main {
+  flex: 1;
+  /* El header es fixed: logo de 80px + 1.7rem de padding arriba y abajo. */
+  padding: calc(80px + 3.4rem + 1.5rem) 16px 4rem;
+}
+
+.pagina-legal__contenido {
+  max-width: 760px;
+  margin: 0 auto;
+  font-size: 0.97rem;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.pagina-legal__contenido h1 {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 6vw, 2.6rem);
+  font-weight: 500;
+  line-height: 1.2;
+  margin: 0 0 0.6rem;
+}
+
+/* "Última actualización", justo debajo del título */
+.pagina-legal__contenido h1 + p {
+  color: var(--marca-gris-suave);
+  font-size: 0.85rem;
+  margin: 0 0 2.2rem;
+}
+
+.pagina-legal__contenido h2 {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--marca-bronce-oscuro);
+  margin: 2.6rem 0 0.8rem;
+  scroll-margin-top: 140px;
+}
+
+.pagina-legal__contenido h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 1.8rem 0 0.6rem;
+}
+
+.pagina-legal__contenido p,
+.pagina-legal__contenido ul {
+  margin: 0 0 1rem;
+}
+
+.pagina-legal__contenido ul {
+  padding-left: 1.2rem;
+  list-style: disc;
+}
+
+.pagina-legal__contenido li {
+  margin-bottom: 0.4rem;
+}
+
+.pagina-legal__contenido li::marker {
+  color: var(--marca-bronce);
+}
+
+.pagina-legal__contenido strong {
+  font-weight: 600;
+}
+
+.pagina-legal .pagina-legal__contenido a {
+  color: var(--marca-bronce-oscuro);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.pagina-legal .pagina-legal__contenido a:hover {
+  color: var(--marca-bronce);
+}
+
+.pagina-legal__contenido code {
+  font-size: 0.88em;
+  background: var(--marca-crema-oscuro);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+
+/* Tabla (cookies). En móvil cada fila es una tarjeta con el nombre de la
+   columna delante de cada dato (data-label); desde 700px, tabla normal. */
+.tabla-legal {
+  margin: 1.2rem 0 1.6rem;
+}
+
+.tabla-legal table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.tabla-legal thead {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.tabla-legal tr {
+  display: block;
+  background: #fff;
+  border: 1px solid var(--marca-crema-oscuro);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  margin-bottom: 0.8rem;
+}
+
+.tabla-legal td {
+  display: block;
+  padding: 0.2rem 0;
+}
+
+.tabla-legal td::before {
+  content: attr(data-label);
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--marca-gris-suave);
+}
+
+@media (min-width: 700px) {
+  .tabla-legal thead {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+
+  .tabla-legal thead tr,
+  .tabla-legal tr {
+    display: table-row;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .tabla-legal th,
+  .tabla-legal td {
+    display: table-cell;
+    text-align: left;
+    vertical-align: top;
+    padding: 0.7rem 0.8rem 0.7rem 0;
+    border-bottom: 1px solid var(--marca-crema-oscuro);
+  }
+
+  .tabla-legal th {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--marca-gris-suave);
+  }
+
+  .tabla-legal td::before {
+    content: none;
+  }
+}

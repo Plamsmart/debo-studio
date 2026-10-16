@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import FlujoReserva from "@/components/FlujoReserva";
+import PieLegal from "@/components/PieLegal";
+import { avisoCortoHtml } from "@/lib/legal";
 
 export default async function ReservarPage() {
   const supabase = await createClient();
@@ -14,17 +16,26 @@ export default async function ReservarPage() {
 
   if (error) {
     return (
-      <main style={{ padding: "2rem" }}>
-        <h1>Reserva tu cita</h1>
-        <p>No se pudieron cargar los servicios en este momento.</p>
-      </main>
+      <>
+        <main style={{ padding: "2rem" }}>
+          <h1>Reserva tu cita</h1>
+          <p>No se pudieron cargar los servicios en este momento.</p>
+        </main>
+        <PieLegal />
+      </>
     );
   }
 
   return (
-    <main style={{ padding: "2rem" }}>
-      <h1>Reserva tu cita</h1>
-      <FlujoReserva servicios={servicios ?? []} />
-    </main>
+    <>
+      <main style={{ padding: "2rem" }}>
+        <h1>Reserva tu cita</h1>
+        <FlujoReserva
+          servicios={servicios ?? []}
+          avisoPrivacidadHtml={avisoCortoHtml("A", { nuevaPestana: true })}
+        />
+      </main>
+      <PieLegal />
+    </>
   );
 }

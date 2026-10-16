@@ -150,6 +150,34 @@
 }
 
 /* ===== Mensajes ===== */
+.chat-widget__aviso {
+  flex-shrink: 0;
+  /* Si el panel es muy bajo (móvil en horizontal), el aviso hace scroll propio
+     en vez de comerse el espacio de los mensajes. */
+  max-height: 34%;
+  overflow-y: auto;
+  padding: 0.6rem 1rem;
+  background: #fff;
+  border-bottom: 1px solid var(--marca-crema-oscuro);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--marca-gris);
+}
+
+.chat-widget__aviso p {
+  margin: 0;
+}
+
+.chat-widget__aviso strong {
+  font-weight: 600;
+}
+
+.chat-widget__aviso a {
+  color: var(--marca-bronce-oscuro);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .chat-widget__mensajes {
   flex: 1;
   overflow-y: auto;

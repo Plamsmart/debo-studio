@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Montserrat } from "next/font/google";
 import ChatWidgetGate from "@/components/ChatWidgetGate";
+import { avisoCortoHtml } from "@/lib/legal";
 import "./globals.css";
 import "./marca-tokens.css";
 
@@ -34,7 +35,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         {children}
-        <ChatWidgetGate />
+        <ChatWidgetGate avisoHtml={avisoCortoHtml("B", { nuevaPestana: true })} />
       </body>
     </html>
   );

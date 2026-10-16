@@ -28,7 +28,7 @@ function formatearTexto(texto: string): string {
   return conEnlaces.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
 }
 
-export default function ChatWidget() {
+export default function ChatWidget({ avisoHtml }: { avisoHtml: string }) {
   const [abierto, setAbierto] = useState(false)
   const [texto, setTexto] = useState('')
   const { mensajes, cargando, enviarMensaje } = useChatSession()
@@ -63,6 +63,10 @@ export default function ChatWidget() {
               </svg>
             </button>
           </header>
+
+          {/* Aviso fijo (avisos-cortos.md, B): visible al abrir, antes de escribir y
+              durante toda la conversación, sin tapar el campo de texto. */}
+          <div className="chat-widget__aviso" dangerouslySetInnerHTML={{ __html: avisoHtml }} />
 
           <div ref={mensajesRef} className="chat-widget__mensajes">
             {mensajes.length === 0 && (

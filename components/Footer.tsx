@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { IconInstagram, IconMail, IconPhone } from '@/components/IconosFooter'
+import EnlacesLegales from '@/components/EnlacesLegales'
 
 export default function Footer() {
   return (
@@ -17,9 +18,9 @@ export default function Footer() {
 
         <div className="footer__columna">
           <h4 className="footer__titulo-columna">Navegación</h4>
-          <a href="#servicios">Servicios</a>
-          <a href="#nosotras">Sobre nosotros</a>
-          <a href="#ubicacion">Ubicación</a>
+          <Link href="/#servicios">Servicios</Link>
+          <Link href="/#nosotras">Sobre nosotros</Link>
+          <Link href="/#ubicacion">Ubicación</Link>
           <Link href="/reservar">Reservar cita</Link>
         </div>
 
@@ -45,6 +46,10 @@ export default function Footer() {
       </div>
 
       <div className="footer__linea" />
+
+      <div className="footer__legal">
+        <EnlacesLegales />
+      </div>
 
       <p className="footer__copy">© {new Date().getFullYear()} Estudio Débora Pereira</p>
     </footer>

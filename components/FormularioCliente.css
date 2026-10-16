@@ -55,3 +55,25 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+.formulario-cliente__aviso {
+  margin-top: 0.9rem;
+  font-size: 0.75rem;
+  line-height: 1.55;
+  color: var(--marca-gris-suave);
+}
+
+.formulario-cliente__aviso p {
+  margin: 0;
+}
+
+.formulario-cliente__aviso strong {
+  font-weight: 600;
+  color: var(--marca-gris);
+}
+
+.formulario-cliente__aviso a {
+  color: var(--marca-bronce-oscuro);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

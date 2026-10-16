@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { getResend } from '@/lib/resend'
 import { escaparHtml } from '@/lib/html'
+import { pieLegalEmail } from '@/lib/legal'
 import { HORARIO_NEGOCIO } from '@/lib/horario-negocio'
 import { esMetodoCobroManual, type MetodoCobroManual } from '@/lib/metodos-pago'
 
@@ -159,6 +160,7 @@ export async function registrarCobroManual(request: NextRequest, metodoFijo?: Me
             <p><strong>Método de pago:</strong> ${ETIQUETA_RECIBO[metodo]}</p>
             <p><strong>Fecha:</strong> ${formatearFechaHoraRecibo(new Date())}</p>
             <p>Gracias por confiar en Estudio Débora Pereira.</p>
+            ${pieLegalEmail()}
           `,
         })
         if (errorResend) {

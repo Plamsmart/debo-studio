@@ -13,6 +13,11 @@ require.extensions['.tsx'] = require.extensions['.ts'] = (m, filename) => {
   m._compile(out, filename)
 }
 
+// Los .md (contenido-legal/) se importan como texto, igual que la regla raw de next.config.ts
+require.extensions['.md'] = (m, filename) => {
+  m.exports = { __esModule: true, default: fs.readFileSync(filename, 'utf8') }
+}
+
 // Mocks de módulos con efectos externos
 const mocks = {
   '@/lib/supabase/server': () => require(path.join(__dirname, 'fake-supabase.js')),
